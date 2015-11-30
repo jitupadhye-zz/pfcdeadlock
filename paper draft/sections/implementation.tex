@@ -1,0 +1,222 @@
+%\vspace{-0.1in}
+\section{Implementation and Experiments}\label{sec:implementation}
+%\vspace{-0.1in}
+We have implemented \sys on both Windows and Linux platforms, and deployed it on a 54-server Fattree testbed with commodity switches for experiments. This paper describes the implementation on Windows. In what follows, we first introduce path ID resolution ($\S$\ref{subsec:resolution}) and failure handling ($\S$\ref{subsec:failure}). Then, we present testbed setup and basic \sys experiments ($\S$\ref{subsec:testbed}).
+
+%\vspace{-0.1in}
+\subsection{Path ID resolution}\label{subsec:resolution}
+%\vspace{-0.1in}
+As introduced in $\S$\ref{subsec:overview}, path ID resolution addresses how to resolve the path IDs (i.e., routing IPs) for a destination. To achieve fault-tolerant path ID resolution, there are two issues to consider. First, how to distribute the path IDs of a destination to the source. The live paths to the destination may change, for example, due to link failures. Second, how to choose the path for a destination, and enforce such path selection in existing networks.
+
+These two issues look similar to the name resolution in existing DNS. In practice, it is possible to return multiple IPs for a server, and balance the load by returning different IPs to the queries. However, integrating the path ID resolution of \sys into existing DNS may challenge the usage of IPs, as legacy applications (on socket communication) may use IPs to differentiate the servers instead of routing to them. Thus, in this paper, we develop a clean-slate \sys implementation on the \sys manager and end servers. Each server has its original name and IP address, and the routing IPs for path IDs are not related to DNS.
+
+To enable path ID resolution, we implemented a \sys software module on the end server, and a module on the \sys manager. The end server \sys software queries the \sys manager to obtain the updated path IDs for a destination. The \sys manager returns the path IDs by indexing the IP-to-ID mapping table. From the path IDs in the query response, the source selects one for the current flow, and caches all (with a timeout) for subsequent communications.
+
+To maintain the connectivity to legacy TCP/IP stacks, we design an IP-in-IP tunnel based implementation. The \sys software encapsulates the original IP packets within an IP tunnel: the path ID is used for the tunnel IP header and the original IP header is the inner one. After the tunnel packets are decapsulated, the inner IP packets are delivered to destinations so that multi-path routing by \sys is transparent to applications. Since path IDs in Fattree end at the last hop ToR, the decapsulation is performed there. The \sys software may switch tunnel IP header to change the paths in case of failures, while for applications the connection is not affected. Such IP-in-IP encapsulation also eases VM migration as VM can keep the original IP during migration.
+
+%In our current design, such IP-in-IP encapsulation eases VM migration because VM is able to migrate to anywhere while keeping the original IP. In addition, we note that if VXLAN~\cite{vxlan} or NVGRE~\cite{nvgre} are presented, we need three IP headers which looks awkward. But in the future, we may consider to apply address translation to outer IP to implement \sys or put have a more efficient and consolidated packet format for the three.
+
+We note that if VXLAN~\cite{vxlan} or NVGRE~\cite{nvgre} is introduced for tenant network virtualization, \sys IP header needs to be the outer IP header and we will need 3 IP headers which looks awkward. In the future, we may consider more efficient and consolidated packet format. For example, we may put path ID in the outer NVGRE IP header and the physical IP in NVGRE GRE Key field. Once the packet reaches the destination, the host OS then switches the physical IP and path ID.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.45\textwidth]{figs/stack}
+%\vspace{-0.1in}
+\caption{The software stacks of \sys on servers.}
+\label{fig:serverstack}
+\vspace{-0.2in}
+\end{figure}
+
+In our implementation, the \sys software on end servers consists of two parts: a Windows Network Driver Interface Specification (NDIS) filter driver in kernel space and a \sys daemon in user space. The software stacks of \sys are shown in Fig.~\ref{fig:serverstack}. The \sys filter driver is between the TCP/IP and the Network Interface Card (NIC) driver. We use the Windows filter driver to parse the incoming/outgoing packets, and to intercept the packets that \sys is interested in. The \sys user mode daemon is responsible for path selection and packet header modification. \kai{The function of the \sys filter driver is relatively fixed, while the algorithm module in the user space daemon simplifies debugging and future extensions.}
+
+In Fig.~\ref{fig:serverstack}, we observe that the packets are transferred between the kernel and user space, which may degrade the performance. \kai{Therefore, we allocate a shared memory pool by the \sys driver. With this pool, the packets are not copied and both the driver and the daemon operate on the same shared buffer. We tested our \sys implementation (with tunnel) and did not observe any visible impact on TCP throughput at Gigabit line rate.}
+
+%\vspace{-0.1in}
+\subsection{Failure handling}\label{subsec:failure}
+%\vspace{-0.1in}
+As introduced in $\S$\ref{subsec:overview}, when a link fails, the devices on the failed link will notify the \sys manager. In our implementation, the communication channel for such notification is out-of-band. Such out-of-band control network and the controller are available in existing production DCNs~\cite{netpilot}.
+
+%For example, NetPilot~\cite{netpilot} has a controller to mitigate the impact of failures in DCNs.
+
+
+The path IDs for a destination server are distributed using a query-response based model. After the \sys manager obtains the updated link status, it may remove the affected paths or add the recovered paths, and respond to any later query with the updated paths.
+
+%However, the performance of the connections on the failed link may be affected until a new path ID resolution request followed by the expire of current path cache at end servers.
+
+%Fortunately, \sys provides the feasibility of controlling per packet routing path to end servers, which can be leveraged for failure handing. For example, by leveraging explicit path control, we may maintain a connection on multiple paths to handle link failures, but be transparent to legacy TCP/IP applications.
+
+\kai{For proof-of-concept experiments, we implemented a failure detection method with TCP connections on the servers.} In our \sys daemon, we check the TCP sequence numbers and switch the path ID once we detect that the TCP has retransmitted a data packet after a TCP timeout. The motivation is that the TCP connection is experiencing bad performance on the current path (either failed or seriously congested) and the \sys driver has other alternative paths ready for use. \kai{We note that this TCP based approach is sub-optimal and there are faster failure detection mechanisms such as BFD~\cite{bfd} or F10~\cite{f10} that can detect failures in 30$\mu$s, which \sys can leverage to perform fast rerouting (combining \sys with these advanced failure detection schemes is our future work). A key benefit of \sys is that it does not require route re-convergence and is loop-free during failure handling. This is because \sys pre-installs the backup paths and there is no need to do table re-computation unless all backup paths are down.}
+
+
+%Note that our fast-detection with TCP timeout (by default, 300ms for Windows and 200ms for Linux) is implemented only to demonstrate the benefits of explicit path control on link failures. We note that there are faster failure detection mechanisms such as BFP or F10~\cite{f10} that can detect failures with 30$\mu$s (which we do not implement in our testbed), and \sys can be combined with them to perform fast rerouting for failures while maintaining transparency for applications. The key is that \sys does not require route re-convergence and is loop-free during failure recovery. This is because \sys pre-installs the backup paths and there is no need to do table re-computation except in exceptional cases where all backup paths are down.
+
+
+%\vspace{-0.2in}
+\subsection{Testbed setup and basic experiments}\label{subsec:testbed}
+%\vspace{-0.1in}
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=0.45\textwidth]{figs/testbed-topo}
+%\vspace{-0.15in}
+%\caption{The Fattree(6) testbed with 54 servers we implemented. Each ToR switch connects 3 servers (not drawn).} \label{fig:fattree}
+%\vspace{-0.15in}
+%\end{figure}
+
+\begin{figure}[t]
+\centering
+%\vspace{-0.1in}
+\includegraphics[width=0.45\textwidth]{figs/testbed-topo}
+\vspace{-0.1in}
+\caption{Fattree(6) testbed with 54 servers. Each ToR switch connects 3 servers (not drawn).}\label{fig:fattree}
+\vspace{-0.1in}
+\end{figure}
+
+\parab{Testbed setup:} We built a testbed with $54$ servers connected by a Fattree(6) network (as shown in Fig.~\ref{fig:fattree}) using commodity Pronto Broadcom 48-port Gigabit Ethernet switches. On the testbed, there are 18 ToR, 18 Agg, and 9 Core switches. Each switch has 6 GigE ports. We achieve these 45 virtual 6-port GigE switches by partitioning the physical switches. Each ToR connects 3 servers; and the OS of each server is Windows Server 2008 R2 Enterprise 64-bit version. We deployed \sys on this testbed for experimentation.
+
+%\begin{figure*}[ht]
+%\centering
+%\subfloat[short for lof][Fattree(6) testbed with 54 servers. Each ToR switch connects 3 servers (not drawn).] {
+%    \includegraphics[width=0.32\textwidth] {figs/testbed-topo}
+%    \label{fig:fattree}
+%}
+%\vspace{-0.17in}\hfill
+%\subfloat[short for lof][TCP goodput of three connections versus time on three phases: no failure, in failure, and recovered.] {
+%    \includegraphics[width=0.29\textwidth]{figs/goodput}
+%    \label{fig:eval-tcpvstime}
+%}\hfill
+%\subfloat[short for lof][\sys vs OpenFlow as packet/flow increases.]{
+%    \includegraphics[width=0.34\textwidth]{figs/openflow.eps}
+%    \label{fig:openflow}
+%}
+%\caption[Optional caption for list of figures]{Testbed topology and experiment results.}
+%\label{fig:rox-implementation}
+%\vspace{-0.25in}
+%\end{figure*}
+
+
+
+
+\begin{figure}[!t]
+\centering
+%\vspace{-0.1in}
+\includegraphics[width=0.45\textwidth]{figs/latency.eps}
+\vspace{-0.1in}
+\caption{The CDF of path ID resolution time.} \label{fig:eval.latency}
+\vspace{-0.15in}
+\end{figure}
+
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.45\textwidth]{figs/goodput}
+\caption{TCP goodput of three connections versus time on three phases: no failure, in failure, and recovered.}
+\label{fig:eval-tcpvstime}
+\vspace{-0.25in}
+\end{figure}
+
+%\begin{figure}[t]
+%\centering
+%\includegraphics[width=0.5\textwidth]{figs/openflow.eps}
+%\caption{\sys vs OpenFlow as packet/flow increases.}
+%\label{fig:openflow}
+%\vspace{-0.15in}
+%\end{figure}
+
+
+%\begin{figure*}[t]
+%\centering
+%\begin{minipage}[t]{.31\textwidth}
+%  \centering
+%  \includegraphics[width=1.05\textwidth] {figs/testbed-topo}
+%  \vspace{-0.25in}
+%  \captionof{figure}{Fattree(6) testbed with 54 servers. Each ToR switch connects 3 servers (not drawn).}
+%  \label{fig:fattree}
+%\end{minipage}%
+%\hfill
+%\begin{minipage}[t]{.29\textwidth}
+%  \centering
+%  \includegraphics[width=\linewidth]{figs/goodput}
+%  \vspace{-0.25in}
+%  \captionof{figure}{TCP goodput of 3 connections versus time: no failure, in failure, and recovered.}
+%  \label{fig:eval-tcpvstime}
+%\end{minipage}%
+%\hfill
+%\begin{minipage}[t]{.35\textwidth}
+%  \centering
+%  \includegraphics[width=\linewidth]{figs/openflow.eps}
+%  \vspace{-0.25in}
+%  \captionof{figure}{\sys vs OpenFlow as packet/flow increases.}
+%  \label{fig:openflow}
+%\end{minipage}%
+%\vspace{-0.25in}
+%\end{figure*}
+
+%\begin{figure}[t]
+%\centering
+%\vspace{-0.2in}
+%\includegraphics[width=0.4\textwidth]{figs/goodput}
+%\vspace{-0.15in}
+%\caption{TCP goodput of three connections versus time on three phases: no failure, in failure, and recovered.}\label{fig:eval-tcpvstime}
+%\vspace{-0.25in}
+%\end{figure}
+
+\parab{IP table configuration:} On our testbed, we consider $2754$ explicit paths between ToRs ($25758$ paths between end hosts). After running the two-step compression algorithm, the number of routing entries for the switch IP tables are as follows, ToR: $31$$\sim$$33$, Agg: $48$, and Core: $6$. Note that the Fattree topology is symmetric, the numbers of routing entries after our heuristic are almost the same for the switches at the same layer, which confirms our hypothesis in $\S$\ref{subsubsec:encoding} that equivalent nodes are likely to have similar numbers of entries.
+
+\parab{Path ID resolution time:}
+We measure the path ID resolution time at the \sys daemon on end servers: from the time when the query message is generated to the time the response from the \sys manager is received. We repeat the experiment $4000$ times and depict the CDF in Fig.~\ref{fig:eval.latency}. We observe that the $99$-th percentile latency is $4$ms.  The path ID resolution is performed for the first packet to a destination server that is not found in the cache, or cache timeout. A further optimization is to perform path ID resolution in parallel with DNS queries.
+
+%As a comparison, we also measure the rule installation time of OpenFlow with three pronto-3295 switches using POX as the controller, and it takes about $9.5734$ms to install a new rule (the amount of time from the point when a new packet arrives at the switch to the time when a corresponding rule is effectively working).
+
+%\subsection{Basic \sys Experiments}\label{subsec:exp}
+
+%\parab{Fast rerouting and loop-free:} In this experiment, we show that \sys leverages explicit control over multi-paths to quickly reroute away from the failed link. We establish one TCP connection from a server under ToR T1 to another server under ToR T3. We use switch shell to obtain the connection that is using the link from ToR T1 to Agg A1. We then disconnect this link to emulate the case of a link failure. The link failure causes all the packets of the connection to be dropped at T1. We assume this failure can be detected within 1ms as there exists even faster failure detection with 30$\mu$s~\cite{f10}.
+
+%We do not implement this failure detection in our testbed because our focus is on how \sys quickly changes the path to recover after failure is detected.
+
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=0.4\textwidth]{figs/Failure}
+%\vspace{-0.15in}
+%\caption{\sys handles failure quickly without loop.}
+%\vspace{-0.15in}
+%\label{fig:failure}
+%\end{figure}
+
+%In Fig.~\ref{fig:failure}, we observe that \sys quickly switches the path ID to avoid the failed link, and resumes the TCP connection which is transparent to TCP/IP and applications. We note that this rerouting is instantaneous because \sys does not need route re-convergence as the paths are pre-installed in the IP tables. As a comparison, it is known that dynamic protocols like OSPF requires much longer for convergence especially on large networks. Furthermore, we frequently switched the path IDs and never encountered any problem of routing loop because by design \sys is loop-free.
+
+%\subsubsection{Fast convergence and loop-free}\label{sssub:failure}
+%
+%In this experiment, we show that \sys leverages explicit path control over multi-paths to avoid the failed link. We establish one TCP connection from a server under ToR T1 to another server under ToR T4. We use switch shell to obtain the connection that is using the link from ToR T1 to Agg A1. We then disconnect this link to emulate the case of a link failure. The link failure causes all the packets of the connection to be dropped at T1.
+%
+%\begin{figure}[t]
+%\centering
+%\includegraphics[width=\linewidth]{figs/tcpseq.eps}
+%%\vspace{-0.35in}
+%\caption{Recovery of a TCP connection on Gigabit Ethernet after a 300ms TCP timeout (RTO$_{min}$) on link failure.\TODO{to change}} \label{fig:eval.tcpseq}
+%%\vspace{-0.1in}
+%\end{figure}
+%
+%We capture the TCP sequence numbers using a packet sniffer and show the results in Fig.~\ref{fig:eval.tcpseq}. We observe that the \sys software quickly switches the path to route away from the failed link after it detects a TCP retransmission, and thus after a TCP timeout it successfully resumes the TCP connection which is transparent to TCP/IP and applications. By default, the TCP timeout value in Windows (RTO$_{min}$) is 300ms, and that is why we see a 300ms downtime in Fig.~\ref{fig:eval.tcpseq}. However, \sys can support any fast TCP retransmission at $\mu$s level.
+
+\parab{\sys routing with and without failure:} In this experiment, we show basic routing of \sys, with and without link failures. We establish $90$ TCP connections from the $3$ servers under ToR T1 to the $45$ servers under ToRs T4 to T18. Each source server initiates 30 TCP connections in parallel, and each destination server hosts two TCP connections. The total link capacity from T1 is 3$\times$1G=3G, shared by 90 TCP connections.
+
+Given the 90 TCP connections randomly share 3 up links from T1, the load should be balanced overall. At around 40 seconds, we disconnect one link (T1 to A1). We use TCP sequence based method developed in $\S$\ref{subsec:failure} for automatic failure detection and recovery in this experiment. We then resume the link at time around 80 seconds to check whether the load is still balanced. We log the goodput (observed by the application) and show the results for three connections versus time in Fig.~\ref{fig:eval-tcpvstime}. Since we find that the throughput of all 90 TCP connections are very similar, we just show the throughput of one TCP connection for each source server.
+
+We observe that all the TCP connections can share the links fairly with and without failure. When the link fails, the TCP connections traversing the failed link (T1 to A1) quickly migrate to the healthy links (T1 to A2 and A3). When the failed link recovers, it can be reused on a new path ID resolution after the timeout of the local cache. In our experiment, we set the cache timeout value as 1 second. However, one can change this parameter to achieve satisfactory recovery time for resumed links. We also run experiments for other traffic patterns, e.g., ToR-to-ToR and All-to-ToR, and link failures at different locations, and find that \sys works as expected in all cases.
+
+%\subsection{\sys vs OpenFlow}\label{subsec:openflow}
+%In this experiment, we compare \sys with OpenFlow in terms of supporting a large number of flows. For the experiment setting, we continuously send out 40KB-size TCP flows from a source to a destination with 3 switches on the path. We vary destination TCP ports to emulate different flows.
+%
+%We measured the average RTTs with the number of packets/flows in Fig.~\ref{fig:openflow}. We can see an abrupt increase when the flow count hits 1K ($\sim$30K packets), while \sys maintains persistent low latency. We note that our OpenFlow switch has 2K hardware forwarding entries, when the hardware flow table is full, the new flows will be automatically installed in the software forwarding table, which is much slower~\cite{softtable}. Thus, when the flow count increases to over 1K (about 2K rules installed), the hardware flow table becomes full. After that, any subsequent new flows will enter the software flow table, which significantly inflates the forwarding delay of the message.
+%
+%We also implemented rule replacement algorithm in which we let new flows replace the old ones in the hardware table when it is full, and we observed bad performance as well. Specifically, we measure the rule installation time of OpenFlow with 3 switches on the path using POX as the controller. We find it takes over $9.6$ms to replace an old rule with a new rule, \ie, the time from a new packet arrives at the switch until a new rule is effectively working. In contrast, \sys is not restricted by table size and its path ID resolution time is relatively small---4ms at 99th percentile as measured in $\S$\ref{subsec:testbed}.
+%
+%In addition, OpenFlow has relatively more communication overhead than \sys. To set up a flow on an $N$-switch path, OpenFlow requires $O(N)$ control packets for flow entry installation, whereas \sys only requires $O(1)$ control packet for path ID resolution.
+
+
+
+
+
+
+
+

@@ -1,0 +1,319 @@
+\section{Evaluation}\label{sec:evaluation}
+
+The goals of evaluation are to: 1) evaluate \sys on various large DCN topologies to demonstrate its scalability, 2) incorporate \sys into applications to demonstrate its utility, and 3) compare \sys with OpenFlow in flow routing to demonstrate its efficiency.
+
+\textbf{The main summaries of results} are as follows:
+
+\begin{icompact}
+
+\item \emph{\sys is highly scalable.} \sys can effectively compress tens of billions of paths to tens of thousands of routing entries for large DCNs. For example, for Fattree(64), we compress from 4 billion paths to 64K entries; for HyperX(4,16,100), we compress from 17 billion paths to 36K entries. With such impressive performance, \sys can easily express and pre-install all desired paths into IP tables with 128K entries, while still reserving space for accommodating more paths in the future.
+
+\item \emph{\sys benefits a variety of applications.}  We incorporate \sys into several representative applications for routing and demonstrate its utility. For bandwidth-guarantee, we show that \sys's explicit path control makes end-to-end bandwidth provisioning easier to implement. For partition-aggregation application, we show that \sys can express 1-to-$n$ or $n$-to-1 patterns and can be leveraged to give search query high priority for service differentiation. For map-reduce, we show that \sys can express $m$-to-$n$ pattern and the path IDs can used to identify disjoint parallel paths that speedup the many-to-many data shuffle and avoid collision of ECMP.
+
+\item \emph{\sys enables efficient flow routing.} We show that OpenFlow significantly inflates the forwarding delay of the packets when the flow table is full, while \sys maintains persistent low latency in case of a large number of flows.
+
+
+\end{icompact}
+
+
+\subsection{Evaluation Methodology}
+
+\begin{table}[t]
+\centering
+\scalebox{0.8}{
+\begin{tabular}{|c|r|r|r|r|}
+%\begin{center}
+\hline
+DCNs &  Nodes $\#$ & Links $\#$  & \multicolumn{1}{c|}{\tabincell{c}{\textbf{Original} \\ \textbf{paths$\#$}}}  & \tabincell{c}{\textbf{Max.} \\ \textbf{entries$\#$}}  \\
+\hline
+\hline
+ Fattree($4$)  &  36   &    48  &   \textbf{224}   &  \textbf{14}  \\
+ Fattree($8$)  &  208        &    384  &  \textbf{15,872} &    \textbf{116}     \\
+ Fattree($16$) &   1,344    &     3,072     &   \textbf{1,040,384}   & \textbf{968}       \\
+ Fattree($32$) &  9,472   &     24,576     &  \textbf{66,977,792}     &  \textbf{7,952}     \\
+ Fattree($64$) &  70,656   &  196,608    & \textbf{4,292,870,144}      &  \textbf{64,544}  \\
+\hline
+ BCube($4,1$)  &    24   &  32   &   \textbf{480}           &      \textbf{9 }      \\
+ BCube($4,2$)  &   112  &    192    &   \textbf{12,096}      &    \textbf{108}    \\
+ BCube($8,2$)  &   704   &   1,536   & \textbf{784,896}  &     \textbf{522}    \\
+ BCube($8,3$)  &   6,144  &   16,384   &    \textbf{67,092,480} &     \textbf{4,989}  \\
+ BCube($8,4$)  &   53,248   &  163,840  &  \textbf{5,368,545,280} &     \textbf{47,731} \\
+\hline
+ VL2($10,4,20$) &  219              & 240         &    \textbf{900}   &    \textbf{30}    \\
+ VL2($20,8,40$) &  1,658            & 1,760       & \textbf{31,200}  &    \textbf{310}   \\
+ VL2($40,16,60$)&  9,796            & 10,240      &  \textbf{1,017,600}  &  \textbf{2,820}  \\
+ VL2($80,64,80$)&    103,784        & 107,520      &  \textbf{130,969,600}  &   \textbf{49,640} \\
+ VL2($100,96,100$)&   242,546        & 249,600      &  \textbf{575,760,000}    &   \textbf{117,550} \\
+\hline
+ HyperX($1,4,20$)& 84      &       86      &   \textbf{12}  &    \textbf{3}   \\
+ HyperX($2,4,40$)&   656      &       688      &    \textbf{480}   &   \textbf{20}       \\
+ HyperX($3,4,60$)&   3,904      &       4,128      & \textbf{12,096}   &   \textbf{107}       \\
+ HyperX($4,10,80$)&  810,000  &  980,000   & \textbf{399,960,000}     &    \textbf{8,732} \\
+ HyperX($4,16,100$)&   6,619,136  &   8,519,680   &\textbf{17,179,607,040}   &    \textbf{36,164} \\
+\hline
+\end{tabular}
+}
+\caption{Scalability of \sys: the main results of paths to routing entries compression for the 4 well-known DCNs.}\label{table:result}
+%\vspace{-0.1in}
+\end{table}
+
+\parab{Large DCNs for scalability evaluation:} We evaluate \sys scalability on 4 well-known DCNs: Fattree~\cite{fattree}, VL2~\cite{vl2}, BCube~\cite{bcube}, and HyperX~\cite{hyperx}. Among these DCNs, BCube is a server-centric structure where servers act not only as end hosts but also rely nodes for each other. For the other 3 DCNs, switches are the only relay nodes and servers are connected to ToRs at the last hop. For this reason, we consider the paths between servers in BCube and between ToRs in Fattree, VL2 and HyperX.
+
+For each DCN, we vary the size as in Table~\ref{table:result}. We consider $k^2/4$ paths between any two ToRs in Fattree($k$), $k$+$1$ paths between any two servers in BCube($n,k$), $D_A$ paths between any two ToRs in VL2($D_A, D_I, T$), and $L$ paths between any two ToRs in HyperX($L,S,T$)\footnote{Different DCNs use different parameters to describe their topologies. In Fattree($k$), $k$ is the number of switch ports; in BCube($n,k$), $n$ is the number of switch ports and $k$ is the BCube layers; in VL2($D_A, D_I, T$), $D_A/D_I$ are the numbers of aggregation/core switch ports and $T$ is the number of servers per rack; in HyperX($L,S,T$), $L$ is the number of dimensions, $S$ is the number of switches per dimension, and $T$ is the number of servers per rack.}. The number of paths for each topology is in column 4. We note that these paths by no means cover all possible paths in the topology, however, they cover all the desired multi-paths that are sufficient to exploit topology redundancy defined in each structure.
+
+Our scalability experiments run on a Windows server with an Intel Xeon E7-4850 2.00GHz CPU and 256GB memory.
+
+\parab{Testbed for evaluation:} We use the 54-server Fattree testbed we implemented in $\S$\ref{subsec:testbed} for our experiments.
+
+
+%Even after the CPF aggregation, the number of trees (column 5) is still large and can easily exceed the switch table capacity when the network size grows. This means we cannot afford for exact matching over flat IDs, and thus entails prefix aggregation via sophisticated ID encoding.
+
+%\textbf{Metrics:} There are 3 metrics in our evaluation. First, we measure the maximal routing entries of the switches in each network after our two-step compression. This is the most important metric since it is relevant to how many explicit paths \sys can accommodate, thus concerning the scalability and expressiveness of \sys. Second, we compare the base algorithm and the speedup algorithm for ID encoding introduced in Section~\ref{subsec:encoding}. Third, we compare the CPF approach and the DPF approach introduced in Section~\ref{subsec:pathunify}. Our experiments run on a Windows server with an Intel Xeon E7-4850 2.00GHz CPU and 256GB memory.
+
+\subsection{Scalability of \sys}\label{subsub:states}
+
+\subsubsection{The main results}
+
+\parab{Maximal routing entries$\#$:} The scalability of \sys depends on the two-step compression algorithm in $\S$\ref{sec:design}. Table~\ref{table:result} shows the main results after running our compression algorithm on the 4 well-known DCNs, which demonstrated \sys's high scalability.
+
+From the Table~\ref{table:result} (highlighted), we find that \sys can effectively compress up to tens of billions of paths all the way down to tens of thousands of routing entries for very large DCNs. Specifically, for Fattree(64) we compress from over 4 billion paths to 64K routing entries, for BCube(8,4) we compress from 5 billion paths to 47K entries, for VL2(100,96,100) we compress from 575 million paths to 117K entries, and for HyperX(4,16,100) we compress from 17 billion paths to 36K entries! With such impressive compression, \sys can easily express and pre-install all desired paths into IP tables with 128K entries, and in the meanwhile we are still able to accommodate more paths in the future.
+
+\begin{figure}[t]
+\hspace{-0.15in}
+\includegraphics[width=1.1\linewidth]{figs/entries2.eps}
+%\vspace{-0.25in}
+\caption{Performance of ID encoding: routing entries$\#$ for the 4 DCNs before and after the ID prefix aggregation.}
+%\vspace{-0.23in}
+\label{fig:table}
+\end{figure}
+
+\parab{Performance of ID encoding:} We found that paths to path sets compression can shrink unique IDs remarkably, however the difficult part in our two-step compression algorithm is still the ID encoding, which eventually determines if \sys can install all paths using 128K entries. Fig.~\ref{fig:table} shows the maximal routing entries before and after ID encoding for the 4 DCNs.
+
+We find that \sys's ID encoding can efficiently compress the routing entries by 2X to 32X for different DCNs. For example, we have over 2 million unique path set IDs for Fattree(64), and after the ID encoding, we achieve 64K entries via prefix aggregation. In the worst case, we can compress the routing states from 240K to 117K in VL2(100,96,100). It is expected that, with such an effective ID encoding, \sys is able to express more paths in larger networks before reaching 128K. Furthermore, we believe that our routing states may be further compressed by taking advantage of existing IP routing table optimizations such as~\cite{longestmatching,IPtable2013}.
+
+From Fig.~\ref{fig:table}, we find that our algorithm has different compression effect on different DCNs. As to the 4 largest topologies, we achieve the compression ratios of $\frac{2,097,152}{64,544}=32.49$ for Fattree(64), $\frac{262,144}{36,164}= 7.25$ for HyperX(4,16,100), $\frac{163,840}{47,731}=3.43$ for BCube(8,4), and $\frac{240,000}{117,550} = 2.04$ for VL2(100,96,100) respectively. We believe one important decisive factor for the compression ratio is the density of the matrix $\mathbf{M}$. According to the Equation~\ref{eq1}, the number of routing entries is determined by the consecutive non-zero elements in $\mathbf{M}$. The sparser the matrix is, the more likely we can achieve better results. For example, in Fattree(64), a typical path set traverses $\frac{1}{32}$ aggregation switches and $\frac{1}{1024}$ core switches, while in VL2(100,96,100), a typical path set traverses $\frac{1}{2}$ aggregation switches and $\frac{1}{50}$ core switches. This indicates that $\mathbf{M}_{\text{Fattree}}$ is much sparser than $\mathbf{M}_{\text{VL2}}$, which contributes to the result that the compression effect of Fattree is better than that of VL2.
+
+%\parab{Computation time:} The time cost and memory consumption for our speedup algorithm are quite efficient. This is evident in Table~\ref{table:result}. It takes hundreds of seconds and consumes at most tens of megabytes to work out all the largest topologies we have evaluated. According to the trend, we believe the algorithm will be able to work for even larger topologies in a fast and memory-efficient manner.
+
+\parab{Results on other DCNs:} We observe that most other DCNs such as CamCube~\cite{camcube} and CiscoDCN~\cite{ciscodc} are quite regular and expected to perform as efficiently as above. Further, in a recent work Jellyfish~\cite{jellyfish}, people discussed random regular graphs for DCN topologies. Since Jellyfish assumes random graph, its topology varies. In our evaluation with different Jellyfish topologies, the results are relatively stable and promising. Averagely, the maximal routing table of Jellyfish was compressed from 1,771,077,120 paths to 238,080 path sets and finally to 119,440 entries for a 245,520-node Jellyfish.
+
+
+
+%\subsubsection{Deeper understanding of \sys algorithms}
+\subsubsection{Further exploration of \sys algorithms}
+%\parab{Speedup algorithm vs Base algorithm:}
+%Table~\ref{table:result} shows that the speedup algorithm holds remarkable advantages over the base algorithm on various DCNs in two aspects.
+%
+%First, the time cost and memory consumption of the base algorithm increase dramatically as the network scales. Worse, it cannot return an output even in 24 hours when the network scales to several thousands or above. In contrast, the speedup algorithm works out good results for all the 4 DCNs in just a few minutes even when the network is quite large.
+%
+%Second, compared with the base algorithm, the speedup algorithm makes use of partial information of $\mathbf{M}$ to perform the ID encoding, however, the achieved maximal forwarding states are as good as the base algorithm for all the 4 evaluated DCNs even though the latter one uses full information of $\mathbf{M}$. This demonstrates the effectiveness of our idea of equivalence reduction in the speedup algorithm on DCN topologies.
+%
+%Furthermore, it is interesting to find that the speedup algorithm can even slightly outperform the base algorithm in some cases such as BCube($8,2$),  VL2($20,8,40$), and HyperX($3,4,60$), \etc~This is not a surprising result since both the base algorithm and the speedup algorithm are heuristics. Even though the speedup algorithm leverages on the partial information of the base algorithm, its performance is not necessarily bounded by the base algorithm.
+
+
+\begin{table}[t]
+\centering
+\scalebox{0.75}{
+\begin{tabular}{|c|r|r|}
+%\begin{center}
+\hline
+\multirow{2}{*}{DCNs} & \multicolumn{2}{|c|}{Time cost (Second)}  \\
+\cline{2-3}
+     & No equivalence reduction & Equivalence reduction \\
+\hline
+\hline
+ Fattree($16$) &   8191.121000  & 0.078000         \\
+ Fattree($32$) &   $>$24 hours   & 4.696000      \\
+ Fattree($64$) &  $>$24 hours    & 311.909000 \\
+\hline
+ BCube($8,2$)  &    365.769000  & 0.046000     \\
+ BCube($8,3$)  &    $>$24 hours  &   6.568000     \\
+ BCube($8,4$)  &    $>$24 hours   &  684.895000     \\
+\hline
+ VL2($40,16,60$)&     227.438000   & 0.047000    \\
+ VL2($80,64,80$)&    $>$24 hours   &  3.645000     \\
+ VL2($100,96,100$)&  $>$24 hours  &   28.258000     \\
+\hline
+ HyperX($3,4,60$)&    0.281000    & 0.000000    \\
+ HyperX($4,10,80$)&   $>$24 hours  &   10.117000   \\
+ HyperX($4,16,100$)&  $>$24 hours  & 442.379000    \\
+\hline
+\end{tabular}
+}
+\caption{Time cost of ID encoding algorithm with and without equivalence reduction for the 4 DCNs.}\label{table:time_cost}
+%\vspace{-0.1in}
+\end{table}
+
+\parab{Time effect of equivalence reduction:} In Table~\ref{table:time_cost}, we find that equivalence reduction significantly speedups the runtime of the ID encoding algorithm. For example, when the algorithm takes $\mathbf{M}$ as input, it cannot return an output even in 24 hours when the network scales to a few thousands. In contrast, with the equivalence reduction, it can work out good results for all the 4 DCNs within just a few minutes even when the network is quite large.
+
+\begin{figure}[t]
+\includegraphics[width=1.2\linewidth]{figs/equivalence_reduction.eps}
+%\vspace{-0.35in}
+\caption{Routing entries$\#$ of ID encoding algorithm with and without equivalence reduction for the 4 DCNs.}\label{fig:equivalence _reduction}
+%\vspace{-0.1in}
+\end{figure}
+
+\parab{Performance effect of equivalence reduction:}
+In Fig.~\ref{fig:equivalence _reduction}, we compare the performance of the ID encoding with and without equivalence reduction. With equivalence reduction, we use $\mathbf{M^*}$ (\ie, part of $\mathbf{M}$) to perform the ID encoding, it turns out that the achieved entries$\#$ are similar as that of without equivalence reduction (\ie, use original $\mathbf{M}$). This demonstrates the effectiveness of our approach of equivalence reduction on DCN topologies, and also validates our hypothesis in $\S$\ref{subsubsec:encoding}.
+
+\begin{figure}[t]
+%\vspace{-0.28in}
+\hspace{-0.1in}
+\includegraphics[width=1.1\linewidth]{figs/compress.eps}
+\vspace{-0.23in}
+\caption{CPF vs DPF: the paths to path sets compression ratio (Path$\#$/Pathset$\#$) and the path set IDs to maximal routing entries compression ratio (Pathset$\#$/MRE$\#$).}\label{fig:CPFvsDPF}
+\vspace{-0.1in}
+\end{figure}
+
+\parab{CPF vs DPF:}
+To make comparison between CPF and DPF, we study two compression ratios in Fig.~\ref{fig:CPFvsDPF}, \ie, the paths to path sets compression ratio ($\frac{Path\#}{PathSet\#}$) and the path set IDs to maximal routing entries compression ratio ($\frac{PathSet\#}{MRE\#}$). We make the following observations.
+
+First, for all the 4 DCNs, both CPF and DPF can effectively reduce the number of unique IDs via paths to path sets aggregation, and in the meantime, CPF has a higher compression ratio than DPF. We find the reason is that a CPF path set can possibly hold more paths than a DPF path set. For example, in Fattree, we observe a CPF path set contains the convergent paths to one destination node from all the other nodes as sources, while a DPF path set contains the paths from half of the nodes as sources to the other half as destinations.
+
+Second, as to the compression from the path set IDs to maximal routing entries, we find that CPF has a higher ratio for Fattree while DPF has a higher ratio for VL2. One reason for this is that, as we mentioned above, this compression ratio has a correlation with the density of matrix $\mathbf{M}$. The path sets generated by CPF form a sparser $\mathbf{M}$ in Fattree, while the path sets computed by DPF lead to a sparser one in VL2.
+
+Third, the overall compression effect of CPF is better than that of DPF for the 4 DCN topologies we have evaluated. However, we believe there also exist topologies where DPF has better performance.
+
+
+%Furthermore, it is interesting to find that the approach of equivalence reduction can even slightly outperform the result from directly working on $\mathbf{M}$ in some cases such as BCube($8,2$),  VL2($20,8,40$), and HyperX($2,4,40$), \etc~This is not a surprising result since both the base algorithm and the speedup algorithm are heuristics. Even though the speedup algorithm leverages on the partial information of the base algorithm, its performance is not necessarily bounded by the base algorithm.
+
+\subsection{Utility of \sys}\label{subsec:utility}
+%\sys's explicit path control is very useful to various applications. We showcase some benefits through case studies below.
+
+%We believe \sys can be used in much more scenarios than what we enumerate here. Please also note that \sys, as a basic routing tool, is not necessarily related to application core designs but provides fundamental explicit routing support.
+
+\subsubsection{Failure handling}\label{sssub:failure}
+In this experiment, we show that \sys leverages explicit path control over multi-paths to avoid the failed link. We establish one TCP connection from a server under ToR T1 to another server under ToR T4. We use switch shell to obtain the connection that is using the link from ToR T1 to Agg A1. We then disconnect this link to emulate the case of a link failure. The link failure causes all the packets of the connection to be dropped at T1.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/tcpseq.eps}
+%\vspace{-0.35in}
+\caption{Recovery of a TCP connection on Gigabit Ethernet after a 300ms TCP timeout (RTO$_{min}$) on link failure.} \label{fig:eval.tcpseq}
+%\vspace{-0.1in}
+\end{figure}
+
+We capture the TCP sequence numbers using a packet sniffer and show the results in Fig.~\ref{fig:eval.tcpseq}. We observe that the \sys software quickly switches the path to route away from the failed link after it detects a TCP retransmission, and thus after a TCP timeout it successfully resumes the TCP connection which is transparent to TCP/IP and applications. By default, the TCP timeout value in Windows (RTO$_{min}$) is 300ms, and that is why we see a 300ms downtime in Fig.~\ref{fig:eval.tcpseq}. However, \sys can support any fast TCP retransmission at $\mu$s level.
+
+\subsubsection{Basic routing of \sys}\label{subs.impl.load}
+In this experiment, we show basic routing of \sys, both with and without link failures. We establish $90$ TCP connections from the $3$ servers under ToR T1 to the $45$ servers under ToRs T4 to T18. Each source server initiates 30 TCP connections in parallel, and each destination server hosts two TCP connections. The total link capacity from T1 is $3 \times 1$G$=3$G, shared by 90 TCP connections.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/goodput.eps}
+%\vspace{-0.3in}
+\caption{TCP goodput of three connections versus time on three phases: no failure, in failure, and recovered.}\label{fig:eval.tcpvstime}
+%\vspace{-0.2in}
+\end{figure}
+
+Given the 90 TCP connections randomly share 3 up links from T1, the load should be balanced overall. At time around 40 seconds, we disconnect one link (T1 to A1). We then resume the link at time around 80 seconds to check whether the load is still balanced. We log the goodput (observed by the application) and show the results for three connections versus time in Fig.~\ref{fig:eval.tcpvstime}. Since we find that the throughput of all 90 TCP connections are very similar, we just show throughput of one TCP connection for each source server.
+
+We observe that all the TCP connections can share the links fairly with and without link failure. When the link fails, the TCP connections traversing the failed link (T1 to A1) quickly migrate to the healthy links (T1 to A2 and A3). When the failed link recovers, it can be reused upon a new path ID resolution after timeout of the local cache. In our experiment, we set the timeout value as 1 seconds. However, one can change this parameter to achieve satisfactory recovery time for resumed links. We also run experiments for other traffic patterns, \eg, ToR-to-ToR and All-to-ToR, and link failures at different locations, and find that \sys works as expected in all cases.
+
+%Note that ECMP may also achieve fair link sharing for this scenario. However, as shown in VL2~\cite{vl2}, existing routing protocols, \eg, OSPF, has very long routing path convergence time at tens of seconds. While in \sys, the TCP paths are shuffled to the healthy links after the TCP timeout at 300ms. For the case of a failed link going back online, the reshuffling time is determined by the cache timeout at end servers. In our experiments, we set the cache timeout as 1 seconds. However, production data centers may change the cache timeout parameter to achieve satisfactory recovery time for resumed links. We also run experiments for other traffic patterns, \eg, ToR-to-ToR and All-to-ToR, and link failures at different locations, and find that they all achieve good load-balancing.
+
+%\begin{figure}[t]
+%\centering
+%\includegraphics[width=\linewidth]{figs/exp.case3.randomvsScheduling.eps}
+%\vspace{-13pt}
+%\caption{The total TCP goodput of random and scheduling versus the number of flows per server.} \label{fig:eval.ranvssc}
+%\vspace{-0.1in}
+%\end{figure}
+%
+%\subsubsection{\sys support for flow scheduling}\label{subs.impl.pathset}
+%%Both Fattree~\cite{fattree} and Hedera~\cite{hedera} show that scheduling greatly outperforms random load-balancing like ECMP.
+%
+%In this experiment, we use \sys to provide explicit routing support for implementing flow scheduling. We note that \sys, as a general tool, can support any flow scheduling scheme. In this particular experiment, the effect of scheduling is achieved by modifying the \sys manager to return different path IDs to different source servers at the stage of path ID resolution.
+%
+%To compare the performance of scheduling versus that of random load-balancing, we generate different numbers of flows per server for a ToR-to-ToR traffic pattern: 3 servers to 3 servers. Ideally, the achieved goodput should be close to link capacity at 3Gbps. We measure the average goodput for 100-round experiments and show the results in Fig.~\ref{fig:eval.ranvssc}. We observe that the scheduling achieves twice goodput that of the random load-balancing for the case of 1 flow per server. Besides, the random load-balancing and the scheduling converge when the number of flows per server increases to 10. This is consistent with the results in Fig.~\ref{fig:eval.tcpvstime} in that, with 30 flows per server, even the random path selection can achieve good performance.
+
+
+\subsubsection{\sys support for bandwidth provisioning}
+
+In cloud services, there is an increasing need for bandwidth provisioning. For example, Amazon RDS enforces provisioned I/O bandwidth for instances to ensure that disk resources are always available whenever you need them~\cite{privisionIO}. In this experiment, we show \sys's explicit path control makes end-to-end bandwidth provisioning easy to implement. For the experiment setting, we pick a pod and use background UDP flows to stature the ToR-Agg links and leave the remaining bandwidth on three paths between X-Y as 100Mpbs, 300Mbps, 100Mbps respectively. Suppose now there comes a demand to provision the bandwidth between X-Y at 300Mbps. We then leverage ECMP and \sys to implement it.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/bp_topo.eps}
+\caption{\sys utility case $\#1$: we leverage \sys explicit path control to easily implement bandwidth provisioning.}
+\label{fig:bandwidth_provisioning}
+\end{figure}
+
+In Fig.~\ref{fig:bandwidth_provisioning}, it can be found that using ECMP we cannot provide the required bandwidth between X-Y although the physical capacity is there. This is because ECMP performs random hashing and cannot specify the explicit path to use, thus it cannot accurately use the remaining bandwidth on each of the multiple paths for end-to-end bandwidth provisioning. However, \sys can be leveraged to easily enforce the provisioned bandwidth by taking advantage of its explicit path control. In our experiment, with \sys we showcase by flexibly using one path and three paths to accurately implement 300Mbps bandwidth provisioning.
+
+\subsubsection{\sys support for virtual network enforcement}
+
+In cloud computing, virtual data center (VDC) abstraction with bandwidth guarantees is an appealing model due to its performance predictability in shared environments~\cite{secondnet,oktopus,proteus2012}. In this experiment, we show \sys can be applied to enforce the virtual networks with bandwidth guarantees. We assume a simple SecondNet-based VDC model~\cite{secondnet} and leverage \sys as routing to embed this VDC to the physical topology.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/be.eps}
+%\vspace{-0.35in}
+\caption{\sys utility case $\#2$: we leverage \sys to accurately enforce VDC with bandwidth guarantees.}
+\label{fig:bandwidth_enforcement}
+%\vspace{-0.1in}
+\end{figure}
+
+
+In Fig.~\ref{fig:bandwidth_enforcement}, we demonstrate that \sys's explicit path control can be easily leveraged to select appropriate paths with enough bandwidth to embed the VDC. In the figure, we show each virtual link gets the desired bandwidth as specified. However, though not explicitly shown here, we found that ECMP cannot be used to efficiently enable this due to the same reason as above. Furthermore, ECMP cannot be used in cases where multiple paths are not equal. \sys has no such constraint.
+
+\subsubsection{\sys support for partition-aggregation query}
+In web applications, the partition-aggregation paradigm is a foundation for many online services such as search query. They usually generate one-to-many and many-to-one communication patterns and has very demanding latency requirements. Using \sys, we can explicitly express such 1-to-$n$ and $n$-to-1 patterns using ($n$+1) path IDs, one ID for $n$-to-1 and $n$ IDs for 1-to-$n$. These IDs can also be leveraged for optimizations such as service differentiation. In this experiment, we selected 9 servers in a pod to emulate a 1-to-8 (8-to-1) query-and-response, and we used 9 IDs to express such communication patterns. We saturated the network with background traffic, and then we leveraged such 9 IDs to set priority to such query-and-response traffic.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/pa.eps}
+%\vspace{-0.35in}
+\caption{\sys utility case $\#3$: we leverage \sys to express partition-aggregation traffic pattern (1-to-$n$, $n$-to-1) and enforce service differentiation.}
+\label{fig:partition_aggregation_query}
+%\vspace{-0.1in}
+\end{figure}
+
+In Fig.~\ref{fig:partition_aggregation_query}, we found that when path IDs are referenced for priority, the query flows see persistently low RTTs irrespective of the background traffic. However, if we do not set up priority for these IDs, the RTT increases as the background load increases.
+
+\subsubsection{\sys support for Map-reduce data shuffle}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/shuffle.eps}
+%\vspace{-0.3in}
+\caption{\sys utility case $\#4$: we leverage \sys select non-conflict parallel paths to speedup the many-to-many Map-reduce data shuffle.} \label{fig:shuffle}
+%\vspace{-0.1in}
+\end{figure}
+
+Map-reduce~\cite{mapreduce} is perhaps the most popular parallel computing framework in data centers. In Map-reduce applications, many-to-many data shuffle communication between the map and reduce stages can be time-consuming. For example, traces from Facebook show that, on average, transferring data between successive stages accounts for $33\%$ of the running times of jobs~\cite{orchestra}. In this experiment, we show that \sys can be leveraged to select non-conflict parallel paths for many-to-many data shuffle and avoid collision. Typically, for a $m$-to-$n$ data shuffle, we can use ($m$+$n$) path IDs to express the communication patterns. For the experiment setting, we selected 18 servers in two pods of the Fattree to emulate many-to-many data shuffle by letting 9 servers in a pod to transfer data to 9 servers in the other pod.
+
+In Fig.~\ref{fig:shuffle}, it can be found that by using \sys for data shuffle, we can perform considerably better than static ECMP hash-based routing. More specifically, it reduces the shuffle time by over 3X for most of the experiments. The reason for \sys to excel is that \sys's explicit path IDs can be easily leveraged to schedule non-interfering paths for shuffling, thus the network bisection bandwidth is fully utilized for speedup.
+
+%We further note that \sys can simply use 3 path IDs to express such many-to-many communication patterns, which makes the non-conflict parallel path arrangement fairly easy to implement.
+
+
+\subsection{Efficiency of \sys (vs OpenFlow)}\label{subsec:openflow}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/openflow.eps}
+%\vspace{-0.3in}
+\caption{\sys vs OpenFlow as packet/flow increases.} \label{fig:openflow}
+%\vspace{-0.2in}
+\end{figure}
+
+%We use two simple experiments to compare \sys with OpenFlow in terms of supporting a large number of flows and handling failures.
+
+%\subsubsection{Supporting a large number of flows}\label{sssec:openflowrule}
+
+OpenFlow can enable explicit path control and is used by many current designs~\cite{hedera,microTE,elastictree,swan,zupdate}. But OpenFlow has limited forwarding rules that affect its efficiency. In this experiment, we compare \sys with OpenFlow in terms of supporting a large number of flows. For the experiment setting, we continuously send out 40KB-size TCP flows from a source to a destination with 3 switches in on the path. We vary destination TCP ports to emulate different flows.
+
+In Fig.~\ref{fig:openflow}, we plot the average RTTs with increased number of packets/flows. From the figure, we can see an abrupt increase when the flow count hits 1K ($\sim$30K packets). We note that our OpenFlow switch has 2K hardware forwarding entries, when the hardware flow table is full, the new flows will be installed in the software forwarding table by default in our switches~\cite{softtable}, which is much slower. Thus, when the flow count increases to over 1K, there are about 2K rules installed (each flow adds 2 rules) and the hardware flow table becomes full. After that, the subsequent new flows will enter the software-based flow table, which significantly inflates the forwarding delay of the message. We further implemented rule replacement algorithm in which we let new flows replace the old ones in the hardware table when the table is full and also observed bad performance. In contrast, \sys does not have small table constraint and experiences persistent low latency.
+
+We note that \sys use one path ID for all the flows because they share the same path. Since our testbed is small scale, we cannot create many paths in our experiment. However, we believe \sys will maintain good performance when applying to a large number of paths as \sys is scalable and is able to pre-install them.
+
+%Through this experiment, we also realize that \sys routing table grows with the number of paths, while OpenFlow table grows with the number of flows.
+
+%\TODO{we also preempt rules, the performance is even worse.}
+
+%\subsubsection{Handling failures}
+%
+%In the second experiment, we create a failure
+
+

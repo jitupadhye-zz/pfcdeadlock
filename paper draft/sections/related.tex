@@ -1,0 +1,72 @@
+%\vspace{-0.1in}
+\section{Related Work}\label{sec:related}
+%\vspace{-0.1in}
+%In general, there are many routing designs in the literature, but none of them achieves all \sys's properties: explicit path control, scalable, generic, readily deployable with commodity switches, and ready for SDN.
+
+%The key of \sys is its explicit path control. However, most decentralized designs such as Layer-2 Spanning Tree Protocol (STP)~\cite{stp}, TRILL~\cite{trill}, Shortest-Path Bridging (SPB)~\cite{spb}, and Layer-3 OSPF~\cite{ospf}, ECMP~\cite{ecmp} do not support explicit path control.
+
+The key to \sys is explicit path control. We note that many other approaches such as source routing~\cite{sourcerouting}, MPLS~\cite{mpls}, OpenFlow~\cite{openflow} and the like, can also enable explicit path control. However, each of them has its own limitation.
+
+OpenFlow~\cite{openflow} has been used in many recent proposals (e.g.,~\cite{hedera,microTE,elastictree,swan,zupdate}) to enable explicit path control. OpenFlow can establish fine-grained explicit routing path by installing flow entries in the switches via the OpenFlow controller. \kai{But in current practice, there are still challenges such as small flow table size and dynamic flow entries setup that need to be solved. For example, the on-chip OpenFlow forwarding rules in commodity switches are limited to a small number, typically $1$--$4$K. To handle this limitation, recent solutions, e.g.~\cite{swan}, dynamically change, based on traffic demand, the set of live paths available in the network at different times through dynamic flow table configurations, which could potentially introduce non-trivial implementation overhead and performance degradation. \sys addresses such challenge by pre-installing all desired paths into IP LPM tables. In this sense, \sys complements existing OpenFlow-based solutions in terms of explicit path control, and in the meanwhile, the OpenFlow framework may still be able to be used as a way for \sys to pre-configure the switches and handle failures.}
+
+
+%change need to dynamically identify and install small working sets of tunnels at different times~\cite{swan,zupdate}, which is technically complicated and heavy-weighted.
+
+
+Source routing is usually implemented in software and slow paths, and not supported in the hardware of the data center switches, which typically only support destination IP based routing. Compared to source routing, \sys is readily deployable without waiting for new hardware capability; and \sys's header length is fixed while it is variable for source routing with different path lengths.
+
+%Further, we believe that our \sys systems including path resolution and failure handling can be applied to source routing as well when it is supported by commodity switches in the future.
+
+\kai{With MPLS, paths can also be explicitly set up before data transmission using MPLS labels. However, \sys is different from MPLS in following aspects. First, because MPLS labels only have local significance, it requires a dynamic Label Distribution Protocol (LDP) for label assignments. In contrast, \sys path IDs are unique, and we do not need such a signaling protocol. Second, MPLS is based on exact matching (EM) and thus MPLS labels cannot be aggregated, whereas \sys is based on longest prefix matching (LPM) and enables more efficient routing table compression.} Furthermore, MPLS is typically used only for traffic engineering in core networks instead of application-level or flow-level path control. In addition, it is reported~\cite{mpls2003,swan} that the number of tunnels that existing MPLS routers can support is limited.
+
+%Further, existing usage of MPLS and ATM is mainly for traffic engineering, not for flow level routing as \sys.
+
+%OpenFlow is a great API between controller and switches that allows the controller to specify an end-to-end path for a flow by configuring the flow tables of switches along the path, and it has now been used in many designs (\eg,~\cite{hedera,microTE,elastictree,swan,zupdate}) as a control plan to enforce explicit path control. However, such an OpenFlow-based approach has fundamental scalability problems as discussed in $\S$\ref{subsec:openflowissue}.
+
+%OpenFlow~\cite{openflow} is a great API between controller and switches that allows explicit path control. However, despite novel proposals like RMT~\cite{rmt2013}, today's commodity switch only supports a limited number of OpenFlow entries. Dynamically configuring the flow tables on-the-fly is technically complicated (such as SWAN~\cite{swan} and zUpdate~\cite{zupdate}), heavy-weighted, and error-prone. \sys is very expressive, and installs all desired multi-paths statically using commodity switch routing tables and does not need to reconfigure the tables even when failure occurs.
+
+%which requires it to dynamically configure the active flow paths (like SWAN~\cite{swan}) to support large networks. This incurs non-trivial overheads and scalability issues and is also error-prone due to inconsistency.  \sys is very expressive, and installs all desired multi-paths statically using commodity switches and does not need to update the routing tables even when failures occur.
+
+%\sys provides an avenue to extend OpenFlow API.
+
+%OpenFlow~\cite{openflow} needs to dynamically configure the switches along the path of a flow. This introduces non-trivial overheads and is not practical for short flows with just one or several packets. In \sys, we do not need to update the forwarding tables of the switches when flows are added or removed, and even when failures occur. Further, the current commodity switch can only support $1$--$4K$ OpenFlow entries, hence it is not ready for large networks with large number of flows. In contrast, \sys is readily deployable using existing commodity switches. Moreover, \sys is more expressive and can be a meta-routing to implement source routing and OpenFlow.
+
+SPAIN~\cite{spain} builds a loop-free tree per VLAN and utilizes multiple paths across VLANs between two nodes, which increases the bisection bandwidth over the traditional Ethernet STP. However, SPAIN does not scale well because each host requires an Ethernet table entry per VLAN. Further, its network scale and path diversity are also restricted by the number of VLANs supported by Ethernet switches, e.g., 4096.
+
+PAST~\cite{past} implements a per-address spanning tree routing for data center networks using the MAC table. PAST supports more spanning trees than SPAIN, but PAST does not support multi-paths between two servers, because a destination has only one tree. This is decided by the MAC table size and its exact matching on flat MAC addresses.
+
+Both SPAIN and PAST are L2 technologies. Relative to them, \sys builds on L3 and harnesses the fast-growing IP LPM table of commodity switches. One reason we choose IP instead of MAC is that it allows prefix aggregation. It is worth noting that our \sys framework contains both SPAIN and PAST. \sys can express SPAIN's VLAN or PAST's spanning tree using CPF, and it can also arrange paths using DPF and perform path ID encoding and prefix aggregation for scalability.
+
+%In general, the fundamental concept of \sys is path ID. The two-step compression we developed in \sys enables it to compress all desired paths into practical IP entries and achieve our own design goals.
+
+\kai{Finally, there are various DCN routing schemes that come with specific topologies, such as those introduced in Fattree~\cite{fattree}, PortLand~\cite{portland}, BCube~\cite{bcube}, VL2~\cite{vl2}, ALIAS~\cite{alias}, and so on. For example, PortLand~\cite{portland} leverages Fattree topology to assign hierarchical Pseudo-MACs to end hosts, while VL2~\cite{vl2} exploits folded Clos network to allocate location-specific IPs to ToRs. These topology-aware addressing schemes generally benefit prefix aggregation and can lead to very small routing tables, however they do not enable explicit path control and still rely on ECMP~\cite{portland} or Valiant Load Balancing (VLB)~\cite{vl2} for traffic spreading over multiple paths. Relative to them, \sys enables explicit path control for general DCN topologies.}
+
+%For example, the routings of Fattree and VL2 are only applicable to Clos topologies, ALIAS works on hierarchical topologies, and BCube and PortLand encode topology information into logical addresses (\eg, BCube IDs and PMAC) for routing. They are mostly customized to specific topologies and not easy to generalize. However, \sys works for arbitrary topologies.
+
+
+%\kai{In designing \sys, we note that many existing DCNs (e.g.,~\cite{vl2,portland,bcube,dcell,fattree}) exploit their specific topology characteristics to design topology-aware addresses for routing. For example, PortLand~\cite{portland} leverages Fattree topology to assign hierarchical Pseudo-MACs to end hosts, while VL2~\cite{vl2} exploits folded Clos to allocate location-specific IPs to ToRs. These topology-aware addressing schemes can generally result in very small routing tables, however they do not enable explicit path control and still rely on ECMP~\cite{portland} or VLB~\cite{vl2} for traffic spreading over multiple paths. As a result, the above applications cannot be efficiently supported.}
+
+
+%\TODO{This section is to be organized: SPT, TRILL, MPLS, OpenFlow, PAST, SPAIN.}
+%the core of the paper is "explicit path control".
+%people may argue that there already existed several schemes that achieve this "explict path control":
+%
+%mpls (atm): with tag switching, the whole path can be setup before data transmission.
+%source routing: source decides the routing path.
+%openflow: the controller explictly controls the packet forwarding path.
+%multiple-spaning trees (e.g., past).
+%
+%we need to argue that mpls's tag just has local meaning, hence it needs a label distribution protocol for label assignment and negotiation. Rox does not need such a protocol. mpls is used mainly for traffic engineering, not for flow level routing.
+%
+%source routing is usually implemented in software and slow path. existing commodity switch hardware does not support source routing.
+%
+%openflow still needs to configure the switches along the path of a flow. It takes time. it is not practical for short-flows with just one or several packets.
+%
+%past or multiple spanning tree is not as expressive as RoX. Due to the pathset aggregation, Rox can express all the desirable (e.g., shortest) paths for a src-dest pair.
+%
+%the advantages of RoX:
+%+ no need to update fwding tables of the switches when flows are added or removed (but you can if you want). this is very useful for short flows. we should consider to do an experiment to demonstrate the point. for example, to let a long flow to take a path, and let the short flows to take another path, without configuring the switches.
+%
+%+ Roxis very expressive. can be a meta routing to implement source routing and openflow.
+%
+%+ directly deployable using existing commodity switches.

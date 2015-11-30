@@ -1,0 +1,36 @@
+\section{Analysis of deadlock problem}\label{sec:analysis}
+
+\subsection{Deadlock problem in RDMA DCNs}\label{subsec:deadlock_problem}
+
+Once a loop occurs in a network, packets of some flows will be caught in the loop and traverse the same links multiple times until they are dropped due to TTL expiration. Apart from causing packet drops, loops will also waste some link bandwidth as well as increase the end-to-end delay for the flows traversing some link(s) in the loop (but not caught by the loop).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.5\textwidth,center]{figs/deadlock_example.pdf}
+\caption[Optional caption for list of figures]{An example of loop induced deadlock: there is a loop between switch A and switch B. Both TX queues (egress queues) are paused by PFC as no buffer are available at both switches to accommodate more packets.}
+\label{fig:loop_deadlock}
+\end{figure}
+
+In a lossy network, the impact of a loop is not fatal and can be completely eliminated as long as the loop is removed from the network. In contrast, in a lossless network, if packets enter a loop faster than they get dropped in the loop due to TTL expiration, a deadlock will be created because of the circular buffer dependency in the loop. Once created, a deadlock will hold persistently even after the loop is eliminated.
+
+A simple deadlock example is shown in Fig.~\ref{fig:loop_deadlock}. In this example, there is a routing loop between switch A and switch B. Packets enter this loop at a sufficient large rate and soon occupy all the available buffer of both switches. Then Both TX queues (egress queues) will be paused by PFC PAUSE frames and a deadlock is created. As we can see, this deadlock cannot be resolved by eliminating the loop.
+
+\subsection{Sufficient condition for deadlock creation}\label{subsec:deadlock_condition}
+
+In this part, we analyze the sufficient condition to create a deadlock when there is a loop in the network. When a deadlock is created, there will be a circular buffer dependency among all the switches in the loop such that each switch is paused by its downstream switch, and at the same time pauses its upstream switch due to the lack of available buffer to accept more packets. 
+
+In order to create such a circular buffer dependency, the rate to inject packets in the loop should be larger   
+%\parab{Sufficient condition for deadlock creation:} \todo{(detailed content to be added later.)}
+%
+%   1. Analysis of the maximum packet drain rate caused by TTL expiration: $r^{max}_d = nB/k_ttl$.
+%
+%   2. Using testbed experiments to demonstrate that $r > r^{max}_d$ is a sufficient condition for deadlock creation.
+%
+%\parab{Creation time of deadlock:} \todo{(detailed content to be added later.)}
+%
+%   1. Analysis of the upper bound and lower-bound of the creation time of deadlock.
+%
+%   2. a) Using testbed experiments to demonstrate that lower-bound value is already a tight estimation when $r << B$; b) Analysis of the impact of PFC PAUSE frames on $r$ and $r^{max}_d$.
+%
+%\subsection{Analysis of device bug induced deadlock}\label{subsec:analysis_loop_deadlock}
+%\todo{to be added.}
