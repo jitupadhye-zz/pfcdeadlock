@@ -1,0 +1,89 @@
+%\vspace{-0.05in}
+%\section{}\label{sec:model}
+%\vspace{-0.05in}
+
+Assuming $n_f$ greedy flows with infinite traffic demand are traversing the ingress queues of $n_s$ switches and $n_h$ hosts in a lossless network. Let $k$ be the port number of the switches (assuming all the switches have uniform port number). We logically consider a switch as k ingress queues, and a host as $1$ ingress queue. An ingress queue consists of $n^\prime$ ($n^\prime=k*n_s+n_h$) virtual output queues. For any ingress queue $q_i$, the queue length of its $j$-$th$ virtual output queue represents the bytes of packets to be sent to ingress queue $q_j$.
+
+For any flow $f_j$ (j = 1,2,\ldots,$n_f$), we add a virtual ingress queue $q_{(j+n^\prime)}$ as the traffic source. Let $q_i$ be the first ingress queue flow $f_j$ traverses in the network. For $q_{(j+n^\prime)}$, the queue length of its $i$-$th$ virtual output queue is non-zero, and the others are all zero.
+
+Let $\textbf{G}(\textbf{V},\textbf{E})$ be a directed graph. Let $n=n^\prime + n_f$.
+
+\begin{enumerate}
+\item Any vertex $v_i \in \textbf{V}$ (i = 1,2,\ldots,$n$) represents the $i$-$th$ ingress queue.
+
+\item $\textbf{V}_0$ is a subset of $\textbf{V}$. Any vertex $v_i \in \textbf{V}_0$ (i = $n^\prime +1,n^\prime +2,\ldots,n$) represents the virtual ingress queue corresponding to the traffic source of $(i-n^\prime)$-$th$ flow.
+
+\item Any arc $e_{i,j} \in \textbf{E}$ (i = 1,2,\ldots,$n$; j = 1,2,\ldots,$n$) means there exists a flow traversing ingress queues $i$ and $j$ in sequence.
+
+\item Any arc $e_{i,j}$ in $\textbf{E}$ has a weight $w_{e_{i,j}}$ ($>=$0), which represents the queue length of the $j$-$th$ virtual output queue of ingress queue $i$.
+
+\item $\forall v_i \in \textbf{V}$, we have $\sum_{j=1}^{n} w_{e_{i,j}} <= m_{\theta}$, where $ m_{\theta}$ is a constant. Here $ m_{\theta}$ represents the PFC threshold. This constraint is used to describe the fact that the queue length of any ingress queue can be no more than the PFC threshold.
+\end{enumerate}
+
+$\textbf{G}(\textbf{V},\textbf{E})$(t) can be viewed as a snapshot of the network state at time t. For any $e_{i,j}$ in $\textbf{E}$, $w_{e_{i,j}}(t)$ is the weight of $e_{i,j}$ at time t. we define
+
+\begin{equation}\label{eq:1}
+ \frac{d(w_{e_{i,j}}(t))}{dt} = \frac{w_{e_{i,j}}(t+\delta t)-w_{e_{i,j}}(t)}{dt}.
+\end{equation}
+
+The behavior of PFC pause can be defined as
+
+\begin{equation}\label{eq:2}
+ \frac{d(w_{e_{i,j}}(t))}{dt} >= 0 \text{ when } \sum_{k=1}^{n} w_{e_{j,k}}(t) = m_{\theta} .
+\end{equation}
+
+The queue length of an ingress queue cannot increase when all the virtual output queues pointing to it are empty, so we have
+
+\begin{equation}\label{eq:3}
+ \frac{d(w_{e_{i,j}}(t))}{dt} <= 0 \text{ when } \sum_{k=1}^{n} w_{e_{k,i}}(t) = 0.
+\end{equation}
+
+The queue length of an ingress queue should increase when not all the virtual output queues pointing to it are empty and PFC threshold is not reached, so we have
+
+\begin{equation}\label{eq:4}
+ \frac{d(w_{e_{i,j}}(t))}{dt} > 0 \text{ when } \sum_{k=1}^{n} w_{e_{k,i}}(t) > 0 \text{ and } \sum_{k=1}^{n} w_{e_{j,k}}(t) < m_{\theta}.
+\end{equation}
+
+The queue length of any ingress queue corresponding to the traffic source of any flow should be larger than zero, so we have
+
+\begin{equation}\label{eq:5}
+ \sum_{j=1}^{n} w_{e_{i,j}}(t) > 0 \text{ when } v_i \in \textbf{V}_0.
+\end{equation}
+
+\textbf{Definition of deadlock:} We say $\textbf{G}(\textbf{V},\textbf{E})$(t) has deadlock when $\exists t_0<\infty$ and $\exists \textbf{V}^\prime \subseteq \textbf{V}$,
+\begin{enumerate}
+ \item $\forall t > t_0$ and $\forall v_i \in \textbf{V}^\prime$, $\frac{d(w_{e_{i,j}}(t))}{dt}=0$ for any feasible j.
+ \item $\forall t > t_0$ and $\forall v_i \in \textbf{V}^\prime$, $\sum_{j=1}^{n} w_{e_{i,j}}(t) > 0$.
+\end{enumerate}
+
+\textbf{Sufficient and necessary condition for deadlock:} If $\exists t_1<\infty$ and $\exists \textbf{V}^\prime \subseteq \textbf{V}$,
+ \begin{enumerate}
+\item $\forall v_i \in \textbf{V}^\prime$,  $\sum_{j=1}^{n} w_{e_{i,j}}(t_1) = m_{\theta}$.
+
+\item $\forall v_i \in \textbf{V}^\prime$ and $\forall v_j \in \textbf{V}-\textbf{V}^\prime$, there is either no edge between $v_i$ and $v_j$, or $w_{e_{i,j}}(t_1)=0$.
+\end{enumerate}
+
+Then $\textbf{G}(\textbf{V},\textbf{E})$(t) has deadlock.
+
+\textbf{Proof:}
+
+$\Rightarrow$ As $\forall v_i \in \textbf{V}^\prime$,  $\sum_{j=1}^{n} w_{e_{i,j}}(t_1) = m_{\theta}$, according to equation (\ref{eq:2}), if $v_i,v_j \in \textbf{V}^\prime$, $\frac{d(w_{e_{i,j}}(t_1))}{dt} >= 0$. However, as we have the constraint $\sum_{j=1}^{n} w_{e_{i,j}}(t_1) <= m_{\theta}$, we have $\frac{d(w_{e_{i,j}}(t_1))}{dt} = 0$.
+
+As $\forall v_i \in \textbf{V}^\prime$ and $\forall v_j \in \textbf{V}-\textbf{V}^\prime$, there is either no edge between $v_i$ and $v_j$, or $w_{e_{i,j}}(t_1)=0$, according to equation (\ref{eq:3}), if $v_i \in \textbf{V}^\prime$, and $v_j \in \textbf{V}-\textbf{V}^\prime$, $\frac{d(w_{e_{i,j}}(t_1))}{dt} <= 0$. As $w_{e_{i,j}}(t_1)>=0$, we have $\frac{d(w_{e_{i,j}}(t_1))}{dt} = 0$
+
+In summary, we have $\forall v_i \in \textbf{V}^\prime$, $\frac{d(w_{e_{i,j}}(t))}{dt}=0$ for any feasible j. It is trivial that $\forall v_i \in \textbf{V}^\prime$, $\sum_{j=1}^{n} w_{e_{i,j}}(t) > 0$. As the two constraints still hold at time $t+\delta t$, we can then prove $\forall t >= t_1$, $\frac{d(w_{e_{i,j}}(t))}{dt}=0$ is true for any $v_i \in \textbf{V}^\prime$. So $\textbf{G}(\textbf{V},\textbf{E})$(t) has deadlock.
+
+$\Leftarrow$ (not finished yet) The key of the proof is to derive a $\textbf{V}^\star$ from $\textbf{V}^\prime$ which satisfies the two constraints of the sufficient and necessary condition. I need more time to work out the details.
+
+
+%Let $t_1$ be a time that satisfies $t_1 > t_0$ and $t_1<\infty$. Assuming $\exists v_i \in \textbf{V}^\prime$, $\sum_{j=1}^{n} w_{e_{i,j}}(t_1) < m_{\theta}$, then the first constraint will be violated. So we have $\sum_{j=1}^{n} w_{e_{i,j}}(t_1) = m_{\theta}$.
+
+
+
+
+%As $ \forall v_i \in \textbf{V}\prime$, and $\forall v_j \in \textbf{V}$, $ \frac{d(w_{e_{i,j}}(t_1))}{dt} = \frac{w_{e_{i,j}}(t_1+\delta t)-w_{e_{i,j}}(t_1)}{dt} = 0$, we have $w_{e_{i,j}}(t_1+\delta t)=w_{e_{i,j}}(t_1)$. According to equation (\ref{eq:4}), either $\sum_{k=1}^{n} w_{e_{k,i}}(t_1) = 0$ or $\sum_{k=1}^{n} w_{e_{j,k}}(t_1) = m_{\theta}$.
+%
+%As $\forall v_i \in \textbf{V}\prime$, $\sum_{j=1}^{n} w_{e_{i,j}}(t_1) > 0$, if $\sum_{k=1}^{n} w_{e_{k,i}}(t_1) = 0$ and $\sum_{k=1}^{n} w_{e_{j,k}}(t_1) < m_{\theta}$, according to equation (\ref{eq:4}), we have \frac{d(w_{e_{i,j}}(t_1))}{dt} < 0
+
+
+

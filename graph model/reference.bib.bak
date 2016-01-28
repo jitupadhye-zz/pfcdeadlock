@@ -1,0 +1,453 @@
+@inproceedings{fattree,
+ author = {Mohammad Al-Fares and Alexander Loukissas and Amin Vahdat},
+ title = {A Scalable, Commodity Data Center Network Architecture},
+ booktitle = {ACM SIGCOMM},
+ year = {2008}
+ }
+
+@inproceedings{wfq,
+ author = {Demers, A. and Keshav, S. and Shenker, S.},
+ title = {Analysis and Simulation of a Fair Queueing Algorithm},
+ booktitle = {SIGCOMM '89},
+}
+
+@inproceedings{pgs,
+ author = {Stoica, Ion and Zhang, Hui},
+ title = {Providing Guaranteed Services Without Per Flow Management},
+ booktitle = {SIGCOMM '99},
+}
+
+@inproceedings{cfq,
+ author = {Stoica, Ion and Shenker, Scott and Zhang, Hui},
+ title = {Core-stateless Fair Queueing: A Scalable Architecture to Approximate Fair Bandwidth Allocations in High-speed Networks},
+ booktitle = {SIGCOMM '98},
+}
+
+
+@article{RCP1,
+ author = {Dukkipati, Nandita and McKeown, Nick},
+ title = {Why Flow-completion Time is the Right Metric for Congestion Control},
+ journal = {SIGCOMM Comput. Commun. Rev.},
+ issue_date = {January 2006},
+}
+
+@article{RCP2,
+ author = {Kelly, Frank and Raina, Gaurav and Voice, Thomas},
+ title = {Stability and Fairness of Explicit Congestion Control with Small Buffers},
+ journal = {SIGCOMM Comput. Commun. Rev.},
+ issue_date = {July 2008},
+}
+
+
+
+@inproceedings{per-packet,
+ author = {Cao, Jiaxin and Xia, Rui and Yang, Pengkun and Guo, Chuanxiong and Lu, Guohan and Yuan, Lihua and Zheng, Yixin and Wu, Haitao and Xiong, Yongqiang and Maltz, Dave},
+ title = {Per-packet Load-balanced, Low-latency Routing for Clos-based Data Center Networks},
+ booktitle = {ACM CoNEXT},
+ year = {2013},
+}
+
+@inproceedings{pase,
+ author = {Ali Munir and Ghufran Baig and Syed Muhammad Irteza and Ihsan Ayyub Qazi and Alex Liu and Fahad Dogar},
+ title = {Friends, not Foes - Synthesizing Existing Transport Strategies for Data Center Networks},
+ booktitle = {SIGCOMM 2014},
+}
+
+@inproceedings{Presto,
+ author = {Keqiang He and Eric Rozner and Kanak Agarwal and Wes Felter and John Carter and Aditya Akella},
+ title = {Presto: Edge-based Load Balancing for Fast Datacenter Networks},
+ booktitle = {SIGCOMM 2015},
+}
+
+@inproceedings{faircloud,
+   author = {Lucian Popa and et.al.},
+   title = {FairCloud: Sharing the Network in Cloud Computing},
+    booktitle = {SIGCOMM},
+   year = {2012}
+}
+
+@inproceedings{tag,
+   author = {Jeongkeun Lee and Myungjin Lee and Lucian Popa and Yoshio Turner and Sujata Banerjee},
+   title = {CloudMirror: Application-Aware Bandwidth Reservations in the Cloud},
+    booktitle = {HotCloud},
+   year = {2013}
+}
+
+@inproceedings{bobtail,
+   author = {Yunjing Xu and Zachary Musgrave and Brian Noble and Michael Bailey},
+   title = {Bobtail: Avoiding Long Tails in the Cloud},
+    booktitle = {NSDI},
+   year = {2013}
+}
+
+@inproceedings{cloudmeasurement,
+   author = {J. Schad and J. Dittrich and J. Ruiz},
+   title = {Runtime Measurements in the Cloud: Observing, Analyzing, and Reducing Variance},
+    booktitle = {VLDB},
+   year = {2010}
+}
+
+@inproceedings{cloudcmp,
+   author = {Ang Li and Xiaowei Yang and Srikanth Kandula and Ming Zhang},
+   title = {CloudCmp: Comparing Public Cloud Providers},
+    booktitle = {IMC},
+   year = {2010}
+}
+
+@inproceedings{silo,
+   author = {Keon Jang and Justine Sherry and Hitesh Ballani and Toby Moncaster},
+   title = {Silo: Predictable Message Completion Time in the Clouds},
+    booktitle = {SIGCOMM},
+   year = {2015}
+}
+
+@inproceedings{secondnet,
+   author = {Chuanxiong Guo and Guohan Lu and Helen Wang and Shuang Yang and Chao Kong and Peng Sun and Wenfei Wu and Yongguang Zhang},
+   title = {SecondNet: A Data Center Network Virtualization Architecture with Bandwidth Guarantees},
+    booktitle = {CoNEXT},
+   year = {2010}
+}
+
+@inproceedings{oktopus,
+   author = {Hitesh Ballani and Paolo Costa and Thomas Karagiannis and Ant Rowstron},
+   title = {Towards Predictable Datacenter Networks},
+   booktitle = {SIGCOMM},
+   year = {2011}
+}
+
+@inproceedings{tivc,
+   author = {Di Xie and Ning Ding and Y. Charlie Hu and Ramana Kompella},
+   title = {The Only Constant is Change: Incorporating Time-Varying Network Reservations in Data Centers},
+   booktitle = {SIGCOMM},
+   year = {2012}
+}
+
+@INPROCEEDINGS{gfs,
+    author={Sanjay Ghemawat and Howard Gobioff and ShunTak Leung},
+    booktitle={SOSP},
+    title={The Google File System},
+    year={2003}
+}
+
+@inproceedings{elasticswitch,
+ author = {Lucian Popa and Praveen Yalagandula and Sujata Banerjee and Jeffrey C. Mogul and Yoshio Turner and Jose Renato Santos},
+ title = {ElasticSwitch: practical work-conserving bandwidth guarantees for cloud computing},
+ booktitle = {SIGCOMM 2013},
+}
+
+@inproceedings{ictcp,
+ author = {Wu, Haitao and Feng, Zhenqian and Guo, Chuanxiong and Zhang, Yongguang},
+ title = {ICTCP: Incast Congestion Control for TCP in data center networks},
+ booktitle = {CoNEXT 2010},
+}
+
+@inproceedings{mcp,
+ author = {Chen, Li and Hu, Shuihai and Chen, Kai and Wu, Haitao and Tsang, Danny},
+ title = {Towards Minimal-Delay Deadline-Driven Data Center TCP},
+ booktitle = {HotNets 2013},
+}
+
+@inproceedings{dctcp,
+ author = {Alizadeh, Mohammad and Greenberg, Albert and Maltz, David A. and Padhye, Jitendra and Patel, Parveen and Prabhakar, Balaji and Sengupta, Sudipta and Sridharan, Murari},
+ title = {Data center TCP (DCTCP)},
+ booktitle = {SIGCOMM 2010},
+}
+
+@inproceedings{rto,
+ author = {Vasudevan, Vijay and Phanishayee, Amar and Shah, Hiral and Krevat, Elie and Andersen, David G. and Ganger, Gregory R. and Gibson, Garth A. and Mueller, Brian},
+ title = {Safe and effective fine-grained TCP retransmissions for datacenter communication},
+ booktitle = {SIGCOMM 2009},
+}
+
+@inproceedings{measurement,
+ author = {Phanishayee, Amar and Krevat, Elie and Vasudevan, Vijay and Andersen, David G. and Ganger, Gregory R. and Gibson, Garth A. and Seshan, Srinivasan},
+ title = {Measurement and analysis of TCP throughput collapse in cluster-based storage systems},
+ booktitle = {FAST 2008},
+}
+
+@inproceedings{understaning,
+ author = {Chen, Yanpei and Griffith, Rean and Liu, Junda and Katz, Randy H. and Joseph, Anthony D.},
+ title = {Understanding TCP incast throughput collapse in datacenter networks},
+ booktitle = {WREN 2009},
+}
+
+@article{mapreduce,
+  title={MapReduce: simplified data processing on large clusters},
+  author={Dean, Jeffrey and Ghemawat, Sanjay},
+  journal={Communications of the ACM},
+  pages={107--113},
+  year={2008},
+}
+
+@inproceedings{spark,
+ author = {Zaharia, Matei and Chowdhury, Mosharaf and Das, Tathagata and Dave, Ankur and Ma, Justin and McCauley, Murphy and Franklin, Michael J. and Shenker, Scott and Stoica, Ion},
+ title = {Resilient distributed datasets: a fault-tolerant abstraction for in-memory cluster computing},
+ booktitle = {NSDI 2012},
+}
+
+@inproceedings{pias,
+ title = {Information-Agnostic Flow Scheduling for Commodity Data Centers},
+ author = {Bai, Wei and Chen, Li and Chen, Kai, and Han, Dongsu and Tian, Chen and Wang, Hao},
+ booktitle = {NSDI 2015},
+}
+
+@inproceedings{taming,
+  title={Taming TCP Incast Throughput Collapse in Data Center Networks},
+  author={Zhang, Jiao and Ren, Fengyuan and Tang, Li and Lin, Chuang},
+  booktitle = {ICNP 2013},
+}
+
+@inproceedings{panasas,
+ author = {Nagle, David and Serenyi, Denis and Matthews, Abbie},
+ title = {The Panasas ActiveScale Storage Cluster: Delivering Scalable High Bandwidth Storage},
+ booktitle = {Supercomputing 2004},
+}
+
+@inproceedings{tuning,
+ author = {Wu, Haitao and Ju, Jiabo and Lu, Guohan and Guo, Chuanxiong and Xiong, Yongqiang and Zhang, Yongguang},
+ title = {Tuning ECN for data center networks},
+ booktitle = {CoNEXT 2012},
+}
+
+@inproceedings{eyeq,
+ author = {Jeyakumar, Vimalkumar and Alizadeh, Mohammad and Mazieres, David and Prabhakar, Balaji and Kim, Changhoon and Greenberg, Albert},
+ title = {EyeQ: practical network performance isolation at the edge},
+ booktitle = {NSDI 2013},
+}
+
+@inproceedings{vl2,
+ author = {Greenberg, Albert and Hamilton, James R. and Jain, Navendu and Kandula, Srikanth and Kim, Changhoon and Lahiri, Parantap and Maltz, David A. and Patel, Parveen and Sengupta, Sudipta},
+ title = {VL2: a scalable and flexible data center network},
+ booktitle = {SIGCOMM 2009},
+}
+
+@article{vegas,
+ author = {Brakmo, L. S. and Peterson, L. L.},
+ title = {TCP Vegas: end to end congestion avoidance on a global Internet},
+ journal = {IEEE J.Sel. A. Commun.},
+ issue_date = {September 2006},
+ pages = {1465--1480},
+}
+
+@inproceedings{wfq,
+ author = {Demers, A. and Keshav, S. and Shenker, S.},
+ title = {Analysis and simulation of a fair queueing algorithm},
+ booktitle = {SIGCOMM 1989},
+}
+
+@misc{ns2,
+ title = {{The Network Simulator NS-2}},
+ howpublished = "\url{http://www.isi.edu/nsnam/ns/}",
+}
+
+@misc{dctcp-ns2,
+ title = {{DCTCP NS-2 Simulation}},
+ howpublished = "\url{http://simula.stanford.edu/~alizade/Site/DCTCP_files/dctcp-ns2-rev1.0.tar.gz}",
+}
+
+@inproceedings{tcp,
+ author = {Jacobson, V.},
+ title = {Congestion avoidance and control},
+ booktitle = {SIGCOMM 1988},
+}
+
+@inproceedings{memcache,
+ author = {Nishtala, Rajesh and Fugal, Hans and Grimm, Steven and Kwiatkowski, Marc and Lee, Herman and Li, Harry C. and McElroy, Ryan and Paleczny, Mike and Peek, Daniel and Saab, Paul and Stafford, David and Tung, Tony and Venkataramani, Venkateshwaran},
+ title = {Scaling Memcache at Facebook},
+ booktitle = {NSDI 2013},
+}
+
+@article{RED,
+ author = {Floyd, Sally and Jacobson, Van},
+ title = {Random early detection gateways for congestion avoidance},
+ journal = {IEEE/ACM Trans. Netw.},
+ issue_date = {Aug. 1993},
+ pages = {397--413},
+}
+
+@inproceedings{zhang2011modeling,
+  title={Modeling and understanding TCP incast in data center networks},
+  author={Zhang, Jiao and Ren, Fengyuan and Lin, Chuang},
+  booktitle={INFOCOM 2011},
+}
+
+@article{dryad,
+  title={Dryad: distributed data-parallel programs from sequential building blocks},
+  author={Isard, Michael and Budiu, Mihai and Yu, Yuan and Birrell, Andrew and Fetterly, Dennis},
+  journal={ACM SIGOPS Operating Systems Review},
+  pages={59--72},
+  year={2007},
+}
+
+@inproceedings{d3,
+  title={Better never than late: Meeting deadlines in datacenter networks},
+  author={Wilson, Christo and Ballani, Hitesh and Karagiannis, Thomas and Rowtron, Ant},
+  booktitle={SIGCOMM'11},
+}
+
+@inproceedings{cp,
+ author = {Peng Cheng, Fengyuan Ren, Ran Shu, Chuang Lin},
+ title = {Catch the Whole Lot in an Action: Rapid Precise Packet Loss Notification in Data Centers},
+ booktitle = {NSDI 2014},
+}
+
+@misc{ecn,
+  title={RFC 3168: The addition of explicit congestion notification (ECN) to IP},
+  author={Ramakrishnan, K and Floyd, Sally and Black, David and others},
+  year={2001},
+}
+
+@misc{dctcp-windows2012,
+ title = {{DCTCP in Windows Server 2012 }},
+ howpublished = "\url{http://technet.microsoft.com/en-us/library/hh997028.aspx}",
+}
+
+@article{cubic,
+  title={CUBIC: a new TCP-friendly high-speed TCP variant},
+  author={Ha, Sangtae and Rhee, Injong and Xu, Lisong},
+  journal={ACM SIGOPS Operating Systems Review},
+  year={2008},
+}
+
+@inproceedings{pfabric,
+  title={pfabric: Minimal near-optimal datacenter transport},
+  author={Alizadeh, Mohammad and Yang, Shuang and Sharif, Milad and Katti, Sachin and McKeown, Nick and Prabhakar, Balaji and Shenker, Scott},
+  booktitle={SIGCOMM 2013},
+}
+
+@inproceedings{pdq,
+  title={Finishing flows quickly with preemptive scheduling},
+  author={Hong, Chi-Yao and Caesar, Matthew and Godfrey, P},
+  booktitle={SIGCOMM 2012},
+}
+
+@inproceedings{d2tcp,
+  title={Deadline-aware datacenter tcp (d2tcp)},
+  author={Vamanan, Balajee and Hasan, Jahangir and Vijaykumar, TN},
+  booktitle={SIGCOMM 2012},
+}
+
+@inproceedings{cloudmirror,
+ title = {Application-driven Bandwidth Guarantees in Datacenters},
+ author = {Lee, Jeongkeun and Turner, Yoshio and Lee, Myungjin and Popa, Lucian and Banerjee, Sujata and Kang, Joon-Myung and Sharma, Puneet},
+ booktitle = {SIGCOMM 2014},
+}
+
+
+
+@book{operating,
+  title={Operating system concepts},
+  author={Silberschatz, Abraham and Galvin, Peter B and Gagne, Greg and Silberschatz, A},
+  year={1998},
+}
+
+@inproceedings{mlfq,
+  title={An experimental time-sharing system},
+  author={Corbat{\'o}, Fernando J and Merwin-Daggett, Marjorie and Daley, Robert C},
+  booktitle={Proceedings of the May 1-3, 1962, spring joint computer conference},
+  pages={335--344},
+}
+
+@inproceedings{mptcp,
+ author = {Raiciu, Costin and Paasch, Christoph and Barre, Sebastien and Ford, Alan and Honda, Michio and Duchene, Fabien and Bonaventure, Olivier and Handley, Mark},
+ title = {How Hard Can It Be? Designing and Implementing a Deployable Multipath TCP},
+ booktitle = {NSDI'12},
+}
+
+
+@inproceedings{drb,
+  title={Per-packet load-balanced, low-latency routing for clos-based data center networks},
+  author={Cao, Jiaxin and Xia, Rui and Yang, Pengkun and Guo, Chuanxiong and Lu, Guohan and Yuan, Lihua and Zheng, Yixin and Wu, Haitao and Xiong, Yongqiang and Maltz, Dave},
+  booktitle={CoNEXT 2013},
+}
+
+@inproceedings{spraying,
+  title={On the impact of packet spraying in data center networks},
+  author={Dixit, Advait and Prakash, Pawan and Hu, Y Charlie and Kompella, Ramana Rao},
+  booktitle={INFOCOM 2013},
+}
+
+@misc{ecmp,
+  title={RFC 2992: Analysis of an Equal-Cost Multi-Path Algorithm},
+  author={Hopps, C},
+  year={2000}
+}
+
+@misc{IOCTL,
+  title={Linux IOCTL},
+  howpublished = "\url{http://man7.org/linux/man-pages/man2/ioctl.2.html}",
+}
+
+@misc{netfilter,
+  title={Linux netfilter},
+  howpublished = "\url{http://www.netfilter.org}",
+}
+
+@misc{hrtimer,
+  title={Hrtimer},
+  howpublished = "\url{https://www.kernel.org/doc/Documentation/timers/hrtimers.txt}",
+}
+
+@misc{DSCP,
+  title={Different Service Code Point},
+  howpublished = "\url{http://en.wikipedia.org/wiki/Type_of_service}",
+}
+
+
+
+@article{tcptimestamp,
+  title={RFC 1323: TCP extensions for high performance},
+  author={Jacobson, Van and Braden, Robert and Borman, David},
+  year={1992}
+}
+
+@misc{dctcp-kernel,
+ title = {{DCTCP Patch}},
+ howpublished = "\url{http://simula.stanford.edu/~alizade/Site/DCTCP.html}",
+}
+
+@article{adding,
+  title={Adding Explicit Congestion Notification (ECN) Capability to TCP's SYN/ACK Packets},
+  author={Kuzmanovic, A and Mondal, A and Floyd, S and Ramakrishnan, KK},
+  journal={draft-ietf-tcpm-ecnsyn-03 (work in progress)},
+  year={2007}
+}
+
+@inproceedings{hull,
+  title={Less is more: trading a little bandwidth for ultra-low latency in the data center},
+  author={Alizadeh, Mohammad and Kabbani, Abdul and Edsall, Tom and Prabhakar, Balaji and Vahdat, Amin and Yasuda, Masato},
+  booktitle={NSDI 2012},
+}
+
+@inproceedings{gatekeeper,
+  title={Gatekeeper: Supporting Bandwidth Guarantees for Multi-tenant Datacenter Networks.},
+  author={Rodrigues, Henrique and Santos, Jose Renato and Turner, Yoshio and Soares, Paolo and Guedes, Dorgival},
+  booktitle={WIOV},
+  year={2011}
+}
+
+@inproceedings{seawall,
+ author = {Shieh, Alan and Kandula, Srikanth and Greenberg, Albert and Kim, Changhoon and Saha, Bikas},
+ title = {Sharing the Data Center Network},
+ booktitle = {NSDI'11},
+}
+
+
+
+@book{netshare,
+  title={NetShare: Virtualizing data center networks across services},
+  author={Lam, Terry and Radhakrishnan, Sivasankar and Vahdat, Amin and Varghese, George},
+  year={2010},
+}
+
+@article{detail,
+  title={DeTail: reducing the flow completion time tail in datacenter networks},
+  author={Zats, David and Das, Tathagata and Mohan, Prashanth and Borthakur, Dhruba and Katz, Randy},
+  journal={ACM SIGCOMM Computer Communication Review},
+}
+
+@inproceedings{Zhang:2015:CEO:2789770.2789807,
+ author = {Zhang, Yiming and Guo, Chuanxiong and Li, Dongsheng and Chu, Rui and Wu, Haitao and Xiong, Yongqiang},
+ title = {CubicRing: Enabling One-hop Failure Detection and Recovery for Distributed In-memory Storage Systems},
+ booktitle = {NSDI'15},
+}
