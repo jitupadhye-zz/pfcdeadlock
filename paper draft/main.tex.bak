@@ -112,7 +112,7 @@
 \newcommand{\parae}[1]{\paraspace\noindent{\em #1} }
 \newcommand{\parabe}[1]{\paraspace\noindent{\bf \em #1} }
 %\newcommand{\kai}[1]{{\color{blue}[Kai: #1]}}
-\newcommand{\todo}{\textcolor{black}}
+\newcommand{\todo}{\textcolor{red}}
 
 \def\naive{na\"\i ve}
 
@@ -183,11 +183,11 @@
 \maketitle
 
 %\vspace{-0.2in}
-%\input{sections/abstract.tex}
-%\input{sections/introduction.tex}
+\input{sections/abstract.tex}
+\input{sections/introduction.tex}
 %\input{sections/background.tex}
-\input{sections/overview.tex}
-%\input{sections/design.tex}
+\input{sections/analysis.tex}
+\input{sections/design.tex}
 %\input{sections/implementation.tex}
 %\input{sections/evaluation.tex}
 %\input{sections/application.tex}

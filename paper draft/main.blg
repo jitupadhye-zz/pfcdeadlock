@@ -1,15 +1,10 @@
 This is BibTeX, Version 0.99dThe top-level auxiliary file: main.aux
 The style file: IEEEtran.bst
+I found no \citation commands---while reading file main.aux
 Database file #1: reference.bib
 -- IEEEtran.bst version 1.12 (2007/01/11) by Michael Shell.
 -- http://www.michaelshell.org/tex/ieeetran/bibtex/
 -- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
-Warning--empty booktitle in libra
-Warning--empty year in libra
-Warning--empty booktitle in dcqcn
-Warning--empty year in dcqcn
-Warning--empty booktitle in everflow
-Warning--empty year in everflow
 
 Done.
-(There were 6 warnings)
+(There was 1 error message)
