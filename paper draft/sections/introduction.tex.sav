@@ -1,0 +1,9 @@
+%\vspace{-0.1in}
+\section{Introduction}\label{sec:intro}
+
+Driven by the need for ultra-low latency, high throughput and low CPU overhead, both Microsoft and Google are deploying Remote Direct Memory Access (RDMA) in their datacenters in rent years. Among the available RDMA technologies,  RDMA over Converged Ethernet (RoCE) is a promising one as it is compatible with current IP and Ethernet based datacenter network.
+
+The deployment of RoCE requires Priority-based Flow Control (PFC) to provide a lossless L2 network. With PFC, packet loss can be avoided by letting a switch pause its immediate upstream device before buffer overflow occurs. However, the adoption of PFC can lead to deadlock problem. Deadlock refers to such a situation: There is a cyclic buffer dependency among a set of switches. Any switch in the cycle holds all the buffer needed by its upstream switch, and meanwhile is waiting for its downstream switch to release some buffer and resume its packet transmission. It is easy to see that no switch can proceed under such a condition.
+
+When deadlock occurs, the whole datacenter network may crash due to the backpressure effect of PFC pause. In the past, many solutions have been proposed to prevent deadlock in a lossless network. While concrete designs are different, the core idea behind these solutions are to break t 
+

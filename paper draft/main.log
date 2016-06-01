@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9) (preloaded format=pdflatex 2014.1.28)  26 MAY 2016 01:27
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9) (preloaded format=pdflatex 2014.1.28)  2 JUN 2016 04:28
 entering extended mode
 **main.tex
 ("D:\pfcdeadlock\paper draft\main.tex"
@@ -586,14 +586,7 @@ Package caption Info: wrapfig package is loaded.
 \hour=\count142
 \minute=\count143
 
-("D:\pfcdeadlock\paper draft\main.aux"
-
-LaTeX Warning: Label `fig:case1' multiply defined.
-
-
-LaTeX Warning: Label `fig:case1' multiply defined.
-
-)
+("D:\pfcdeadlock\paper draft\main.aux")
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 177.
 LaTeX Font Info:    ... okay on input line 177.
 LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 177.
@@ -609,7 +602,8 @@ LaTeX Font Info:    ... okay on input line 177.
 LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 177.
 LaTeX Font Info:    Try loading font information for TS1+cmr on input line 177.
 
- (C:\CTEX\MiKTeX\tex\latex\base\ts1cmr.fd
+
+(C:\CTEX\MiKTeX\tex\latex\base\ts1cmr.fd
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    ... okay on input line 177.
@@ -655,8 +649,17 @@ LaTeX Font Info:    Try loading font information for U+stmry on input line 183.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1.
 )
-("D:\pfcdeadlock\paper draft\sections/introduction.tex")
-("D:\pfcdeadlock\paper draft\sections/analysis.tex"
+("D:\pfcdeadlock\paper draft\sections/introduction.tex"
+Underfull \hbox (badness 1629) in paragraph at lines 6--7
+[]\OT1/ptm/m/n/10 The de-ploy-ment of RoCE re-quires Priority-based
+ []
+
+
+Underfull \hbox (badness 3872) in paragraph at lines 15--16
+[]\OT1/ptm/m/n/10 Though obey-ing this prin-ci-ple can guar-an-tee a
+ []
+
+) ("D:\pfcdeadlock\paper draft\sections/analysis.tex"
 
 pdfTeX warning: pdflatex.exe (file D:/pfcdeadlock/paper draft/figs/case1_topo.p
 df): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
@@ -664,233 +667,313 @@ df): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
 File: figs/case1_topo.pdf Graphic file (type pdf)
 
 <use figs/case1_topo.pdf>
-Package pdftex.def Info: figs/case1_topo.pdf used on input line 9.
-(pdftex.def)             Requested size: 164.4171pt x 95.29733pt.
+Package pdftex.def Info: figs/case1_topo.pdf used on input line 11.
+(pdftex.def)             Requested size: 187.89912pt x 108.90816pt.
 
 
 pdfTeX warning: pdflatex.exe (file D:/pfcdeadlock/paper draft/figs/case1_buffer
-.pdf): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowe
-d
-<figs/case1_buffer.pdf, id=2, 226.88765pt x 195.24344pt>
-File: figs/case1_buffer.pdf Graphic file (type pdf)
+_dependency.pdf): PDF inclusion: found PDF version <1.6>, but at most version <
+1.5> allowed
+<figs/case1_buffer_dependency.pdf, id=2, 226.88765pt x 195.24344pt>
+File: figs/case1_buffer_dependency.pdf Graphic file (type pdf)
 
-<use figs/case1_buffer.pdf>
-Package pdftex.def Info: figs/case1_buffer.pdf used on input line 12.
-(pdftex.def)             Requested size: 140.92792pt x 121.2761pt.
+<use figs/case1_buffer_dependency.pdf>
+Package pdftex.def Info: figs/case1_buffer_dependency.pdf used on input line 14
+.
+(pdftex.def)             Requested size: 112.74377pt x 97.01967pt.
 Package epstopdf Info: Source file: <figs/case1_pause.eps>
-(epstopdf)                    date: 2016-05-25 23:08:41
-(epstopdf)                    size: 237184 bytes
+(epstopdf)                    date: 2016-06-02 00:55:30
+(epstopdf)                    size: 127541 bytes
 (epstopdf)             Output file: <figs/case1_pause-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-05-25 23:08:47
-(epstopdf)                    size: 6962 bytes
+(epstopdf)                    date: 2016-06-02 00:55:40
+(epstopdf)                    size: 17146 bytes
 (epstopdf)             Command: <epstopdf --outfile=figs/case1_pause-eps-conver
 ted-to.pdf figs/case1_pause.eps>
-(epstopdf)             \includegraphics on input line 15.
+(epstopdf)             \includegraphics on input line 17.
 Package epstopdf Info: Output file is already uptodate.
 
-<figs/case1_pause-eps-converted-to.pdf, id=3, 367.3725pt x 297.11pt>
+<figs/case1_pause-eps-converted-to.pdf, id=3, 376.40625pt x 285.065pt>
 File: figs/case1_pause-eps-converted-to.pdf Graphic file (type pdf)
 
 <use figs/case1_pause-eps-converted-to.pdf>
 Package pdftex.def Info: figs/case1_pause-eps-converted-to.pdf used on input li
-ne 15.
-(pdftex.def)             Requested size: 140.92792pt x 113.97742pt.
-Package epstopdf Info: Source file: <figs/buffer_A.eps>
-(epstopdf)                    date: 2016-05-26 00:26:18
-(epstopdf)                    size: 606124 bytes
-(epstopdf)             Output file: <figs/buffer_A-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-05-26 00:28:58
-(epstopdf)                    size: 1204691 bytes
-(epstopdf)             Command: <epstopdf --outfile=figs/buffer_A-eps-converted
--to.pdf figs/buffer_A.eps>
-(epstopdf)             \includegraphics on input line 19.
+ne 17.
+(pdftex.def)             Requested size: 140.92792pt x 106.72946pt.
+Package epstopdf Info: Source file: <figs/case1_buffer_occupancy_A.eps>
+(epstopdf)                    date: 2016-06-02 00:54:47
+(epstopdf)                    size: 209954 bytes
+(epstopdf)             Output file: <figs/case1_buffer_occupancy_A-eps-converte
+d-to.pdf>
+(epstopdf)                    date: 2016-06-02 00:55:41
+(epstopdf)                    size: 461877 bytes
+(epstopdf)             Command: <epstopdf --outfile=figs/case1_buffer_occupancy
+_A-eps-converted-to.pdf figs/case1_buffer_occupancy_A.eps>
+(epstopdf)             \includegraphics on input line 21.
 Package epstopdf Info: Output file is already uptodate.
 
-<figs/buffer_A-eps-converted-to.pdf, id=4, 376.40625pt x 297.11pt>
-File: figs/buffer_A-eps-converted-to.pdf Graphic file (type pdf)
-
-<use figs/buffer_A-eps-converted-to.pdf>
-Package pdftex.def Info: figs/buffer_A-eps-converted-to.pdf used on input line 
-19.
-(pdftex.def)             Requested size: 117.43874pt x 92.69704pt.
-Package epstopdf Info: Source file: <figs/buffer_B.eps>
-(epstopdf)                    date: 2016-05-26 00:26:35
-(epstopdf)                    size: 320343 bytes
-(epstopdf)             Output file: <figs/buffer_B-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-05-26 00:29:00
-(epstopdf)                    size: 617304 bytes
-(epstopdf)             Command: <epstopdf --outfile=figs/buffer_B-eps-converted
--to.pdf figs/buffer_B.eps>
-(epstopdf)             \includegraphics on input line 22.
+<figs/case1_buffer_occupancy_A-eps-converted-to.pdf, id=4, 378.41376pt x 297.11
+pt>
+File: figs/case1_buffer_occupancy_A-eps-converted-to.pdf Graphic file (type pdf
+)
+ <use figs/case1_buffer_occupancy_A-eps-converted-to.pdf>
+Package pdftex.def Info: figs/case1_buffer_occupancy_A-eps-converted-to.pdf use
+d on input line 21.
+(pdftex.def)             Requested size: 117.43874pt x 92.20741pt.
+Package epstopdf Info: Source file: <figs/case1_buffer_occupancy_B.eps>
+(epstopdf)                    date: 2016-06-02 00:54:57
+(epstopdf)                    size: 138786 bytes
+(epstopdf)             Output file: <figs/case1_buffer_occupancy_B-eps-converte
+d-to.pdf>
+(epstopdf)                    date: 2016-06-02 00:55:43
+(epstopdf)                    size: 280603 bytes
+(epstopdf)             Command: <epstopdf --outfile=figs/case1_buffer_occupancy
+_B-eps-converted-to.pdf figs/case1_buffer_occupancy_B.eps>
+(epstopdf)             \includegraphics on input line 24.
 Package epstopdf Info: Output file is already uptodate.
 
-<figs/buffer_B-eps-converted-to.pdf, id=5, 376.40625pt x 297.11pt>
-File: figs/buffer_B-eps-converted-to.pdf Graphic file (type pdf)
-
-<use figs/buffer_B-eps-converted-to.pdf>
-Package pdftex.def Info: figs/buffer_B-eps-converted-to.pdf used on input line 
-22.
-(pdftex.def)             Requested size: 117.43874pt x 92.69704pt.
-Package epstopdf Info: Source file: <figs/buffer_C.eps>
-(epstopdf)                    date: 2016-05-26 00:26:49
-(epstopdf)                    size: 590827 bytes
-(epstopdf)             Output file: <figs/buffer_C-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-05-26 00:29:03
-(epstopdf)                    size: 1171822 bytes
-(epstopdf)             Command: <epstopdf --outfile=figs/buffer_C-eps-converted
--to.pdf figs/buffer_C.eps>
-(epstopdf)             \includegraphics on input line 25.
+<figs/case1_buffer_occupancy_B-eps-converted-to.pdf, id=5, 378.41376pt x 297.11
+pt>
+File: figs/case1_buffer_occupancy_B-eps-converted-to.pdf Graphic file (type pdf
+)
+ <use figs/case1_buffer_occupancy_B-eps-converted-to.pdf>
+Package pdftex.def Info: figs/case1_buffer_occupancy_B-eps-converted-to.pdf use
+d on input line 24.
+(pdftex.def)             Requested size: 117.43874pt x 92.20741pt.
+Package epstopdf Info: Source file: <figs/case1_buffer_occupancy_C.eps>
+(epstopdf)                    date: 2016-06-02 00:55:06
+(epstopdf)                    size: 206381 bytes
+(epstopdf)             Output file: <figs/case1_buffer_occupancy_C-eps-converte
+d-to.pdf>
+(epstopdf)                    date: 2016-06-02 00:55:44
+(epstopdf)                    size: 453734 bytes
+(epstopdf)             Command: <epstopdf --outfile=figs/case1_buffer_occupancy
+_C-eps-converted-to.pdf figs/case1_buffer_occupancy_C.eps>
+(epstopdf)             \includegraphics on input line 27.
 Package epstopdf Info: Output file is already uptodate.
 
-<figs/buffer_C-eps-converted-to.pdf, id=6, 376.40625pt x 297.11pt>
-File: figs/buffer_C-eps-converted-to.pdf Graphic file (type pdf)
-
-<use figs/buffer_C-eps-converted-to.pdf>
-Package pdftex.def Info: figs/buffer_C-eps-converted-to.pdf used on input line 
-25.
-(pdftex.def)             Requested size: 117.43874pt x 92.69704pt.
-Package epstopdf Info: Source file: <figs/buffer_D.eps>
-(epstopdf)                    date: 2016-05-26 00:27:01
-(epstopdf)                    size: 298387 bytes
-(epstopdf)             Output file: <figs/buffer_D-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-05-26 00:29:05
-(epstopdf)                    size: 571629 bytes
-(epstopdf)             Command: <epstopdf --outfile=figs/buffer_D-eps-converted
--to.pdf figs/buffer_D.eps>
-(epstopdf)             \includegraphics on input line 28.
+<figs/case1_buffer_occupancy_C-eps-converted-to.pdf, id=6, 378.41376pt x 297.11
+pt>
+File: figs/case1_buffer_occupancy_C-eps-converted-to.pdf Graphic file (type pdf
+)
+ <use figs/case1_buffer_occupancy_C-eps-converted-to.pdf>
+Package pdftex.def Info: figs/case1_buffer_occupancy_C-eps-converted-to.pdf use
+d on input line 27.
+(pdftex.def)             Requested size: 117.43874pt x 92.20741pt.
+Package epstopdf Info: Source file: <figs/case1_buffer_occupancy_D.eps>
+(epstopdf)                    date: 2016-06-02 00:55:19
+(epstopdf)                    size: 133977 bytes
+(epstopdf)             Output file: <figs/case1_buffer_occupancy_D-eps-converte
+d-to.pdf>
+(epstopdf)                    date: 2016-06-02 00:55:45
+(epstopdf)                    size: 270642 bytes
+(epstopdf)             Command: <epstopdf --outfile=figs/case1_buffer_occupancy
+_D-eps-converted-to.pdf figs/case1_buffer_occupancy_D.eps>
+(epstopdf)             \includegraphics on input line 30.
 Package epstopdf Info: Output file is already uptodate.
 
-<figs/buffer_D-eps-converted-to.pdf, id=7, 376.40625pt x 297.11pt>
-File: figs/buffer_D-eps-converted-to.pdf Graphic file (type pdf)
+<figs/case1_buffer_occupancy_D-eps-converted-to.pdf, id=7, 378.41376pt x 297.11
+pt>
+File: figs/case1_buffer_occupancy_D-eps-converted-to.pdf Graphic file (type pdf
+)
+ <use figs/case1_buffer_occupancy_D-eps-converted-to.pdf>
+Package pdftex.def Info: figs/case1_buffer_occupancy_D-eps-converted-to.pdf use
+d on input line 30.
+(pdftex.def)             Requested size: 117.43874pt x 92.20741pt.
 
-<use figs/buffer_D-eps-converted-to.pdf>
-Package pdftex.def Info: figs/buffer_D-eps-converted-to.pdf used on input line 
-28.
-(pdftex.def)             Requested size: 117.43874pt x 92.69704pt.
-
-Overfull \hbox (19.99995pt too wide) in paragraph at lines 19--29
+Overfull \hbox (19.99995pt too wide) in paragraph at lines 21--31
  [][][][][] 
  []
 
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 30.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 32.
+[1{C:/CTEX/UserData/pdftex/config/pdftex.map{Unicode.sfd}{UGBK.sfd}}
 
+
+]
 
 pdfTeX warning: pdflatex.exe (file D:/pfcdeadlock/paper draft/figs/case2_topo.p
 df): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<figs/case2_topo.pdf, id=8, 349.28592pt x 254.6062pt>
+<figs/case2_topo.pdf, id=15, 349.28592pt x 254.6062pt>
 File: figs/case2_topo.pdf Graphic file (type pdf)
 
 <use figs/case2_topo.pdf>
-Package pdftex.def Info: figs/case2_topo.pdf used on input line 41.
-(pdftex.def)             Requested size: 164.4171pt x 119.84752pt.
+Package pdftex.def Info: figs/case2_topo.pdf used on input line 49.
+(pdftex.def)             Requested size: 173.80704pt x 126.69284pt.
 
 
 pdfTeX warning: pdflatex.exe (file D:/pfcdeadlock/paper draft/figs/case2_buffer
-.pdf): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowe
-d
-<figs/case2_buffer.pdf, id=9, 226.88765pt x 203.23929pt>
-File: figs/case2_buffer.pdf Graphic file (type pdf)
+_dependency.pdf): PDF inclusion: found PDF version <1.6>, but at most version <
+1.5> allowed
+<figs/case2_buffer_dependency.pdf, id=16, 226.88765pt x 203.23929pt>
+File: figs/case2_buffer_dependency.pdf Graphic file (type pdf)
 
-<use figs/case2_buffer.pdf>
-Package pdftex.def Info: figs/case2_buffer.pdf used on input line 44.
-(pdftex.def)             Requested size: 140.92792pt x 126.24274pt.
+<use figs/case2_buffer_dependency.pdf>
+Package pdftex.def Info: figs/case2_buffer_dependency.pdf used on input line 52
+.
+(pdftex.def)             Requested size: 126.83585pt x 113.61784pt.
 Package epstopdf Info: Source file: <figs/case2_pause.eps>
-(epstopdf)                    date: 2016-05-26 01:25:41
-(epstopdf)                    size: 3530468 bytes
+(epstopdf)                    date: 2016-06-02 01:02:34
+(epstopdf)                    size: 3530477 bytes
 (epstopdf)             Output file: <figs/case2_pause-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-05-26 01:26:36
-(epstopdf)                    size: 112766 bytes
+(epstopdf)                    date: 2016-06-02 01:02:45
+(epstopdf)                    size: 115822 bytes
 (epstopdf)             Command: <epstopdf --outfile=figs/case2_pause-eps-conver
 ted-to.pdf figs/case2_pause.eps>
-(epstopdf)             \includegraphics on input line 47.
+(epstopdf)             \includegraphics on input line 55.
 Package epstopdf Info: Output file is already uptodate.
 
-<figs/case2_pause-eps-converted-to.pdf, id=10, 378.41376pt x 297.11pt>
+<figs/case2_pause-eps-converted-to.pdf, id=17, 392.46625pt x 297.11pt>
 File: figs/case2_pause-eps-converted-to.pdf Graphic file (type pdf)
 
 <use figs/case2_pause-eps-converted-to.pdf>
 Package pdftex.def Info: figs/case2_pause-eps-converted-to.pdf used on input li
-ne 47.
-(pdftex.def)             Requested size: 140.92792pt x 110.6498pt.
+ne 55.
+(pdftex.def)             Requested size: 140.92792pt x 106.6875pt.
 
+Underfull \hbox (badness 1527) in paragraph at lines 64--65
+[]\OT1/ptm/m/n/10 Buffer de-pen-dency graph of case 1 is drawn in
+ []
+
+[2 <D:/pfcdeadlock/paper draft/figs/case1_topo.pdf> <D:/pfcdeadlock/paper draft
+/figs/case1_buffer_dependency.pdf> <D:/pfcdeadlock/paper draft/figs/case1_pause
+-eps-converted-to.pdf> <D:/pfcdeadlock/paper draft/figs/case1_buffer_occupancy_
+A-eps-converted-to.pdf> <D:/pfcdeadlock/paper draft/figs/case1_buffer_occupancy
+_B-eps-converted-to.pdf> <D:/pfcdeadlock/paper draft/figs/case1_buffer_occupanc
+y_C-eps-converted-to.pdf> <D:/pfcdeadlock/paper draft/figs/case1_buffer_occupan
+cy_D-eps-converted-to.pdf>]
 
 pdfTeX warning: pdflatex.exe (file D:/pfcdeadlock/paper draft/figs/case3_topo.p
 df): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<figs/case3_topo.pdf, id=11, 349.28592pt x 298.7381pt>
+<figs/case3_topo.pdf, id=107, 349.28592pt x 298.7381pt>
 File: figs/case3_topo.pdf Graphic file (type pdf)
 
 <use figs/case3_topo.pdf>
-Package pdftex.def Info: figs/case3_topo.pdf used on input line 62.
-(pdftex.def)             Requested size: 164.4171pt x 140.62115pt.
+Package pdftex.def Info: figs/case3_topo.pdf used on input line 102.
+(pdftex.def)             Requested size: 173.80704pt x 148.65302pt.
 
 
 pdfTeX warning: pdflatex.exe (file D:/pfcdeadlock/paper draft/figs/case3_buffer
-.pdf): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowe
-d
-<figs/case3_buffer.pdf, id=12, 226.88765pt x 208.39156pt>
-File: figs/case3_buffer.pdf Graphic file (type pdf)
+_dependency.pdf): PDF inclusion: found PDF version <1.6>, but at most version <
+1.5> allowed
+<figs/case3_buffer_dependency.pdf, id=108, 226.88765pt x 208.39156pt>
+File: figs/case3_buffer_dependency.pdf Graphic file (type pdf)
 
-<use figs/case3_buffer.pdf>
-Package pdftex.def Info: figs/case3_buffer.pdf used on input line 65.
-(pdftex.def)             Requested size: 140.92792pt x 129.44308pt.
+<use figs/case3_buffer_dependency.pdf>
+Package pdftex.def Info: figs/case3_buffer_dependency.pdf used on input line 10
+5.
+(pdftex.def)             Requested size: 131.53082pt x 120.81313pt.
 Package epstopdf Info: Source file: <figs/case3_pause.eps>
-(epstopdf)                    date: 2016-05-26 01:25:28
-(epstopdf)                    size: 3530468 bytes
+(epstopdf)                    date: 2016-06-02 01:02:38
+(epstopdf)                    size: 3530477 bytes
 (epstopdf)             Output file: <figs/case3_pause-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-05-26 01:27:48
-(epstopdf)                    size: 112766 bytes
+(epstopdf)                    date: 2016-06-02 01:02:49
+(epstopdf)                    size: 115822 bytes
 (epstopdf)             Command: <epstopdf --outfile=figs/case3_pause-eps-conver
 ted-to.pdf figs/case3_pause.eps>
-(epstopdf)             \includegraphics on input line 68.
+(epstopdf)             \includegraphics on input line 108.
 Package epstopdf Info: Output file is already uptodate.
 
-<figs/case3_pause-eps-converted-to.pdf, id=13, 378.41376pt x 297.11pt>
+<figs/case3_pause-eps-converted-to.pdf, id=109, 392.46625pt x 297.11pt>
 File: figs/case3_pause-eps-converted-to.pdf Graphic file (type pdf)
 
 <use figs/case3_pause-eps-converted-to.pdf>
 Package pdftex.def Info: figs/case3_pause-eps-converted-to.pdf used on input li
-ne 68.
-(pdftex.def)             Requested size: 140.92792pt x 110.6498pt.
+ne 108.
+(pdftex.def)             Requested size: 140.92792pt x 106.6875pt.
+Package epstopdf Info: Source file: <figs/case3_buffer_occupancy_A.eps>
+(epstopdf)                    date: 2016-06-01 23:59:56
+(epstopdf)                    size: 159137 bytes
+(epstopdf)             Output file: <figs/case3_buffer_occupancy_A-eps-converte
+d-to.pdf>
+(epstopdf)                    date: 2016-06-02 00:04:00
+(epstopdf)                    size: 348683 bytes
+(epstopdf)             Command: <epstopdf --outfile=figs/case3_buffer_occupancy
+_A-eps-converted-to.pdf figs/case3_buffer_occupancy_A.eps>
+(epstopdf)             \includegraphics on input line 112.
+Package epstopdf Info: Output file is already uptodate.
+
+<figs/case3_buffer_occupancy_A-eps-converted-to.pdf, id=110, 389.455pt x 297.11
+pt>
+File: figs/case3_buffer_occupancy_A-eps-converted-to.pdf Graphic file (type pdf
 )
-("D:\pfcdeadlock\paper draft\main.bbl"
+ <use figs/case3_buffer_occupancy_A-eps-converted-to.pdf>
+Package pdftex.def Info: figs/case3_buffer_occupancy_A-eps-converted-to.pdf use
+d on input line 112.
+(pdftex.def)             Requested size: 155.02pt x 118.2616pt.
+Package epstopdf Info: Source file: <figs/case3_buffer_occupancy_B1.eps>
+(epstopdf)                    date: 2016-06-02 00:00:09
+(epstopdf)                    size: 122277 bytes
+(epstopdf)             Output file: <figs/case3_buffer_occupancy_B1-eps-convert
+ed-to.pdf>
+(epstopdf)                    date: 2016-06-02 00:04:01
+(epstopdf)                    size: 256660 bytes
+(epstopdf)             Command: <epstopdf --outfile=figs/case3_buffer_occupancy
+_B1-eps-converted-to.pdf figs/case3_buffer_occupancy_B1.eps>
+(epstopdf)             \includegraphics on input line 115.
+Package epstopdf Info: Output file is already uptodate.
 
-LaTeX Warning: Empty `thebibliography' environment on input line 24.
+<figs/case3_buffer_occupancy_B1-eps-converted-to.pdf, id=111, 378.41376pt x 297
+.11pt>
+File: figs/case3_buffer_occupancy_B1-eps-converted-to.pdf Graphic file (type pd
+f)
+ <use figs/case3_buffer_occupancy_B1-eps-converted-to.pdf>
+Package pdftex.def Info: figs/case3_buffer_occupancy_B1-eps-converted-to.pdf us
+ed on input line 115.
+(pdftex.def)             Requested size: 155.02pt x 121.71161pt.
+Package epstopdf Info: Source file: <figs/case3_buffer_occupancy_B3.eps>
+(epstopdf)                    date: 2016-06-02 00:00:24
+(epstopdf)                    size: 199106 bytes
+(epstopdf)             Output file: <figs/case3_buffer_occupancy_B3-eps-convert
+ed-to.pdf>
+(epstopdf)                    date: 2016-06-02 00:04:03
+(epstopdf)                    size: 436467 bytes
+(epstopdf)             Command: <epstopdf --outfile=figs/case3_buffer_occupancy
+_B3-eps-converted-to.pdf figs/case3_buffer_occupancy_B3.eps>
+(epstopdf)             \includegraphics on input line 118.
+Package epstopdf Info: Output file is already uptodate.
 
-) [1{C:/CTEX/UserData/pdftex/config/pdftex.map{Unicode.sfd}{UGBK.sfd}}
+<figs/case3_buffer_occupancy_B3-eps-converted-to.pdf, id=112, 378.41376pt x 280
+.04625pt>
+File: figs/case3_buffer_occupancy_B3-eps-converted-to.pdf Graphic file (type pd
+f)
+ <use figs/case3_buffer_occupancy_B3-eps-converted-to.pdf>
+Package pdftex.def Info: figs/case3_buffer_occupancy_B3-eps-converted-to.pdf us
+ed on input line 118.
+(pdftex.def)             Requested size: 155.02pt x 114.7214pt.
 
+Overfull \hbox (10.30502pt too wide) in paragraph at lines 112--119
+ [][][][] 
+ []
 
+[3 <D:/pfcdeadlock/paper draft/figs/case2_topo.pdf> <D:/pfcdeadlock/paper draft
+/figs/case2_buffer_dependency.pdf> <D:/pfcdeadlock/paper draft/figs/case2_pause
+-eps-converted-to.pdf>]) ("D:\pfcdeadlock\paper draft\main.bbl"
+Underfull \hbox (badness 1540) in paragraph at lines 58--61
+\OT1/ptm/m/n/9 Y. Liron, J. Pad-hye, S. Rain-del, M. H. Yahia, and
+ []
 
-]
-[2 <D:/pfcdeadlock/paper draft/figs/case1_topo.pdf> <D:/pfcdeadlock/paper draft
-/figs/case1_buffer.pdf> <D:/pfcdeadlock/paper draft/figs/case1_pause-eps-conver
-ted-to.pdf> <D:/pfcdeadlock/paper draft/figs/buffer_A-eps-converted-to.pdf> <D:
-/pfcdeadlock/paper draft/figs/buffer_B-eps-converted-to.pdf> <D:/pfcdeadlock/pa
-per draft/figs/buffer_C-eps-converted-to.pdf> <D:/pfcdeadlock/paper draft/figs/
-buffer_D-eps-converted-to.pdf> <D:/pfcdeadlock/paper draft/figs/case2_topo.pdf>
- <D:/pfcdeadlock/paper draft/figs/case2_buffer.pdf> <D:/pfcdeadlock/paper draft
-/figs/case2_pause-eps-converted-to.pdf> <D:/pfcdeadlock/paper draft/figs/case3_
-topo.pdf> <D:/pfcdeadlock/paper draft/figs/case3_buffer.pdf> <D:/pfcdeadlock/pa
-per draft/figs/case3_pause-eps-converted-to.pdf>]
-("D:\pfcdeadlock\paper draft\main.aux")
-
-LaTeX Warning: There were multiply-defined labels.
-
- ) 
+) [4 <D:/pfcdeadlock/paper draft/figs/case3_topo.pdf> <D:/pfcdeadlock/paper dra
+ft/figs/case3_buffer_dependency.pdf> <D:/pfcdeadlock/paper draft/figs/case3_pau
+se-eps-converted-to.pdf> <D:/pfcdeadlock/paper draft/figs/case3_buffer_occupanc
+y_A-eps-converted-to.pdf> <D:/pfcdeadlock/paper draft/figs/case3_buffer_occupan
+cy_B1-eps-converted-to.pdf> <D:/pfcdeadlock/paper draft/figs/case3_buffer_occup
+ancy_B3-eps-converted-to.pdf>] ("D:\pfcdeadlock\paper draft\main.aux") ) 
 Here is how much of TeX's memory you used:
- 7578 strings out of 494045
- 109759 string characters out of 3153701
- 177641 words of memory out of 3000000
- 10637 multiletter control sequences out of 15000+200000
- 21148 words of font info for 53 fonts, out of 3000000 for 9000
+ 7638 strings out of 494045
+ 111474 string characters out of 3153701
+ 182641 words of memory out of 3000000
+ 10682 multiletter control sequences out of 15000+200000
+ 30668 words of font info for 78 fonts, out of 3000000 for 9000
  715 hyphenation exceptions out of 8191
- 61i,10n,96p,997b,456s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/CTEX/MiKTeX/fonts/enc/dvips/fontname/8r.enc}<C:/CTEX/MiKTeX/fonts/type1/u
-rw/times/utmb8a.pfb><C:/CTEX/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/CTEX/M
-iKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (2 pages, 4398179 bytes).
+ 61i,10n,96p,997b,454s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/CTE
+X/MiKTeX/fonts/enc/dvips/fontname/8r.enc}<C:/CTEX/MiKTeX/fonts/type1/public/ams
+fonts/cm/cmmi10.pfb><C:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C
+:/CTEX/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/CTEX/MiKTeX/fonts/type1/urw/
+times/utmr8a.pfb><C:/CTEX/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
+Output written on main.pdf (4 pages, 3394526 bytes).
 PDF statistics:
- 285 PDF objects out of 1000 (max. 8388607)
+ 313 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 66 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 81 words of extra memory for PDF output out of 10000 (max. 10000000)
 

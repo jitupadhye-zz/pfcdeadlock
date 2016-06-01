@@ -178,7 +178,7 @@
 %\conferenceinfo{SIGCOMM,} {XXXXXX, XXXXX, XXXXX, XXXXX.} %
 %\CopyrightYear{2009} \crdata{1-59593-308-5/06/0009}
 
-\title{Improving resilience of RDMA data centers}
+\title{ case study of deadlock in RDMA data centers}
 \author{\timestamp}
 \maketitle
 
@@ -187,7 +187,7 @@
 \input{sections/introduction.tex}
 %\input{sections/background.tex}
 \input{sections/analysis.tex}
-\input{sections/design.tex}
+%\input{sections/design.tex}
 %\input{sections/implementation.tex}
 %\input{sections/evaluation.tex}
 %\input{sections/application.tex}

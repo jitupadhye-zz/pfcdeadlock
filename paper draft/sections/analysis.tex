@@ -1,56 +1,96 @@
 \section{Deadlock case study}\label{sec:casestudy}
 
+In this part, we present our simulation study about three deadlock cases, and demonstrate that 1) cyclic buffer dependency is not a sufficient and necessary condition for deadlock; 2) simultaneous cyclic pause is not sufficient to create a permanent deadlock.
+
 \begin{figure*}[t]
 %\vspace{-0.1in}
 \centering
 
 \subfloat[short for lof][Topology and flows.] {
-    \includegraphics[width=0.35\textwidth] {figs/case1_topo}
+    \includegraphics[width=0.4\textwidth] {figs/case1_topo}
 }
-\subfloat[short for lof][Buffer dependency.]{
-    \includegraphics[width=0.3\textwidth] {figs/case1_buffer}  
+\subfloat[short for lof][Buffer dependency graph.]{
+    \includegraphics[width=0.24\textwidth] {figs/case1_buffer_dependency}
 }
 \subfloat[short for lof][Pause events at four links.]{
-    \includegraphics[width=0.3\textwidth] {figs/case1_pause.eps}   
+    \includegraphics[width=0.3\textwidth] {figs/case1_pause.eps}
 }
 
 \subfloat[short for lof][Buffer occupancy at switch A.] {
-    \includegraphics[width=0.25\textwidth] {figs/buffer_A.eps}
+    \includegraphics[width=0.25\textwidth] {figs/case1_buffer_occupancy_A.eps}
 }
 \subfloat[short for lof][Buffer occupancy at switch B.] {
-    \includegraphics[width=0.25\textwidth] {figs/buffer_B.eps}
+    \includegraphics[width=0.25\textwidth] {figs/case1_buffer_occupancy_B.eps}
 }
 \subfloat[short for lof][Buffer occupancy at switch C.] {
-    \includegraphics[width=0.25\textwidth] {figs/buffer_C.eps}
+    \includegraphics[width=0.25\textwidth] {figs/case1_buffer_occupancy_C.eps}
 }
 \subfloat[short for lof][Buffer occupancy at switch D.] {
-    \includegraphics[width=0.25\textwidth] {figs/buffer_D.eps}
+    \includegraphics[width=0.25\textwidth] {figs/case1_buffer_occupancy_D.eps}
 }
 
 \caption{Deadlock case 1.}\label{fig:case1}
 
 \end{figure*}
 
+ \textbf{Simulation setup}: To create a well controlled experimental environment for deadlock analysis, we did our deadlock case study using packet-level NS-3 simulations. 
+ 
+ In our modified NS-3 simulator, we implement PFC protocol (i.e., IEEE 802.1 Qbb protocol). Note that most modern commodity switches are output-queued, while PFC works in a per ingress queue fashion. Basically, for each ingress queue, the switch will maintain a counter to track its instant virtual queue length (i.e., bytes of buffered packets received by this ingress queue). Once the queue length of an ingress queue exceeds the pre-configured PFC threshold, a pause frame will be sent to the corresponding upstream device. The upstream device then stop sending any packet to this ingress queue unless 1) the pause frame has expired; 2) or it has received a resume frame from this ingress queue.
+ 
+ In our simulations, link capacity of all links is 40Gbps. All the switches have 12MB buffer. PFC threshold is statically set to 40KB for each ingress queue.
+
 
 \begin{figure*}[t]
 %\vspace{-0.1in}
 \centering
 
 \subfloat[short for lof][Topology and flows.] {
-    \includegraphics[width=0.35\textwidth] {figs/case2_topo}
+    \includegraphics[width=0.37\textwidth] {figs/case2_topo}
 }
-\subfloat[short for lof][Buffer dependency.]{
-    \includegraphics[width=0.3\textwidth] {figs/case2_buffer}
+\subfloat[short for lof][Buffer dependency graph.]{
+    \includegraphics[width=0.27\textwidth] {figs/case2_buffer_dependency}
 }
 \subfloat[short for lof][Pause events at four links.]{
     \includegraphics[width=0.3\textwidth] {figs/case2_pause.eps}
 }
 
 
-\caption{Deadlock case 2.}\label{fig:case1}
+\caption{Deadlock case 2.}\label{fig:case2}
 
 \end{figure*}
 
+\textbf{Case 1:} In this case, as shown in Fig.~\ref{fig:case1}(a), we let two flows run over four switches A, B, C and D. Flow 1 starts at a host (not shown) attached to A, passes through B and C, and ends at a host attached to D. Flow 2 starts at a host attached to C, passes through D and A, and ends at a host attached to B. In the figure, RX represents input queue (or port), while TX represents output queue (or port). To evaluate whether there will be deadlock in the worst case, both flows are UDP flows with infinite traffic demand.
+
+Buffer dependency graph of case 1 is drawn in Fig.~\ref{fig:case1}(b). Each directed line represents a buffer dependency from the source TX to the destination TX. For example, packets buffered in TX1 of A will be sent to either TX1 or TX2 of B, so in Fig.~\ref{fig:case1}(b), two directed lines are drawn there between A and B. Similarly, we can draw the dependency lines between other switches. As we can see in Fig.~\ref{fig:case1}(b), there is a cyclic buffer dependency among the four switches, i.e., dependencies from TX1 of A to TX1 of B, then to TX1 of C, then to TX1 of D, and finally back to TX1 of A.
+
+In Fig.~\ref{fig:case1}(c), we plot the PFC pause events at four links L1, L2, L3 and L4. Basically, if link Li (i=1,2,3,4) is paused at time t, we plot a point at location (t, i). Pause events at different links are plotted with different colors and of different heights. As we can observe, links L2 and L4 are paused continuously, while the other two links L1 and L3 never get paused. In this case, deadlock will never occur as no packet will be paused permanently.
+
+To understand the pause pattern in Fig.~\ref{fig:case1}(c), we sample the instant buffer occupancy of both flows at TX1 queues of A, B, C and D every 1us. In Fig.~\ref{fig:case1}(d), we draw the instant buffer occupancy of flow 2 at TX1 of A. Buffer occupancy of flow 1 is not drawn in Fig.~\ref{fig:case1}(d) as it does not contribute to the pause of link L1 (Note that PFC works in a per ingress queue fashion). 
+
+Similarly, in Fig.~\ref{fig:case1}(e), Fig.~\ref{fig:case1}(f) and Fig.~\ref{fig:case1}(g), we draw the instant buffer occupancy of interested flows at TX1 queues of B, C and D, respectively. As flow 1 and flow 2 are symmetric, we only present the analysis for Fig.~\ref{fig:case1}(d) and Fig.~\ref{fig:case1}(e) to show why Link L4 is paused continuously but link L1 never gets paused.
+
+As shown in Fig.~\ref{fig:case1}(d), buffer occupancy of flow 2 at TX1 of A fluctuates between 10KB and 55KB around the PFC threshold, so link L4 will get paused intermittently. In contrast, buffer occupancy of flow 1 at TX1 of B is well below the PFC threshold (fluctuates between 0KB and 18KB), hence link L1 will never be paused.
+
+%In Fig.~\ref{fig:case1}(a), packets of flow 1 and flow 2 will build up at TX1 of A as both flows are competing for the capacity of link L1. Once the buffer occupancy of flow 2 exceeds the PFC threshold, RX1 of A will generate a pause frame to TX1 of D to stop packet transmission over link L4.
+%
+%After link L4 is paused, buffer occupancy of flow 2 will decrease as no more packets can be received by RX1 of A. Once the buffer occupancy of flow 2 is below the PFC threshold at switch A, link L4 will be resumed. Then buffer occupancy of flow 2 will start to increase again. This is why in
+%
+%Since packets of flow 1 buffered in TX1 of B can get transmitted at full link speed when link L2 is not paused, TX1 queue of B can not easily build up. As we can see in Fig.~\ref{fig:case1}(e), buffer occupancy of flow 1 at TX1 of B fluctuates between 0KB and 18KB, which . Hence as we can see in Fig.~\ref{fig:case1}(c), link L1 is never paused by RX1 of C.
+
+
+\textbf{Observation 1:} Deadlock may not occur when cyclic buffer dependency exists in the network. Cyclic buffer dependency is just a necessary condition for deadlock.
+
+
+
+\textbf{Case 2:} as shown in Fig.~\ref{fig:case2}(a), in the second case, in addition to case 1, we add another flow (flow 3) to run over switches B and C in sequence. All the three flows are UDP flows with infinite traffic demand. Buffer dependency graph of case 2 is drawn in Fig.~\ref{fig:case2}(b). Compared with case 1, one additional dependency from TX1 of B to TX1 of C is added.
+
+Pause events at four links L1, L2, L3 and L4 are plotted In Fig.~\ref{fig:case2}(c). As we can see, in this case four links are all paused. To check whether deadlock will occur in this case, we stop the three flows after a sufficient long period (1000ms). What we find is that, pause events are continuously generated at all the four links even after three flows stop sending new packets (not shown in the figure). This means that a deadlock has been created among switches A, B, C and D.
+
+In the next, we will explain why deadlock can be created by adding one additional flow to the network. After adding flow 3, packets of flow 1 buffered in TX1 of B can no longer get transmitted at full link speed due to the contention with packets of flow 3. Packets of flow 1 will then build up at TX1 of B. Once the packets of flow 1 buffered at TX1 of B exceed the PFC threshold, RX1 of B will send a pause frame to TX1 of A to pause Link L1. The pause on link L1 will help packets to build up at TX1 of A, and has a cascade effect on link L4. Due to the pause at link L1, link L4 will get paused more frequently. Then packets of flow 2 are easier to build up at TX1 of D. Once the PFC threshold is triggered at D, link L3 also get paused. So in case 2, pause events can occur at all the four links.
+
+Once all the four links are paused simultaneously, there is a chance that no link can get resumed. For example, it is possible that when simultaneous pause happens, at switch A and switch B, the first packet buffered in the head of TX1 is a packet of flow 1, and meanwhile, at switch C and switch D, the first packet buffered in the head of TX1 is a packet of flow 2. If the above condition occurs, no link can get resumed as all the TX1 queues are waiting for its downstream neighbors to release some buffer to break the standstill condition.
+
+\textbf{Observation 2:} Deadlock will occur when all the links in a cycle are paused simultaneously and no link can get resumed.
 
 
 \begin{figure*}[t]
@@ -58,19 +98,41 @@
 \centering
 
 \subfloat[short for lof][Topology and flows.] {
-    \includegraphics[width=0.35\textwidth] {figs/case3_topo}
+    \includegraphics[width=0.37\textwidth] {figs/case3_topo}
 }
 \subfloat[short for lof][Buffer dependency.]{
-    \includegraphics[width=0.3\textwidth] {figs/case3_buffer}
+    \includegraphics[width=0.28\textwidth] {figs/case3_buffer_dependency}
 }
 \subfloat[short for lof][Pause events at four links.]{
     \includegraphics[width=0.3\textwidth] {figs/case3_pause.eps}
 }
 
+\subfloat[short for lof][Buffer occupancy of flow 2 at switch A.] {
+    \includegraphics[width=0.33\textwidth] {figs/case3_buffer_occupancy_A.eps}
+}
+\subfloat[short for lof][Buffer occupancy of flow 1 at switch B.] {
+    \includegraphics[width=0.33\textwidth] {figs/case3_buffer_occupancy_B1.eps}
+}
+\subfloat[short for lof][Buffer occupancy of flow 3 at switch B.] {
+    \includegraphics[width=0.33\textwidth] {figs/case3_buffer_occupancy_B3.eps}
+}
 
-\caption{Deadlock case 3.}\label{fig:case1}
+\caption{Deadlock case 3.}\label{fig:case3}
 
 \end{figure*}
+
+\textbf{Case 3:} In this case, we will show that even if all the four links are paused simultaneously, it is not guaranteed that a deadlock will be created. As shown in Fig.~\ref{fig:case3}(a), in addition to case 1, we add another two flows (flow 3 and flow 4). Flow 3 starts at a host attached to A, passes through A and B, and ends at a host attached to B. Flow 4 is a symmetric flow of flow 3 that runs over C and D. All the four flows are UDP flows with infinite traffic demand. Two rate limiters are added at TX3 queues of B and D to ensure that rates of flow 3 and flow 4 will not exceed $1/4$ of the link capacity. Buffer dependency graph of case 3 is drawn in Fig.~\ref{fig:case3}(b). Compared with case 1, two additional buffer dependencies from TX1 queues to TX3 queues are added.
+
+Pause events at four links L1, L2, L3 and L4 are plotted In Fig.~\ref{fig:case3}(c).  As we can see from the figure, all the four links are paused continuously. However, we find that once we stop the flows, all the links get resumed and buffer occupancy of four switches soon becomes zero. This indicates that deadlock cannot be created in case 3.
+
+To find out why there is no deadlock in case 3, we draw the instant buffer occupancy of 3 flows at switches A and B in Fig.~\ref{fig:case3}(d), Fig.~\ref{fig:case3}(e) and Fig.~\ref{fig:case3}(f). Here we omit the buffer occupancy condition of switches C and D as the topology and the flows are symmetric.
+
+As shown in Fig.~\ref{fig:case3}(d), at TX1 of A, the buffer occupancy of flow 2 exceeds the PFC threshold, so link L4 will get paused. To understand why link L1 is also paused, we need to consider the buffer occupancy of flow 1 and flow 3 at switch B. The reason is that packets received by RX1 of B are possible to be queued at both TX1 and TX3 (note that there is a rate limiter on TX3). As long as the sum of the buffer occupancies of both TX queues exceeds the PFC threshold, link L1 will get paused. As we can see in Fig.~\ref{fig:case3}(e) and Fig.~\ref{fig:case3}(f), although individually buffer occupancy of either TX1 or TX3 is less than the PFC threshold, their sum is larger than the PFC threshold. Hence link L1 is paused.
+
+As both TX1 and TX3 contribute to the pause on link L1, to create a deadlock, we need to ensure that packets buffered at both TX queues cannot get resumed. However, packets buffered at TX3 can always get transmitted within a finite time as it is not involved in any cyclic buffer dependency. This explains why when we stop the flows, all the four links can be resumed from the pauses. 
+
+
+\textbf{Observation 3:} even if all the links in a cycle are paused simultaneously, it is not sufficient to create a permanent deadlock.
 
 %\subsection{Deadlock problem in RDMA DCNs}\label{subsec:deadlock_problem}
 %

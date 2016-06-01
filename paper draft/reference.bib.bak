@@ -1,5 +1,5 @@
 @LINKS{bgp,
-    author = {Use of BGP for routing in large-scale data centers},
+    author = {BGP for large-scale data centers},
 	link = {https://datatracker.ietf.org/doc/draft-ietf-rtgwg-bgp-routing-large-dc/?include_text=1}
 }
 
@@ -20,20 +20,14 @@
  series = {SIGCOMM '15},
 }
 
-@inproceedings{Zhu:2015:CCL:2785956.2787484,
+@inproceedings{dcqcn,
  author = {Zhu, Yibo and Eran, Haggai and Firestone, Daniel and Guo, Chuanxiong and Lipshteyn, Marina and Liron, Yehonatan and Padhye, Jitendra and Raindel, Shachar and Yahia, Mohamad Haj and Zhang, Ming},
  title = {Congestion Control for Large-Scale RDMA Deployments},
- booktitle = {Proceedings of the 2015 ACM Conference on Special Interest Group on Data Communication},
  series = {SIGCOMM '15},
- year = {2015},
- isbn = {978-1-4503-3542-3},
- location = {London, United Kingdom},
- pages = {523--536},
- numpages = {14},
- url = {http://doi.acm.org/10.1145/2785956.2787484},
- doi = {10.1145/2785956.2787484},
- acmid = {2787484},
- publisher = {ACM},
- address = {New York, NY, USA},
- keywords = {ECN, PFC, RDMA, congestion control, datacenter transport},
+}
+
+@inproceedings{Mittal:2015:TRC:2785956.2787510,
+ author = {Mittal, Radhika and Lam, Vinh The and Dukkipati, Nandita and Blem, Emily and Wassel, Hassan and Ghobadi, Monia and Vahdat, Amin and Wang, Yaogong and Wetherall, David and Zats, David},
+ title = {TIMELY: RTT-based Congestion Control for the Datacenter},
+ series = {SIGCOMM '15},
 }
