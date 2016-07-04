@@ -99,6 +99,8 @@
 \renewcommand{\arraystretch}{1.05}      % make the space between tabular lines larger
 \newcommand{\capspace}{}           % control space between figure/table and caption
 
+\newcommand{\para}[1]{{\vspace{3pt} \bf \noindent #1 \hspace{6pt}}}
+
 \def\TODO#1{\textcolor{red}{}}
 %\setlength{\textheight}{9.3in}
 %\setlength{\columnsep}{1.4pc}
@@ -186,22 +188,18 @@
 %\vspace{-0.2in}
 \input{abstract.tex}
 \input{intro.tex}
-%\input{sections/background.tex}
+\input{background.tex}
 \input{analysis.tex}
-%\input{sections/design.tex}
-%\input{sections/implementation.tex}
-%\input{sections/evaluation.tex}
-%\input{sections/application.tex}
-%\input{sections/related.tex}
-%\input{sections/conclusion.tex}
-
+\input{solution.tex}
+\input{related.tex}
+\input{conclusion.tex}
 %\vspace{0.1in}
 %\section*{Acknowledgements}
 
 
 %\begin{normalsize}
 \begin{small}
-\bibliographystyle{IEEEtran}
+\bibliographystyle{plain}
 \bibliography{reference}
 \end{small}
 %\end{normalsize}
