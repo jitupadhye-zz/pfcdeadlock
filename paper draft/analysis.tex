@@ -1,4 +1,16 @@
-\section{Deadlock case study}\label{sec:casestudy}
+\section{Cyclic Buffer Dependency is Insufficient for Deadlock}\label{sec:casestudy}
+
+\subsection{Single Flow in a Loop}
+
+A routing loop leads to cyclic buffer dependency if a flow is trapped in the loop.
+Such cyclic buffer dependency may not be sufficient for forming a deadlock. The flow
+sending rate, draining rate and the TTL (time-to-live) of packets determine whether
+there will be deadlock and how fast the deadlock forms.
+
+
+\subsection{Multiple flows}
+
+
 
 In this part, we present our simulation study about three deadlock cases, and demonstrate that 1) cyclic buffer dependency is not a sufficient and necessary condition for deadlock; 2) simultaneous cyclic pause is not sufficient to create a permanent deadlock.
 
