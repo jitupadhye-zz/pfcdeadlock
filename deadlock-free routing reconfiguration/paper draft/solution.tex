@@ -1,0 +1,10 @@
+\section{Solution}\label{sec:solution}
+
+In this part, we present our preliminary solution for achieving fast deadlock-free network update.
+
+Enumerating all the possible orders of path updates would be computationally impossible as there are combinatorial such options.  Hence we seek to find an efficient heuristic solution for minimizing the number of order constraints on update actions.
+
+The intuition behind our solution is that \textit{For each possible cycle in the buffer dependency graph, as long as we ensure that one old dependency link is removed before one new dependency link is added, the reconfiguration process is deadlock-free.} 
+
+The idea of our heuristic solution is as follows: First, for each cycle in the buffer dependency graph, we enumerate all the sets of update actions that can exactly add or remove one dependency link from the graph. Then we pick up two minimum action sets A and B, where A can remove one dependency link for a given cycle while B can add an dependency link for the same cycle. The deadlock-free reconfiguration scheme our solution produces will ensure that A is finished before B starts to be configured.
+
