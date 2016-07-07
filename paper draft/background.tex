@@ -1,11 +1,27 @@
-\section{Deadlock in RDMA networks}
+\section{Deadlock in Lossless Network}
 
-\para{RDMA networks rely on PFC.}
+\para{RDMA over Ethernet relies on PFC.}
 
 \para{PFC may lead to deadlock, if forming a cycle of PFC-paused links.}
 
+We define deadlock as a permanent state in which a subset of links are all paused
+by PFC, and none of the packets in the involved buffers can ever move even there is 
+no more packet being sent into these links.
+
 \para{Achieving deadlock-free routing has high price, and may not even be viable.} 
-It limits the choice of topology. Upon bugs or misconfiguration, deadlock-free routing
-configuration may still have deadlock issues. 
+The common way to achieve deadlock-free routing is to avoid cyclic buffer dependency.
+It is proved that cyclic buffer dependency-free is necessary and sufficient to deadlock-free.
+However, ensuring there is always no cyclic buffer dependency is challenging.
+
+First, deadlock-free routing largely limits the choice of topology. For example, TCP-bolt 
+has lengthy discussion on the design of deadlock-free routing and propose certain topology and routing. 
+In today's datacenter network, a common configuration is to only use Clos-style topology, which does 
+not have cyclic buffer dependency problem when the topology is complete. However, a number
+of other topology setups are not cyclic buffer dependency-free.
+
+
+Second, upon bugs or misconfiguration, deadlock-free routing configuration may become
+vulnerable to deadlock. In fact, we have observed a deadlock case in our Clos network
+deployment with PFC. (example here)
 
 

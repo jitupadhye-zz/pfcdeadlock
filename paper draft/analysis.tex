@@ -1,6 +1,27 @@
-\section{Cyclic Buffer Dependency is Insufficient for Deadlock}\label{sec:casestudy}
+\section{Cyclic Buffer Dependency is not a sufficient condition for Deadlock}\label{sec:casestudy}
 
-\subsection{Single Flow in a Loop}
+In this part, we present several cases with cyclic buffer dependency, and demonstrate 
+that 1) a looping flow does not always lead to deadlock. The length of loop, flow rates and packet
+Time-To-Live (TTL) affects whether and how long the deadlock forms. 
+2) multiple flows may cause cyclic buffer dependency and even simultaneous cyclic pauses,
+but still may not be sufficient to create deadlock. 
+
+
+\subsection{Single Flow in a Routing Loop}
+
+\begin{figure*}[t]
+%\vspace{-0.1in}
+\centering
+\subfigure[Topology and flows.] {
+    \includegraphics[width=0.37\textwidth] {figs/loop_case_topo_and_flow}
+}
+\subfigure[Buffer dependency graph.]{
+    \includegraphics[width=0.37\textwidth] {figs/loop_case_ingress_buffer_dependency}
+}
+\caption{Single looping flow creates cyclic buffer dependency but may not create deadlock.}
+\label{fig:case2}
+\end{figure*}
+
 
 A routing loop leads to cyclic buffer dependency if a flow is trapped in the loop.
 Such cyclic buffer dependency may not be sufficient for forming a deadlock. The flow
@@ -8,37 +29,40 @@ sending rate, draining rate and the TTL (time-to-live) of packets determine whet
 there will be deadlock and how fast the deadlock forms.
 
 
+
+
+
 \subsection{Multiple flows}
 
+Multiple flows may create a complete buffer dependency circle even if there is no loop in routing.
 
 
-In this part, we present our simulation study about three deadlock cases, and demonstrate that 1) cyclic buffer dependency is not a sufficient and necessary condition for deadlock; 2) simultaneous cyclic pause is not sufficient to create a permanent deadlock.
 
 \begin{figure*}[t]
 %\vspace{-0.1in}
 \centering
 
-\subfloat[short for lof][Topology and flows.] {
+\subfigure[Topology and flows.] {
     \includegraphics[width=0.4\textwidth] {figs/case1_topo.pdf}
 }
-\subfloat[short for lof][Buffer dependency graph.]{
+\subfigure[Buffer dependency graph.]{
     \includegraphics[width=0.24\textwidth] {figs/case1_buffer_dependency.pdf}
 }
-\subfloat[short for lof][Pause events at four links.]{
+\subfigure[Pause events at four links.]{
     \includegraphics[width=0.3\textwidth] {figs/case1_pause.eps}
 }
 
-\subfloat[short for lof][Buffer occupancy at switch A.] {
-    \includegraphics[width=0.25\textwidth] {figs/case1_buffer_occupancy_A.eps}
+\subfigure[Buffer occupancy at switch A.] {
+    \includegraphics[width=0.23\textwidth] {figs/case1_buffer_occupancy_A.eps}
 }
-\subfloat[short for lof][Buffer occupancy at switch B.] {
-    \includegraphics[width=0.25\textwidth] {figs/case1_buffer_occupancy_B.eps}
+\subfigure[Buffer occupancy at switch B.] {
+    \includegraphics[width=0.23\textwidth] {figs/case1_buffer_occupancy_B.eps}
 }
-\subfloat[short for lof][Buffer occupancy at switch C.] {
-    \includegraphics[width=0.25\textwidth] {figs/case1_buffer_occupancy_C.eps}
+\subfigure[Buffer occupancy at switch C.] {
+    \includegraphics[width=0.23\textwidth] {figs/case1_buffer_occupancy_C.eps}
 }
-\subfloat[short for lof][Buffer occupancy at switch D.] {
-    \includegraphics[width=0.25\textwidth] {figs/case1_buffer_occupancy_D.eps}
+\subfigure[Buffer occupancy at switch D.] {
+    \includegraphics[width=0.23\textwidth] {figs/case1_buffer_occupancy_D.eps}
 }
 
 \caption{Deadlock case 1.}\label{fig:case1}
@@ -56,13 +80,13 @@ In this part, we present our simulation study about three deadlock cases, and de
 %\vspace{-0.1in}
 \centering
 
-\subfloat[short for lof][Topology and flows.] {
+\subfigure[Topology and flows.] {
     \includegraphics[width=0.37\textwidth] {figs/case2_topo}
 }
-\subfloat[short for lof][Buffer dependency graph.]{
+\subfigure[Buffer dependency graph.]{
     \includegraphics[width=0.27\textwidth] {figs/case2_buffer_dependency}
 }
-\subfloat[short for lof][Pause events at four links.]{
+\subfigure[Pause events at four links.]{
     \includegraphics[width=0.3\textwidth] {figs/case2_pause.eps}
 }
 
@@ -109,24 +133,24 @@ Once all the four links are paused simultaneously, there is a chance that no lin
 %\vspace{-0.1in}
 \centering
 
-\subfloat[short for lof][Topology and flows.] {
+\subfigure[Topology and flows.] {
     \includegraphics[width=0.37\textwidth] {figs/case3_topo}
 }
-\subfloat[short for lof][Buffer dependency.]{
+\subfigure[Buffer dependency.]{
     \includegraphics[width=0.28\textwidth] {figs/case3_buffer_dependency}
 }
-\subfloat[short for lof][Pause events at four links.]{
+\subfigure[Pause events at four links.]{
     \includegraphics[width=0.3\textwidth] {figs/case3_pause.eps}
 }
 
-\subfloat[short for lof][Buffer occupancy of flow 2 at switch A.] {
-    \includegraphics[width=0.33\textwidth] {figs/case3_buffer_occupancy_A.eps}
+\subfigure[Buffer occupancy of flow 2 at switch A.] {
+    \includegraphics[width=0.32\textwidth] {figs/case3_buffer_occupancy_A.eps}
 }
-\subfloat[short for lof][Buffer occupancy of flow 1 at switch B.] {
-    \includegraphics[width=0.33\textwidth] {figs/case3_buffer_occupancy_B1.eps}
+\subfigure[Buffer occupancy of flow 1 at switch B.] {
+    \includegraphics[width=0.32\textwidth] {figs/case3_buffer_occupancy_B1.eps}
 }
-\subfloat[short for lof][Buffer occupancy of flow 3 at switch B.] {
-    \includegraphics[width=0.33\textwidth] {figs/case3_buffer_occupancy_B3.eps}
+\subfigure[Buffer occupancy of flow 3 at switch B.] {
+    \includegraphics[width=0.32\textwidth] {figs/case3_buffer_occupancy_B3.eps}
 }
 
 \caption{Deadlock case 3.}\label{fig:case3}
