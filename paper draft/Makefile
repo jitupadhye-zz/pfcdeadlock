@@ -9,7 +9,11 @@ TEXFILES = main.tex \
 	reference.bib \
 	analysis.tex \
 	intro.tex \
-	abstract.tex
+	background.tex \
+	abstract.tex \
+	solution.tex \
+	conclusion.tex \
+	related.tex
 
 EPSFIGS = \
 

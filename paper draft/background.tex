@@ -1,15 +1,43 @@
 \section{Deadlock in Lossless Network}
 
-\para{RDMA over Ethernet relies on PFC.}
+In this section, we explain the background of deadlock in lossless network, and 
+why we must study the necessary and sufficient condition of it.
 
-\para{PFC may lead to deadlock, if forming a cycle of PFC-paused links.}
+\para{Lossless Ethernet relies on PFC.} 
+Modern data center networks require efficient network stacks in order to support 
+40Gbps or even higher bandwidth. RDMA over Ethernet, or RoCE, is the most popular
+solution and has been deployed in both Google and Microsoft data centers~\cite{dcqcn, timely}.
+The key property of such network is that it runs on lossless Ethernet, meaning
+that no packet is dropped due to congestion. This is realized by PFC 
+(Priority-based Flow Control).
 
+PFC introduces PAUSE mechanism, with which the switch can pause an incoming link
+when its ingress buffer occupancy reaches a preset threshold. Properly tuned, the 
+buffer will never overflow, and no packet will be dropped due to full buffer.
+As shown below, deadlock may occur in such lossless networks.
+
+
+\para{Deadlock definition.}
 We define deadlock as a permanent state in which a subset of links are all paused
 by PFC, and none of the packets in the involved buffers can ever move even there is 
 no more packet being sent into these links.
 
+\para{PFC may lead to deadlock, if PFC-paused links form a circle.}
+In a PFC-enabled network, if a subset of links congest and the buffer usage reach
+the PFC threshold at the same time, the links are all paused. If these links happen
+to form a complete circle, the network has a deadlock. No packet can moves because 
+the links are paused, even if there is no more new traffic injected into this circle.
+
+This essentially means {\em cyclic buffer dependency}. Any one link is waiting for its next
+hop to RESUME the link, while this depends on the buffer status of the next hop. However,
+the next hop buffer depend on the next next hop and wait for the RESUME
+so that it can send out packets to lower the buffer usage. This goes on, and in the end, 
+any stuck buffer depends on itself to move, thus forming a deadlock.
+
+To avoid deadlock, previous work has considered {\em deadlock-free routing}.
+
 \para{Achieving deadlock-free routing has high price, and may not even be viable.} 
-The common way to achieve deadlock-free routing is to avoid cyclic buffer dependency.
+In previous work, to achieve deadlock-free routing is to completely avoid cyclic buffer dependency.
 It is proved that cyclic buffer dependency-free is necessary and sufficient to deadlock-free.
 However, ensuring there is always no cyclic buffer dependency is challenging.
 
@@ -19,9 +47,15 @@ In today's datacenter network, a common configuration is to only use Clos-style 
 not have cyclic buffer dependency problem when the topology is complete. However, a number
 of other topology setups are not cyclic buffer dependency-free.
 
-
 Second, upon bugs or misconfiguration, deadlock-free routing configuration may become
 vulnerable to deadlock. In fact, we have observed a deadlock case in our Clos network
 deployment with PFC. (example here)
+
+
+In this paper, we argue that we do not need to completely avoid cyclic buffer dependency.
+Even if there is cyclic buffer dependency, deadlock may not occur (see Section~\ref{sec:xxx}).
+This means that cyclic buffer dependency is a quite loose condition for deadlock.
+We aim to explore a tighter condition, ideally a necessary and sufficient condition for deadlock.
+Once we have better understanding, we may avoid deadlock with smaller price ({\em e.g.,} Section~\ref{sec:yyy}).
 
 
