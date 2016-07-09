@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.8.27)  10 JUL 2016 06:31
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.8.27)  10 JUL 2016 07:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -740,7 +740,11 @@ Overfull \hbox (15.18794pt too wide) in paragraph at lines 15--16
 deadlock-
  []
 
-) (./background.tex
+) (./background.tex [1{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updma
+p/pdftex.map}
+
+
+]
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 7.
 
@@ -754,13 +758,13 @@ Overfull \hbox (3.31688pt too wide) in paragraph at lines 7--8
 ns-
  []
 
-<figs/case1_topo.pdf, id=1, 457.71pt x 273.02pt>
+<figs/case1_topo.pdf, id=14, 457.71pt x 273.02pt>
 File: figs/case1_topo.pdf Graphic file (type pdf)
  <use figs/case1_topo.pdf>
 Package pdftex.def Info: figs/case1_topo.pdf used on input line 20.
 (pdftex.def)             Requested size: 151.20154pt x 90.18852pt.
 
-<figs/case1_dependency.pdf, id=2, 344.28625pt x 252.945pt>
+<figs/case1_dependency.pdf, id=15, 344.28625pt x 252.945pt>
 File: figs/case1_dependency.pdf Graphic file (type pdf)
 
 <use figs/case1_dependency.pdf>
@@ -771,10 +775,6 @@ Overfull \hbox (22.0pt too wide) in paragraph at lines 20--24
  [][][] 
  []
 
-[1{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
-
-
-]
 <figs/deadlock_fattree_a.pdf, id=16, 432.61626pt x 285.065pt>
 File: figs/deadlock_fattree_a.pdf Graphic file (type pdf)
 
@@ -861,27 +861,26 @@ File: figs/reconfiguration_e.pdf Graphic file (type pdf)
 <use figs/reconfiguration_e.pdf>
 Package pdftex.def Info: figs/reconfiguration_e.pdf used on input line 97.
 (pdftex.def)             Requested size: 126.0pt x 101.89482pt.
-
-Underfull \vbox (badness 6396) has occurred while \output is active []
-
  [2 <./figs/case1_topo.pdf> <./figs/case1_dependency.pdf>]
 Overfull \hbox (3.48773pt too wide) in paragraph at lines 113--114
 []\T1/ptm/m/n/10 While for this ex-am-ple it may seem easy to find a deadlock-
  []
 
-) (./solution.tex
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+)
+(./solution.tex
 Overfull \hbox (1.64764pt too wide) in paragraph at lines 3--4
 []\T1/ptm/m/n/10 In this part, we present our pre-lim-i-nary so-lu-tion for ach
 iev-
  []
 
-) (./evaluation.tex) (./related.tex [3 <./figs/deadlock_fattree_a.pdf> <./figs/
-deadlock_fattree_b.pdf> <./figs/deadlock_fattree_c.pdf> <./figs/deadlock_fattre
-e_d.pdf>]) (./main.bbl) [4
-
- <./figs/reconfiguration_a.pdf> <./figs/reconfiguration_b.pdf> <./figs/reconfig
-uration_c.pdf> <./figs/reconfiguration_f.pdf> <./figs/reconfiguration_d.pdf> <.
-/figs/reconfiguration_e.pdf>] (./main.aux) ) 
+[3 <./figs/deadlock_fattree_a.pdf> <./figs/deadlock_fattree_b.pdf> <./figs/dead
+lock_fattree_c.pdf> <./figs/deadlock_fattree_d.pdf>]) (./evaluation.tex)
+(./related.tex) (./main.bbl) [4 <./figs/reconfiguration_a.pdf> <./figs/reconfig
+uration_b.pdf> <./figs/reconfiguration_c.pdf> <./figs/reconfiguration_f.pdf> <.
+/figs/reconfiguration_d.pdf> <./figs/reconfiguration_e.pdf>] (./main.aux) ) 
 Here is how much of TeX's memory you used:
  8002 strings out of 493089
  117470 string characters out of 6134842
@@ -890,18 +889,19 @@ Here is how much of TeX's memory you used:
  66641 words of font info for 83 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  61i,10n,96p,667b,515s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2015/texmf-dist
-/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/2015/texmf-dist/fonts/type1/pu
-blic/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/pub
-lic/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmr10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/
-amsfonts/cm/cmr7.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/ams
-fonts/cm/cmsy10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/helveti
-c/uhvb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/helvetic/uhvr8
-a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></us
-r/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/te
-xlive/2015/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (4 pages, 350779 bytes).
+{/us
+r/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive
+/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/
+2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/20
+15/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2015
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2015/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2015/tex
+mf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2015/texmf-dist
+/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/
+type1/urw/times/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/
+times/utmr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmr
+i8a.pfb>
+Output written on main.pdf (4 pages, 351560 bytes).
 PDF statistics:
  734 PDF objects out of 1000 (max. 8388607)
  461 compressed objects within 5 object streams
