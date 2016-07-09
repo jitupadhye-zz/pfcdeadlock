@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.8.27)  7 JUL 2016 09:22
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.8.27)  10 JUL 2016 06:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -775,51 +775,97 @@ Overfull \hbox (22.0pt too wide) in paragraph at lines 20--24
 
 
 ]
-<figs/reconfiguration_a.pdf, id=16, 196.735pt x 125.46875pt>
+<figs/deadlock_fattree_a.pdf, id=16, 432.61626pt x 285.065pt>
+File: figs/deadlock_fattree_a.pdf Graphic file (type pdf)
+
+<use figs/deadlock_fattree_a.pdf>
+Package pdftex.def Info: figs/deadlock_fattree_a.pdf used on input line 46.
+(pdftex.def)             Requested size: 236.88062pt x 156.09027pt.
+
+<figs/deadlock_fattree_b.pdf, id=17, 434.62375pt x 285.065pt>
+File: figs/deadlock_fattree_b.pdf Graphic file (type pdf)
+
+<use figs/deadlock_fattree_b.pdf>
+Package pdftex.def Info: figs/deadlock_fattree_b.pdf used on input line 49.
+(pdftex.def)             Requested size: 236.88062pt x 155.36821pt.
+
+<figs/deadlock_fattree_c.pdf, id=18, 434.62375pt x 213.79875pt>
+File: figs/deadlock_fattree_c.pdf Graphic file (type pdf)
+
+<use figs/deadlock_fattree_c.pdf>
+Package pdftex.def Info: figs/deadlock_fattree_c.pdf used on input line 53.
+(pdftex.def)             Requested size: 302.40308pt x 148.76422pt.
+
+<figs/deadlock_fattree_d.pdf, id=19, 233.87375pt x 213.79875pt>
+File: figs/deadlock_fattree_d.pdf Graphic file (type pdf)
+
+<use figs/deadlock_fattree_d.pdf>
+Package pdftex.def Info: figs/deadlock_fattree_d.pdf used on input line 56.
+(pdftex.def)             Requested size: 161.28369pt x 147.44626pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 56--56
+[]\T1/ptm/m/n/9 (d) |Buffer de-pen-den-cies among ingress
+ []
+
+
+Overfull \hbox (10.23805pt too wide) in paragraph at lines 68--69
+\T1/ptm/m/n/10 path T3-L3-S2-L2-S1-L1-T2 is the only congestion-free choice
+ []
+
+
+Overfull \hbox (17.14746pt too wide) in paragraph at lines 72--73
+[]\T1/ptm/m/n/10 To avoid pos-si-ble PFC dead-lock prob-lem, one safe congestio
+n-
+ []
+
+<figs/reconfiguration_a.pdf, id=20, 196.735pt x 125.46875pt>
 File: figs/reconfiguration_a.pdf Graphic file (type pdf)
 
 <use figs/reconfiguration_a.pdf>
-Package pdftex.def Info: figs/reconfiguration_a.pdf used on input line 42.
+Package pdftex.def Info: figs/reconfiguration_a.pdf used on input line 81.
 (pdftex.def)             Requested size: 151.20154pt x 96.42934pt.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <9> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 42.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 81.
 
-<figs/reconfiguration_b.pdf, id=17, 207.77625pt x 125.46875pt>
+<figs/reconfiguration_b.pdf, id=21, 207.77625pt x 125.46875pt>
 File: figs/reconfiguration_b.pdf Graphic file (type pdf)
 
 <use figs/reconfiguration_b.pdf>
-Package pdftex.def Info: figs/reconfiguration_b.pdf used on input line 45.
+Package pdftex.def Info: figs/reconfiguration_b.pdf used on input line 84.
 (pdftex.def)             Requested size: 126.0pt x 76.0859pt.
 
-<figs/reconfiguration_c.pdf, id=18, 196.735pt x 125.46875pt>
+<figs/reconfiguration_c.pdf, id=22, 196.735pt x 125.46875pt>
 File: figs/reconfiguration_c.pdf Graphic file (type pdf)
 
 <use figs/reconfiguration_c.pdf>
-Package pdftex.def Info: figs/reconfiguration_c.pdf used on input line 48.
+Package pdftex.def Info: figs/reconfiguration_c.pdf used on input line 87.
 (pdftex.def)             Requested size: 126.0pt x 80.35715pt.
 
-<figs/reconfiguration_f.pdf, id=19, 426.59375pt x 192.72pt>
+<figs/reconfiguration_f.pdf, id=23, 426.59375pt x 192.72pt>
 File: figs/reconfiguration_f.pdf Graphic file (type pdf)
 
 <use figs/reconfiguration_f.pdf>
-Package pdftex.def Info: figs/reconfiguration_f.pdf used on input line 52.
+Package pdftex.def Info: figs/reconfiguration_f.pdf used on input line 91.
 (pdftex.def)             Requested size: 201.59692pt x 91.07538pt.
 
-<figs/reconfiguration_d.pdf, id=20, 196.735pt x 149.55875pt>
+<figs/reconfiguration_d.pdf, id=24, 196.735pt x 149.55875pt>
 File: figs/reconfiguration_d.pdf Graphic file (type pdf)
 
 <use figs/reconfiguration_d.pdf>
-Package pdftex.def Info: figs/reconfiguration_d.pdf used on input line 55.
+Package pdftex.def Info: figs/reconfiguration_d.pdf used on input line 94.
 (pdftex.def)             Requested size: 126.0pt x 95.78572pt.
 
-<figs/reconfiguration_e.pdf, id=21, 230.8625pt x 186.6975pt>
+<figs/reconfiguration_e.pdf, id=25, 230.8625pt x 186.6975pt>
 File: figs/reconfiguration_e.pdf Graphic file (type pdf)
 
 <use figs/reconfiguration_e.pdf>
-Package pdftex.def Info: figs/reconfiguration_e.pdf used on input line 58.
+Package pdftex.def Info: figs/reconfiguration_e.pdf used on input line 97.
 (pdftex.def)             Requested size: 126.0pt x 101.89482pt.
 
-Overfull \hbox (3.48773pt too wide) in paragraph at lines 76--77
+Underfull \vbox (badness 6396) has occurred while \output is active []
+
+ [2 <./figs/case1_topo.pdf> <./figs/case1_dependency.pdf>]
+Overfull \hbox (3.48773pt too wide) in paragraph at lines 113--114
 []\T1/ptm/m/n/10 While for this ex-am-ple it may seem easy to find a deadlock-
  []
 
@@ -829,18 +875,19 @@ Overfull \hbox (1.64764pt too wide) in paragraph at lines 3--4
 iev-
  []
 
-) (./evaluation.tex) (./related.tex [2 <./figs/case1_topo.pdf> <./figs/case1_de
-pendency.pdf>]) (./main.bbl) [3
+) (./evaluation.tex) (./related.tex [3 <./figs/deadlock_fattree_a.pdf> <./figs/
+deadlock_fattree_b.pdf> <./figs/deadlock_fattree_c.pdf> <./figs/deadlock_fattre
+e_d.pdf>]) (./main.bbl) [4
 
  <./figs/reconfiguration_a.pdf> <./figs/reconfiguration_b.pdf> <./figs/reconfig
 uration_c.pdf> <./figs/reconfiguration_f.pdf> <./figs/reconfiguration_d.pdf> <.
 /figs/reconfiguration_e.pdf>] (./main.aux) ) 
 Here is how much of TeX's memory you used:
- 7978 strings out of 493089
- 116815 string characters out of 6134842
- 191758 words of memory out of 5000000
- 11199 multiletter control sequences out of 15000+600000
- 65505 words of font info for 82 fonts, out of 8000000 for 9000
+ 8002 strings out of 493089
+ 117470 string characters out of 6134842
+ 193758 words of memory out of 5000000
+ 11218 multiletter control sequences out of 15000+600000
+ 66641 words of font info for 83 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  61i,10n,96p,667b,515s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2015/texmf-dist
@@ -854,10 +901,10 @@ c/uhvb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/helvetic/uhvr8
 a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></us
 r/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/te
 xlive/2015/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (3 pages, 252026 bytes).
+Output written on main.pdf (4 pages, 350779 bytes).
 PDF statistics:
- 423 PDF objects out of 1000 (max. 8388607)
- 269 compressed objects within 3 object streams
+ 734 PDF objects out of 1000 (max. 8388607)
+ 461 compressed objects within 5 object streams
  0 named destinations out of 1000 (max. 500000)
- 41 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 61 words of extra memory for PDF output out of 10000 (max. 10000000)
 

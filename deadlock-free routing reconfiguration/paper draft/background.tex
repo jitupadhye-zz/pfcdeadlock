@@ -32,7 +32,46 @@ As we can find in Fig.~\ref{fig:deadlock_case}(b), the paths taken by the 3 flow
 
 PFC deadlock problem can be avoided by leveraging a routing function that introduces no cycle in the buffer dependency graph. However, this approach cannot eliminate the cyclic buffer dependency during routing reconfiguration, as we are going to show in the next.
 
-\subsection{Reconfiguration-induced deadlock}\label{subsec:reconfigdeadlock}
+\subsection{Reconfiguration-induced Deadlock}\label{subsec:reconfigdeadlock}
+
+In this part, we use examples to show 1) cyclic buffer dependency can be generated for both tree based and non-tree based DCNs when the routing reconfiguration is not well planed; 2) a bad deadlock-free reconfiguration plan will lead to a slow reconfiguration process.
+
+\subsubsection{Deadlock Under Tree Based DCNs}\label{subsubsec:treecase}
+
+\begin{figure*}[t]
+	\centering
+	
+	\subfloat[short for lof][Routing state before reconfiguration.] {
+		\includegraphics[width=0.47\textwidth] {figs/deadlock_fattree_a}
+	}
+	\subfloat[short for lof][Routing state after reconfiguration.]{
+		\includegraphics[width=0.47\textwidth] {figs/deadlock_fattree_b}
+	}
+	
+	\subfloat[short for lof][Traffic among switches L2, L3, S1 and S2.]{
+		\includegraphics[width=0.6\textwidth] {figs/deadlock_fattree_c}
+	}
+	\subfloat[short for lof][Buffer dependencies among ingress queues.] {
+		\includegraphics[width=0.32\textwidth] {figs/deadlock_fattree_d}
+	}
+	
+	\caption{Reconfiguration-induced deadlock case.}\label{fig:treecase}
+	
+\end{figure*}
+
+Fig.~\ref{fig:treecase}(a) shows a small Leaf-Spine DCNs. The capacity of all the links are 40Gbps. Due to maintenance issue, the network operator now wants to replace two links L2-T2 and L3-T3 in the topology. To avoid long-term packet loss during link replacement, the network traffic passing through these two links needs to be migrated to some other paths. 
+
+In this example, we consider the traffic from switch T1 to switch T4 following the path T1-L2-S1-L3-T4, and the traffic from switch T3 to switch T2 following the path T3-L3-S2-L2-T2. There are three alternative paths that the traffic load from T1 to T4 can migrate to: 1) path-1 along T1-L1-S1-L4-T4; 2) path-2 along T1-L2-S1-L4-T4; 3) non-shortest path-3 along T1-L2-S1-L3-S2-L4-T4. 
+
+As we can find in Fig.~\ref{fig:treecase}(a), the traffic load from T1 to T4 is 15Gbps. Path-1 and path-2 thus are not congestion-free choices as the load on link S1-L4 are 30Gbps, larger than 25Gbps. Path-3 is a good choice the load on links L3-S2, S2-L4 and L4-T4 are all smaller than 25Gbps. 
+
+While not drawn in the Fig.~\ref{fig:treecase}(a), let's say non-shortest path T3-L3-S2-L2-S1-L1-T2 is the only congestion-free choice that the traffic from T3 to T2 can migrate to. Fig.~\ref{fig:treecase}(b) shows the routing state after performing congestion-free routing reconfiguration. 
+
+In Fig.~\ref{fig:treecase}(c), we focus on four switches L2, L3, S1 and S2. We reposit the locations of these four switches and draw both ingress queues (RX) and egress queues (TX) for the purpose of better explanation. As shwon In Fig.~\ref{fig:treecase}(d), there is a cyclic buffer dependency among the ingress queues. This indicates that the network is now exposed to the danger of PFC deadlock.
+
+To avoid possible PFC deadlock problem, one safe congestion-free reconfiguration plan is to replace the two links one by one. Only using one non-shortest path will not introduce cyclic buffer dependency into the network.
+
+\subsubsection{Deadlock Under Non-tree Based DCNs}\label{subsubsec:nontreecase}
 
 \begin{figure*}[t]
 	\centering
@@ -57,19 +96,17 @@ PFC deadlock problem can be avoided by leveraging a routing function that introd
 		\includegraphics[width=0.25\textwidth] {figs/reconfiguration_e}
 	}
 	
-	\caption{Reconfiguration-induced deadlock case.}\label{fig:reconfigdeadlock}
+	\caption{Reconfiguration-induced deadlock case.}\label{fig:nontreecase}
 	
 \end{figure*}
 
-In this part, we use an example to show 1) cyclic buffer dependency can be generated if the routing reconfiguration is not well planed; 2) a bad deadlock-free reconfiguration plan will lead to a slow reconfiguration process.
-
-As shown in Fig.~\ref{fig:reconfigdeadlock}(a), in this example we consider a 4-node network \textbf{N}. Fig.~\ref{fig:reconfigdeadlock}(b)-(c),(e)-(f) are four spanning trees \textbf{T1}-\textbf{T4} which specify the routing paths that can be used in \textbf{N}. For example, path p1 is a legal routing path specified in T1.  
+As shown in Fig.~\ref{fig:nontreecase}(a), in this example we consider a 4-node network \textbf{N}. Fig.~\ref{fig:nontreecase}(b)-(c),(e)-(f) are four spanning trees \textbf{T1}-\textbf{T4} which specify the routing paths that can be used in \textbf{N}. For example, path p1 is a legal routing path specified in T1.  
 
 Let $\textbf{R}_i$ be the set of paths specified in tree \textbf{Ti}. Let $\textbf{R}_s = \textbf{R}_1 \cup \textbf{R}_2$, and $\textbf{R}_t = \textbf{R}_3 \cup \textbf{R}_4$. It is easy to check both $\textbf{R}_s$ and $\textbf{R}_t$ are deadlock-free routing functions. Initially,  $\textbf{R}_s$ are used as the routing function of \textbf{N}. Due to the failure of link S2-S3, switch S3 becomes unreachable. To maintain the connectivity of \textbf{N}, we can perform a routing reconfiguration to transition from $\textbf{R}_s$ to $\textbf{R}_t$.
 
 During the reconfiguration process, if path p2 in \textbf{T3} and path p3 in \textbf{T4} are added to the routing function before path p1 in \textbf{T1} is removed, a cyclic buffer dependency will be generated. This may cause a PFC deadlock as we explained in Sec.~\ref{subsec:pfcdeadlock}.
 
-In Fig.~\ref{fig:reconfigdeadlock}(d), we present three possible deadlock-free reconfiguration schmes. The first scheme is to remove all the paths in \textbf{T1} and \textbf{T2} before adding any new paths in \textbf{T3} and \textbf{T4}. This scheme will lead to a slow reconfiguration process as all the operations of adding new paths are delayed by the operations of removing old paths. 
+In Fig.~\ref{fig:nontreecase}(d), we present three possible deadlock-free reconfiguration schmes. The first scheme is to remove all the paths in \textbf{T1} and \textbf{T2} before adding any new paths in \textbf{T3} and \textbf{T4}. This scheme will lead to a slow reconfiguration process as all the operations of adding new paths are delayed by the operations of removing old paths. 
 
 The second scheme only requires path p1 is removed before paths p2 and p3 are added. All the other paths not mentioned can be updated freely without any order constraint. Hence the speed of routing reconfiguration can be improved. The third scheme is an optimized reconfiguration scheme in terms of imposing minimum order constraints on the update actions. The intuition here is that as long as paths p1, p2 and p3 do not take effect at the same, deadlock-free can be well guaranteed. 
 
