@@ -17,8 +17,8 @@ buffer will never overflow, and no packet will be dropped due to full buffer.
 As shown below, deadlock may occur in such lossless networks.
 
 
-\para{Deadlock definition.}
-We define deadlock as a permanent state in which a subset of links are all paused
+\para{Deadlock.}
+In this paper, we define deadlock as a permanent state in which a subset of links are all paused
 by PFC, and none of the packets in the involved buffers can ever move even there is 
 no more packet being sent into these links.
 
@@ -55,7 +55,8 @@ deployment with PFC. (example here)
 In this paper, we argue that we do not need to completely avoid cyclic buffer dependency.
 Even if there is cyclic buffer dependency, deadlock may not occur (see Section~\ref{sec:xxx}).
 This means that cyclic buffer dependency is a quite loose condition for deadlock.
-We aim to explore a tighter condition, ideally a necessary and sufficient condition for deadlock.
-Once we have better understanding, we may avoid deadlock with smaller price ({\em e.g.,} Section~\ref{sec:yyy}).
+In this paper, we aim to explore a tighter condition, ideally a necessary and sufficient condition for deadlock.
+Once we have better understanding, we may avoid deadlock with smaller price ({\em e.g.,} 
+Section~\ref{sec:yyy}).
 
 

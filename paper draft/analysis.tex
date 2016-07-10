@@ -1,11 +1,12 @@
-\section{Cyclic Buffer Dependency is not a sufficient condition for Deadlock}\label{sec:casestudy}
+\section{Cyclic Buffer Dependency is insufficient for Deadlock}\label{sec:casestudy}
 
-In this part, we present several cases with cyclic buffer dependency, and demonstrate 
-that 1) a looping flow does not always lead to deadlock. The length of loop, flow rates and packet
-Time-To-Live (TTL) affects whether and how long the deadlock forms. 
-2) multiple flows may cause cyclic buffer dependency and even simultaneous cyclic pauses,
+Although cyclic buffer dependency is a necessary condition for deadlock, it is not a
+sufficient condition. In this section, we present several typical cases containing cyclic 
+buffer dependency, but no deadlock is formed. We demonstrate 
+that 1) a looping flow that generates cyclic buffer dependency does not always lead to deadlock. 
+The length of loop, flow rates and packet Time-To-Live (TTL) affects whether and how fast 
+the deadlock forms. 2) Multiple flows may cause cyclic buffer dependency and even simultaneous cyclic pauses,
 but still may not be sufficient to create deadlock. 
-
 
 \subsection{Single Flow in a Routing Loop}
 
@@ -16,17 +17,115 @@ but still may not be sufficient to create deadlock.
     \includegraphics[width=0.37\textwidth] {figs/loop_case_topo_and_flow}
 }
 \subfigure[Buffer dependency graph.]{
-    \includegraphics[width=0.37\textwidth] {figs/loop_case_ingress_buffer_dependency}
+    \includegraphics[width=0.28\textwidth] {figs/loop_case_ingress_buffer_dependency}
+}
+\subfigure[Stable state model.]{
+    \includegraphics[width=0.28\textwidth] {figs/loop_case_ingress_buffer_dependency}
 }
 \caption{Single looping flow creates cyclic buffer dependency but may not create deadlock.}
-\label{fig:case2}
+\label{fig:loop}
 \end{figure*}
 
 
-A routing loop leads to cyclic buffer dependency if a flow is trapped in the loop.
-Such cyclic buffer dependency may not be sufficient for forming a deadlock. The flow
-sending rate, draining rate and the TTL (time-to-live) of packets determine whether
-there will be deadlock and how fast the deadlock forms.
+A routing loop can create cyclic buffer dependency if a flow is trapped in the loop.
+The simplest example is a two-hop loop between two switches, as shown in Figure~\ref{fig:loop}(a).
+Figure~\ref{fig:loop}(b) shows the buffer dependency relationship. Whether switch A can move
+the packets in ints receiving buffer {\em RX1} to egress depends on switch B's buffer {\em RX1}.
+\footnote{We focus on receiving buffer because PFC PAUSE triggers based on the occupancy of receiving buffer.}
+Switch B's {\em RX1} also depends on switch A's {\em RX1}. The deadlock happens when
+both of the involved buffers reach the PFC threshold at the same time and PAUSE the links.
+
+
+However, this cyclic buffer dependency may not always turn into that state. The flow
+sending rate, the TTL (time-to-live) of packets and the length of the loop together 
+determine whether there will be deadlock and how fast the deadlock forms. 
+For example, we run a simple experiment on two switches that are connected by a 
+40Gbps link. All packets have initial TTL of 16 and are injected into switch A. We find that, 
+only if the packet injection rate exceeds 5Gbps, there can occur deadlock. 
+
+In order to analyze this single flow in routing loop case, we develop a mechanism called 
+{\em boundary state analysis}. It yields accurate prediction of whether deadlock forms,
+as shown below.
+
+\para{Boundary state analysis.} 
+On any of the switch in the loop, packets are injected from previous hop and ``drained'' by the next hop. If the draining
+rate cannot catch up the injecting rate, packets will continuously build up a queue in the
+buffer. In a loop, as long as one switch triggers PFC, Deadlock will occur in the end. 
+We define {\em Boundary state}, in which the injecting rate and draining rate are balanced on every
+switch, and larger injecting rate leads to deadlock because draining rate cannot catch up.
+
+We build the boundary state model as illustrated in 
+Figure~\ref{fig:loop}(c). The variables are described in Table~\ref{tab:stable_state}.
+
+
+\begin{table}[h]
+\centering
+\caption{\small Stable state analysis variables}
+\label{tab:stable_state}
+{\small
+\begin{tabular}{|c|c|}
+ \hline
+Variable &  Description \\
+\hline
+$r$ & Inject rate of new packets. \\
+\hline
+$B$ & Link bandwidth. \\
+\hline
+$r_d$ & Packets drain rate caused by TTL expiration. \\
+\hline
+$TTL$ & Initial Time-To-Live value. \\
+\hline
+$n$ & The length of the routing loop. \\
+\hline
+\end{tabular}
+}
+\end{table}
+
+According to the boundary state definition, the injecting rate and draining rate
+must be equal on the first switch:
+
+\begin{equation}
+\small
+r + B - r_d = B
+\label{eq:rate}
+\end{equation}
+
+In addition, we consider the sum of TTL values of all packets in the system. 
+During the boundary state, it should remain stable. Therefore, the increase
+rate and decrease rate of the sum of TTL should be the same:
+
+\begin{equation}
+\small
+n * B = TTL * r
+\label{eq:ttl}
+\end{equation}
+
+Combining Equation~\ref{eq:rate}, Equation~\ref{eq:ttl}, and the fact that
+deadlock requires larger injecting rate than that in boundary state, we derive the 
+{\em necessary and sufficient condition} of deadlock in a routing loop scenario:
+
+\begin{equation}
+\small
+r > r_d = \frac{nB}{TTL}
+\label{eq:condition}
+\end{equation}
+
+This matches what we observe in testbed experiment: with $B=40Gbps$, $n=2$ and
+$TTL=16$, the flow injecting rate must be at least $5Gbps$. With larger bandwidth,
+shorter loop length or smaller initial TTL values, the threshold can be higher.
+As long as the flow rate is smaller than the threshold, no deadlock will form.
+As shown in Section~\ref{sec:yyy}, we may utilize this property to avoid deadlock, 
+even if routing loop occurs. 
+
+
+
+
+
+
+
+
+
+
 
 
 
