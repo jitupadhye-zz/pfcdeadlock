@@ -49,14 +49,14 @@ of other topology setups are not cyclic buffer dependency-free.
 
 Second, upon bugs or misconfiguration, deadlock-free routing configuration may become
 vulnerable to deadlock. In fact, we have observed a deadlock case in our Clos network
-deployment with PFC. (example here)
+deployment with PFC. \fixme{example here}
 
 
 In this paper, we argue that we do not need to completely avoid cyclic buffer dependency.
-Even if there is cyclic buffer dependency, deadlock may not occur (see Section~\ref{sec:xxx}).
+Even if there is cyclic buffer dependency, deadlock may not occur (see Section~\ref{sec:analysis}).
 This means that cyclic buffer dependency is a quite loose condition for deadlock.
 In this paper, we aim to explore a tighter condition, ideally a necessary and sufficient condition for deadlock.
 Once we have better understanding, we may avoid deadlock with smaller price ({\em e.g.,} 
-Section~\ref{sec:yyy}).
+Section~\ref{sec:mitigation}).
 
 
