@@ -34,29 +34,36 @@ the next hop buffer depend on the next next hop and wait for the RESUME
 so that it can send out packets to lower the buffer usage. This goes on, and in the end, 
 any stuck buffer depends on itself to move, thus forming a deadlock.
 
-To avoid deadlock, previous work has considered {\em deadlock-free routing}.
+To avoid deadlock, previous work has considered {\em deadlock-free routing}. Deadlock-free
+routing guarantees that (if the routing configuration is correct,) any traffic does not
+cause deadlock.
 
-\para{Achieving deadlock-free routing has high price, and may not even be viable.} 
+\para{Unfortunately, achieving deadlock-free routing has high price, and may not even be viable.} 
 In previous work, to achieve deadlock-free routing is to completely avoid cyclic buffer dependency.
-It is proved that cyclic buffer dependency-free is necessary and sufficient to deadlock-free.
+It is proved that cyclic buffer dependency-free is necessary and sufficient to deadlock-free routing.
 However, ensuring there is always no cyclic buffer dependency is challenging.
 
-First, deadlock-free routing largely limits the choice of topology. For example, TCP-bolt 
-has lengthy discussion on the design of deadlock-free routing and propose certain topology and routing. 
-In today's datacenter network, a common configuration is to only use Clos-style topology, which does 
-not have cyclic buffer dependency problem when the topology is complete. However, a number
-of other topology setups are not cyclic buffer dependency-free.
+First, deadlock-free routing largely limits the choice of topology. For example, \cite{tcpbolt}
+proposes to only use tree-based datacenter topology and routing, and shows that it is deadlock-free. 
+However, tree-based topology and routing has well-known problems including oversubscription~\cite{fattree},
+large path length~\cite{jellyfish} and vulnerable to failures.
+Thus, there are a number of other datacenter topology and routing schemes that are not 
+tree-based~\cite{bcube, camcube, jellyfish} and do not have deadlock-free guarantee. 
 
-Second, upon bugs or misconfiguration, deadlock-free routing configuration may become
-vulnerable to deadlock. In fact, we have observed a deadlock case in our Clos network
-deployment with PFC. \fixme{example here}
+Second, upon bugs or misconfiguration, deadlock-free routing configuration may turn into
+deadlock-vulnerable. In fact, recent work has observed a PFC deadlock case in production
+datacenter environments\cite{rdmascale}. It is caused by (unexpected) flooding of 
+lossless class traffic. Furthermore, there are multiple reports of routing loops in today's non-RDMA
+production datacenters~\cite{everflow, libra}, due to misconfiguration. If lossless traffic encounters
+any of these loops, cyclic buffer dependency is unavoidable and deadlock can form in milliseconds.
 
-
-In this paper, we argue that we do not need to completely avoid cyclic buffer dependency.
-Even if there is cyclic buffer dependency, deadlock may not occur (see Section~\ref{sec:analysis}).
+In this paper, we argue that we accept the fact that cyclic buffer dependency may not be completely 
+avoided,\footnote{In other words, deadlock-free routing may not always apply or work correctly.}
+but try to understand more precise conditions of deadlock. Our findings show that,
+even if there is cyclic buffer dependency, deadlock may not occur (see Section~\ref{sec:analysis}).
 This means that cyclic buffer dependency is a quite loose condition for deadlock.
-In this paper, we aim to explore a tighter condition, ideally a necessary and sufficient condition for deadlock.
-Once we have better understanding, we may avoid deadlock with smaller price ({\em e.g.,} 
-Section~\ref{sec:mitigation}).
+In this paper, we show our work in progress towards a tighter, and ideally a necessary and sufficient 
+condition for deadlock. Once we have better understanding, we may avoid deadlock with smaller price. 
+See discussion in Section~\ref{sec:mitigation}.
 
 
