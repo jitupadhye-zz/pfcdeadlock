@@ -1,28 +1,28 @@
 \section{Potential Deadlock Mitigations}
 \label{sec:mitigation}
 
-Since cyclic buffer dependency is a loose condition for deadlock, there are 
-mitigation mechanisms that avoid deadlock even if cyclic buffer dependency is present. 
+Since cyclic buffer dependency is a loose condition for deadlock, there are
+mitigation mechanisms that avoid deadlock even if cyclic buffer dependency is present.
 The examples and analysis in Section~\ref{sec:analysis}, {\em e.g.,} Equation~\ref{eq:condition},
-inspire us with some of the following potential deadlock mitigations. 
+inspire us with some of the following potential deadlock mitigations.
 
 
-\para{TTL-based mitigation for deadlock caused by loops.} Upon a routing loop, TTL plays an important role in 
+\para{TTL-based mitigation for deadlock caused by loops.} Upon a routing loop, TTL plays an important role in
 determining whether deadlock is created. The smaller TTL, the less possible deadlock forms.
 Thus, the most straightforward mitigation is to reduce packets' initial TTL values.
 For example, with an $N$-hop routing loop, if the initial TTL is not larger than $N$,
-no deadlock will form because the deadlock threshold for $r$ is $B$, as shown in 
+no deadlock will form because the deadlock threshold for $r$ is $B$, as shown in
 Equation~\ref{eq:condition}.
 
 In practice, we may not be able to guarantee that initial TTL values are always smaller than
 the size of the loop. However, by proper switch buffer management, we may make {\em class-specific}
-TTL much smaller than the actual TTL values. For example, if we assign packets with TTL that 
+TTL much smaller than the actual TTL values. For example, if we assign packets with TTL that
 is different by at least $X$ to different priority classes, the effective TTL becomes $X$
 within a priority class. Since PFC PAUSE operates based on priority classes, the deadlock threshold
 of injecting rate $r$ is effectively increased.
 
 In worst case scenarios, the effective TTL may still be larger than the size of loop, meaning
-that some $r$ smaller than $B$ leads to deadlock. We may consider rate limiting to keep 
+that some $r$ smaller than $B$ leads to deadlock. We may consider rate limiting to keep
 $r$ below the threshold $NB/TTL$.
 
 \para{Rate limiting.} Commodity switches support bandwidth shaping for each priority class
@@ -30,17 +30,27 @@ or even particular flows. This can mitigate deadlock caused by both routing loop
 buffer dependency. \fixme{more here.}
 
 
-\para{Preventing PFC from propagating to upper tier.} 
-In Clos networks, a deadlock that involves high tiers can cause the most serious damage.
-A natural mitigation is to limit the impact of PFC locally near servers. This reduces
-the risk of deadlock as well as the impact once deadlock occurs.
-The idea is to assign different PFC thresholds to different tiers and make PFC happen less
-on higher tier. Also, higher tier switches may be allowed to ignore PFC or drop packets from
-lower tier upon extreme cases.
-The price is that this turns the network into partly
-``lossy'' and may cause congestion drops.
+\para{Limiting PFC pause frames near the source}
+PFC is well known for its head of line blocking. The damage of HOL and the potential deadlock caused by PFC is significant because the pause frames are generated near the destination or in the middle of the network, where network congestions usually happen. Hence if we can limit the PFC pause frame generation near the source, we can reduce the damage of both deadlock and HOL blocking. 
 
+Here we describe several possible ways of doing so: First, we can assign different PFC thresholds to the ports of a switch based on their positions. Ports connecting to the downstream get smaller threshold, whereas ports connecting to the upstream get larger threshold. %different tiers and make PFC happen less on higher tier. Also, higher tier switches may be allowed to ignore PFC or drop packets from lower tier upon extreme cases.
+Similarly, we can use switches with larger threshold values at the higher tiers so that they can absorb temporal burstiness instead of generating PFC pause frames.  (todo: using larger threshold values is tricky, as it does not push PFC back to the source for all cases.)
 
+%In Clos networks, a deadlock that involves high tiers can cause the most serious damage.
+%A natural mitigation is to limit the impact of PFC locally near servers. This reduces
+%the risk of deadlock as well as the impact once deadlock occurs.
+%The idea is to assign different PFC thresholds to different tiers and make PFC happen less
+%on higher tier. Also, higher tier switches may be allowed to ignore PFC or drop packets from
+%lower tier upon extreme cases.
+%The price is that this turns the network into partly
+%``lossy'' and may cause congestion drops.
+
+Second, we may classify packets based on the TTL value they carry, and use TTL-based buffer management similar to that in \ref{karol2003prevention}. The smaller the TTL value of a packet, the smaller the chance that the packet will trigger PFC pause frames. Hence the TTL-based buffer management has the ability to limiting the pause frame generation near the source. But its fairness property is less understood and worthy of further study.
+
+\para{Preventing PFC from been generated.}
+Both DCQCN and TIMELY are designed to reduce the possibility of PFC generation. But due to the feedback latency introduced by the end-to-end delay, and the fact that both algorithms react only after the congestions been generated (through either queue length or latency increase), they cannot prevent PFC from been generated. 
+
+One possible way to further preventing PFC from been generated is to integrate DCQCN together with phantom queuing. By reacting to the phantom queues which assume lower link speed, DCQCN can generate congestion signals much earlier. 
 
 In future work, a deeper understanding of tighter conditions for deadlock may
-lead to more deadlock mitigations.
+lead to more deadlock mitigations. 
