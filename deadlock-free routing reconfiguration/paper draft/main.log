@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.8.27)  13 JUL 2016 20:38
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.8.27)  13 JUL 2016 20:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -660,11 +660,7 @@ Package caption Info: wrapfig package is loaded.
 \c@theorem=\count150
 \hour=\count151
 \minute=\count152
- (./main.aux
-
-LaTeX Warning: Label `eq:1' multiply defined.
-
-)
+ (./main.aux)
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 179.
@@ -889,47 +885,40 @@ mm/m/it/10 G[]\OT1/cmr/m/n/10 )$
  []
 
 
-Underfull \vbox (badness 2875) has occurred while \output is active []
-
-
-Overfull \hbox (1.52942pt too wide) in paragraph at lines 88--89
+Overfull \hbox (2.63953pt too wide) in paragraph at lines 88--89
 []\T1/ptm/m/n/10 Given $\OML/cmm/m/it/10 G\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 V; 
 E\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 , $\OML/cmm/m/it/10 P[]$\T1/ptm/m/n/10 , $\OM
-L/cmm/m/it/10 P[]$ \T1/ptm/m/n/10 ans $\OML/cmm/m/it/10 G[]\OT1/cmr/m/n/10 (\OM
+L/cmm/m/it/10 P[]$ \T1/ptm/m/n/10 and $\OML/cmm/m/it/10 G[]\OT1/cmr/m/n/10 (\OM
 L/cmm/m/it/10 V[]; E[]\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 , we say $\OML/cmm/m/it/
 10 G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 V[]; E[]\OT1/cmr/m/n/10 )$
  []
 
 ) (./evaluation.tex) (./related.tex) (./main.bbl) [4 <./figs/formulation_exampl
-e.pdf>] (./main.aux)
-
-LaTeX Warning: There were multiply-defined labels.
-
- ) 
+e.pdf>] (./main.aux) ) 
 Here is how much of TeX's memory you used:
- 7953 strings out of 493089
- 116953 string characters out of 6134842
- 196758 words of memory out of 5000000
- 11183 multiletter control sequences out of 15000+600000
+ 7954 strings out of 493089
+ 116959 string characters out of 6134842
+ 194758 words of memory out of 5000000
+ 11184 multiletter control sequences out of 15000+600000
  60707 words of font info for 65 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  61i,17n,96p,667b,515s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
-exlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/te
-xlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/tex
-live/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/texli
-ve/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive
-/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2
-015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/2015
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2015/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2015/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2015/texmf
--dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2015/texmf-dist/f
-onts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/ty
-pe1/urw/times/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/ti
-mes/utmr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmri8
-a.pfb>
-Output written on main.pdf (4 pages, 283662 bytes).
+{/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/
+8r.enc}</usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex1
+0.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10
+.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.p
+fb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb
+></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><
+/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></us
+r/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/l
+ocal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/lo
+cal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/loca
+l/texlive/2015/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texli
+ve/2015/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2015
+/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2015/texmf-dis
+t/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/ty
+pe1/urw/times/utmri8a.pfb>
+Output written on main.pdf (4 pages, 283617 bytes).
 PDF statistics:
  471 PDF objects out of 1000 (max. 8388607)
  316 compressed objects within 4 object streams
