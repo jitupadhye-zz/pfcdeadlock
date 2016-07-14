@@ -2,14 +2,15 @@
 \label{sec:analysis}
 
 Although cyclic buffer dependency is a necessary condition for deadlock, it is not a
-sufficient condition. In this section, we present several typical cases containing cyclic 
-buffer dependency, but no deadlock is formed. We demonstrate 
+sufficient condition. In this section, we present our case studies in which cyclic 
+buffer dependency is present, but deadlock occurrence still depends on other factors. We demonstrate 
 that 1) a looping flow that generates cyclic buffer dependency does not always lead to deadlock. 
-The length of loop, flow rates and packet Time-To-Live (TTL) affects whether and how fast 
-the deadlock forms. 2) Multiple flows may cause cyclic buffer dependency and even simultaneous cyclic pauses,
-but still may not be sufficient to create deadlock. 
+The length of loop, flow rates and packet Time-To-Live (TTL) affects whether 
+the deadlock forms. 2) Multiple flows may cause cyclic buffer dependency,
+but slightly different flow sets lead to different deadlock results. 3) Rate-limiting can
+prevent deadlock from happening.
 
-\subsection{Single Flow in a Routing Loop}
+\subsection{Case 1: Flow Rate Affects Deadlock in a Routing Loop}
 
 \begin{figure*}[t]
 %\vspace{-0.1in}
@@ -115,10 +116,10 @@ This matches what we observe in testbed experiment: with $B=40Gbps$, $n=2$ and
 $TTL=16$, the flow injecting rate must be at least $5Gbps$. With larger bandwidth,
 shorter loop length or smaller initial TTL values, the threshold can be higher.
 As long as the flow rate is smaller than the threshold, no deadlock will form.
-As shown in Section~\ref{sec:yyy}, we may utilize this property to avoid deadlock, 
+As shown in Section~\ref{sec:mitigation}, we may utilize this property to avoid deadlock, 
 even if routing loop occurs. 
 
-\subsection{Multiple flows}
+\subsection{Case 2: Traffic Matrix Affects Deadlock}
 
 Multiple flows may create a cyclic buffer dependency even if there is no routing loop.
 Figure~\ref{fig:case1}(a) shows an example. With Flow 1 and Flow 2, the four switches' receiving buffers $RX1$ 
@@ -158,7 +159,7 @@ To understand such scenarios, we must analyze and simulate them at packet level.
 \subfigure[Buffer occupancy at switch D.] {
     \includegraphics[width=0.23\textwidth] {figs/case1_buffer_occupancy_D.eps}
 }
-\caption{Deadlock case 1.}
+\caption{There is no deadlock even though two flows create cyclic buffer dependency among four switches.}
 \label{fig:case1}
 \end{figure*}
 
@@ -192,10 +193,12 @@ To understand such scenarios, we must analyze and simulate them at packet level.
 \subfigure[Pause events at four links.]{
     \includegraphics[width=0.3\textwidth] {figs/case2_pause.eps}
 }
-\caption{Deadlock case 2.}\label{fig:case2}
+\caption{Slightly different traffic matrix leads to deadlock, even though
+the stable state analysis shows the rates of Flow 1 and Flow 2 are not affected.}
+\label{fig:case2}
 \end{figure*}
 
-\textbf{Case 1:} In this case, as shown in Fig.~\ref{fig:case1}(a), we let two flows run over four 
+As shown in Fig.~\ref{fig:case1}(a), we let two flows run over four 
 switches A, B, C and D. Flow 1 starts at a host (not shown) attached to A, passes through B and C, 
 and ends at a host attached to D. Flow 2 starts at a host attached to C, passes through D and A, 
 and ends at a host attached to B. In the figure, RX represents input queue (or port), while TX 
@@ -241,7 +244,7 @@ hence link L1 will never be paused.
 Cyclic buffer dependency is just a necessary condition for deadlock.
 
 
-\textbf{Case 2:} as shown in Fig.~\ref{fig:case2}(a), in the second case, in addition to case 1, we 
+\textbf{Slightly different traffic matrix leads to deadlock:} as shown in Fig.~\ref{fig:case2}(a), based on the previous case, we 
 add another flow (flow 3) to run over switches B and C in sequence. All the three flows are UDP 
 flows with infinite traffic demand. Buffer dependency graph of case 2 is drawn in Fig.~\ref{fig:case2}(b). 
 Compared with case 1, one additional dependency from TX1 of B to TX1 of C is added.
@@ -300,6 +303,8 @@ and no link can get resumed.
 
 \end{figure*}
 
+\subsection{Case 3: Rate Limiting Mitigates Deadlock}
+
 \textbf{Case 3:} In this case, we will show that even if all the four links are paused simultaneously, 
 it is not guaranteed that a deadlock will be created. As shown in Fig.~\ref{fig:case3}(a), in addition 
 to case 1, we add another two flows (flow 3 and flow 4). Flow 3 starts at a host attached to A, passes 
@@ -336,7 +341,7 @@ why when we stop the flows, all the four links can be resumed from the pauses.
 \textbf{Observation 3:} even if all the links in a cycle are paused simultaneously, it is not 
 sufficient to create a permanent deadlock.
 
-\para{Summary.} In the multi-flow scenarios, cyclic buffer dependency can be created without 
+\subsection{Summary} In the multi-flow scenarios, cyclic buffer dependency can be created without 
 a routing loop, and is still not a sufficient condition for deadlock. The analysis of sufficient
 condition is complicated. Stable flow state analysis does not apply, whereas we so far do not have 
 packet-level analysis tools despite packet-level simulations. While we cannot obtain the tightest
