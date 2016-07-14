@@ -5,7 +5,7 @@
 The deployment of RDMA over Ethernet requires Priority-based Flow Control (PFC)~\cite{pfc}  to provide a lossless L2 network~\cite{dcqcn, rdmaatscale}. 
 PFC is a mechanism for ensuring zero packet loss under congestion in data center bridging (DCB) networks. When PFC is enabled, the switch will maintain a counter to track the virtual queue length of each ingress queue. Once the queue length reaches a pre-configured PFC threshold, a PAUSE frame will be generated to pause the incoming link for a specified period of time.
 
-The using of PFC will cause PFC deadlock problem, as reported in ~\cite{dcqcn, rdmaatscale}. PFC deadlock arises when the buffer usage of a set of ingress queues reach their PFC thresholds simultaneously, and the paused links form a cycle. Once PFC deadlock is created, no packet is allowed to be transmitted through the affected links. 
+The using of PFC will cause PFC deadlock problem, as reported in ~\cite{rdmaatscale}. PFC deadlock arises when the buffer usage of a set of ingress queues reach their PFC thresholds simultaneously, and the paused links form a cycle. Once PFC deadlock is created, no packet is allowed to be transmitted through the affected links. 
 
 Due to the backpressue paradigm of PFC~\cite{tcpbolt,dcqcn}, data transmission of the whole DCN may be paused by a PFC deadlock only among a small number of network devices. Hence it is important to avoid PFC deadlock in DCN.
 
