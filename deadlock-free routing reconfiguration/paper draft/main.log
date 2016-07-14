@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.8.27)  14 JUL 2016 02:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.8.27)  14 JUL 2016 08:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -740,122 +740,152 @@ Overfull \hbox (15.18794pt too wide) in paragraph at lines 15--16
 deadlock-
  []
 
-) (./background.tex <figs/deadlock_tree_a.pdf, id=1, 432.61626pt x 285.065pt>
-File: figs/deadlock_tree_a.pdf Graphic file (type pdf)
-
-<use figs/deadlock_tree_a.pdf>
-Package pdftex.def Info: figs/deadlock_tree_a.pdf used on input line 8.
-(pdftex.def)             Requested size: 166.32092pt x 109.5916pt.
-
-<figs/deadlock_tree_b.pdf, id=2, 434.62375pt x 285.065pt>
-File: figs/deadlock_tree_b.pdf Graphic file (type pdf)
-
-<use figs/deadlock_tree_b.pdf>
-Package pdftex.def Info: figs/deadlock_tree_b.pdf used on input line 11.
-(pdftex.def)             Requested size: 166.32092pt x 109.09137pt.
-
-<figs/deadlock_tree_d.pdf, id=3, 233.87375pt x 213.79875pt>
-File: figs/deadlock_tree_d.pdf Graphic file (type pdf)
-
-<use figs/deadlock_tree_d.pdf>
-Package pdftex.def Info: figs/deadlock_tree_d.pdf used on input line 14.
-(pdftex.def)             Requested size: 126.0pt x 115.18535pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 14--14
-[]\T1/ptm/m/n/9 (c) |Buffer de-pen-den-cies among
- []
-
-LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 16.
-[1{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+) (./background.tex [1{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updma
+p/pdftex.map}
 
 
 ]
-Overfull \hbox (3.58777pt too wide) in paragraph at lines 23--24
-\T1/ptm/m/n/10 PFC al-lows an over-whelmed net-work de-vice to send a PAUSE
+Overfull \hbox (1.74754pt too wide) in paragraph at lines 5--7
+[]\T1/ptm/m/n/10 The de-ploy-ment of RDMA over Eth-er-net re-quires Priority-
  []
 
 
-Overfull \hbox (3.31688pt too wide) in paragraph at lines 23--24
-\T1/ptm/m/n/10 frame to its im-me-di-ate up-stream de-vice, which halts the tra
-ns-
+Overfull \hbox (5.32785pt too wide) in paragraph at lines 5--7
+\T1/ptm/m/n/10 counter to track the vir-tual queue length of each ingress queue
+.
+ []
+
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 18.
+) (./motivation.tex
+Overfull \hbox (1.44948pt too wide) in paragraph at lines 1--1
+[]\secfnt RECONFIGURATION-INDUCED DEAD-
+ []
+
+<figs/deadlock_tree_a.pdf, id=14, 419.5675pt x 310.15875pt>
+File: figs/deadlock_tree_a.pdf Graphic file (type pdf)
+
+<use figs/deadlock_tree_a.pdf>
+Package pdftex.def Info: figs/deadlock_tree_a.pdf used on input line 16.
+(pdftex.def)             Requested size: 120.96277pt x 89.41841pt.
+
+<figs/deadlock_tree_b.pdf, id=15, 419.5675pt x 310.15875pt>
+File: figs/deadlock_tree_b.pdf Graphic file (type pdf)
+
+<use figs/deadlock_tree_b.pdf>
+Package pdftex.def Info: figs/deadlock_tree_b.pdf used on input line 19.
+(pdftex.def)             Requested size: 120.96277pt x 89.41841pt.
+
+Overfull \hbox (11.92554pt too wide) in paragraph at lines 16--20
+ [][][] 
+ []
+
+<figs/deadlock_tree_c.pdf, id=16, 419.5675pt x 310.15875pt>
+File: figs/deadlock_tree_c.pdf Graphic file (type pdf)
+
+<use figs/deadlock_tree_c.pdf>
+Package pdftex.def Info: figs/deadlock_tree_c.pdf used on input line 23.
+(pdftex.def)             Requested size: 120.96277pt x 89.41841pt.
+
+<figs/deadlock_tree_d.pdf, id=17, 434.62375pt x 310.15875pt>
+File: figs/deadlock_tree_d.pdf Graphic file (type pdf)
+
+<use figs/deadlock_tree_d.pdf>
+Package pdftex.def Info: figs/deadlock_tree_d.pdf used on input line 26.
+(pdftex.def)             Requested size: 120.96277pt x 86.31853pt.
+
+Overfull \hbox (11.92554pt too wide) in paragraph at lines 23--27
+ [][][] 
+ []
+
+<figs/deadlock_tree_e.pdf, id=18, 233.87375pt x 213.79875pt>
+File: figs/deadlock_tree_e.pdf Graphic file (type pdf)
+
+<use figs/deadlock_tree_e.pdf>
+Package pdftex.def Info: figs/deadlock_tree_e.pdf used on input line 30.
+(pdftex.def)             Requested size: 100.79846pt x 92.14697pt.
+
+<figs/treecase_dfschemes.pdf, id=19, 303.1325pt x 192.72pt>
+File: figs/treecase_dfschemes.pdf Graphic file (type pdf)
+
+<use figs/treecase_dfschemes.pdf>
+Package pdftex.def Info: figs/treecase_dfschemes.pdf used on input line 33.
+(pdftex.def)             Requested size: 141.11938pt x 89.71973pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 33--33
+[]\T1/ptm/m/n/9 (f) |Deadlock-free re-con-fig-u-ra-tion
  []
 
 
-Overfull \hbox (1.80803pt too wide) in paragraph at lines 32--33
-[]\T1/ptm/m/n/10 PFC dead-lock can be avoided by lever-ag-ing a rout-ing func-
+Overfull \hbox (11.91785pt too wide) in paragraph at lines 30--34
+ [][][] 
  []
 
-
-Overfull \hbox (17.14746pt too wide) in paragraph at lines 48--49
-[]\T1/ptm/m/n/10 To avoid pos-si-ble PFC dead-lock prob-lem, one safe congestio
-n-
- []
-
-<figs/deadlock_nontree_a.pdf, id=17, 197.73875pt x 125.46875pt>
+[2 <./figs/deadlock_tree_a.pdf> <./figs/deadlock_tree_b.pdf> <./figs/deadlock_t
+ree_c.pdf> <./figs/deadlock_tree_d.pdf> <./figs/deadlock_tree_e.pdf> <./figs/tr
+eecase_dfschemes.pdf>]
+<figs/deadlock_nontree_a.pdf, id=241, 197.73875pt x 125.46875pt>
 File: figs/deadlock_nontree_a.pdf Graphic file (type pdf)
 
 <use figs/deadlock_nontree_a.pdf>
-Package pdftex.def Info: figs/deadlock_nontree_a.pdf used on input line 55.
+Package pdftex.def Info: figs/deadlock_nontree_a.pdf used on input line 67.
 (pdftex.def)             Requested size: 80.64185pt x 51.16873pt.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <9> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 55.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 67.
 
-<figs/deadlock_nontree_b.pdf, id=18, 208.78pt x 125.46875pt>
+<figs/deadlock_nontree_b.pdf, id=242, 208.78pt x 125.46875pt>
 File: figs/deadlock_nontree_b.pdf Graphic file (type pdf)
 
 <use figs/deadlock_nontree_b.pdf>
-Package pdftex.def Info: figs/deadlock_nontree_b.pdf used on input line 58.
+Package pdftex.def Info: figs/deadlock_nontree_b.pdf used on input line 70.
 (pdftex.def)             Requested size: 80.64185pt x 48.46355pt.
 
-<figs/deadlock_nontree_c.pdf, id=19, 198.7425pt x 125.46875pt>
+<figs/deadlock_nontree_c.pdf, id=243, 198.7425pt x 125.46875pt>
 File: figs/deadlock_nontree_c.pdf Graphic file (type pdf)
 
 <use figs/deadlock_nontree_c.pdf>
-Package pdftex.def Info: figs/deadlock_nontree_c.pdf used on input line 61.
+Package pdftex.def Info: figs/deadlock_nontree_c.pdf used on input line 73.
 (pdftex.def)             Requested size: 80.64185pt x 50.91219pt.
 
-Overfull \hbox (16.92554pt too wide) in paragraph at lines 55--62
+Overfull \hbox (16.92554pt too wide) in paragraph at lines 67--74
  [][][][] 
  []
 
-<figs/deadlock_nontree_d.pdf, id=20, 198.7425pt x 146.5475pt>
+<figs/deadlock_nontree_d.pdf, id=244, 198.7425pt x 146.5475pt>
 File: figs/deadlock_nontree_d.pdf Graphic file (type pdf)
 
 <use figs/deadlock_nontree_d.pdf>
-Package pdftex.def Info: figs/deadlock_nontree_d.pdf used on input line 65.
+Package pdftex.def Info: figs/deadlock_nontree_d.pdf used on input line 77.
 (pdftex.def)             Requested size: 80.64185pt x 59.46544pt.
 
-<figs/deadlock_nontree_e.pdf, id=21, 226.8475pt x 154.5775pt>
+<figs/deadlock_nontree_e.pdf, id=245, 226.8475pt x 154.5775pt>
 File: figs/deadlock_nontree_e.pdf Graphic file (type pdf)
 
 <use figs/deadlock_nontree_e.pdf>
-Package pdftex.def Info: figs/deadlock_nontree_e.pdf used on input line 68.
+Package pdftex.def Info: figs/deadlock_nontree_e.pdf used on input line 80.
 (pdftex.def)             Requested size: 80.64185pt x 54.94968pt.
 
-<figs/deadlock_nontree_f.pdf, id=22, 279.0425pt x 241.90375pt>
+<figs/deadlock_nontree_f.pdf, id=246, 279.0425pt x 241.90375pt>
 File: figs/deadlock_nontree_f.pdf Graphic file (type pdf)
 
 <use figs/deadlock_nontree_f.pdf>
-Package pdftex.def Info: figs/deadlock_nontree_f.pdf used on input line 71.
+Package pdftex.def Info: figs/deadlock_nontree_f.pdf used on input line 83.
 (pdftex.def)             Requested size: 75.59692pt x 65.53265pt.
 
-Overfull \hbox (11.88062pt too wide) in paragraph at lines 65--72
+Overfull \hbox (11.88062pt too wide) in paragraph at lines 77--84
  [][][][] 
  []
 
-<figs/dfschemes.pdf, id=23, 426.59375pt x 192.72pt>
-File: figs/dfschemes.pdf Graphic file (type pdf)
- <use figs/dfschemes.pdf>
-Package pdftex.def Info: figs/dfschemes.pdf used on input line 83.
+<figs/nontreecase_dfschemes.pdf, id=247, 426.59375pt x 192.72pt>
+File: figs/nontreecase_dfschemes.pdf Graphic file (type pdf)
+
+<use figs/nontreecase_dfschemes.pdf>
+Package pdftex.def Info: figs/nontreecase_dfschemes.pdf used on input line 91.
 (pdftex.def)             Requested size: 226.79846pt x 102.46162pt.
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [2 <./figs/deadlock_tree_a.pdf> <./figs/deadlock_tree_b.pdf> <./figs/deadlock_
-tree_d.pdf>]
-Overfull \hbox (3.48773pt too wide) in paragraph at lines 100--101
-[]\T1/ptm/m/n/10 While for this ex-am-ple it may seem easy to find a deadlock-
+Overfull \hbox (3.60799pt too wide) in paragraph at lines 106--107
+\T1/ptm/m/n/10 men-tioned can be up-dated freely with-out any or-der con-strain
+t.
  []
 
 ) (./solution.tex
@@ -864,26 +894,21 @@ Overfull \hbox (1.64764pt too wide) in paragraph at lines 3--4
 iev-
  []
 
-
-Overfull \hbox (1.91785pt too wide) in paragraph at lines 51--52
-[][] 
- []
-
-<figs/formulation_example.pdf, id=197, 215.80624pt x 107.40125pt>
+<figs/formulation_example.pdf, id=248, 215.80624pt x 107.40125pt>
 File: figs/formulation_example.pdf Graphic file (type pdf)
 
 <use figs/formulation_example.pdf>
-Package pdftex.def Info: figs/formulation_example.pdf used on input line 58.
+Package pdftex.def Info: figs/formulation_example.pdf used on input line 9.
 (pdftex.def)             Requested size: 226.79846pt x 112.87622pt.
 
-Underfull \hbox (badness 1112) in paragraph at lines 59--59
+Underfull \hbox (badness 1112) in paragraph at lines 10--10
 []\T1/ptm/b/n/10 Figure 4: |An ex-am-ple of con-fig-u-ra-tion de-pen-dency
  []
 
 [3 <./figs/deadlock_nontree_a.pdf> <./figs/deadlock_nontree_b.pdf> <./figs/dead
 lock_nontree_c.pdf> <./figs/deadlock_nontree_d.pdf> <./figs/deadlock_nontree_e.
-pdf> <./figs/deadlock_nontree_f.pdf> <./figs/dfschemes.pdf>]
-Overfull \hbox (6.86017pt too wide) in paragraph at lines 73--74
+pdf> <./figs/deadlock_nontree_f.pdf> <./figs/nontreecase_dfschemes.pdf>]
+Overfull \hbox (6.86017pt too wide) in paragraph at lines 19--20
 []\T1/ptm/m/n/10 We use $\OML/cmm/m/it/10 ts\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 G
 []\OT1/cmr/m/n/10 )$ \T1/ptm/m/n/10 to de-note a topo-log-i-cal sort-ing of $\O
 ML/cmm/m/it/10 G[]$\T1/ptm/m/n/10 . $\OML/cmm/m/it/10 ts\OT1/cmr/m/n/10 (\OML/c
@@ -891,71 +916,80 @@ mm/m/it/10 G[]\OT1/cmr/m/n/10 )$
  []
 
 
-Overfull \hbox (11.1601pt too wide) in paragraph at lines 89--90
+Overfull \hbox (1.91785pt too wide) in paragraph at lines 67--68
+[][] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Overfull \hbox (11.1601pt too wide) in paragraph at lines 96--97
 \T1/ptm/m/n/10 there is no cyclic buffer de-pen-dency for any cy-cle C in $\OML
 /cmm/m/it/10 G\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 V; E\OT1/cmr/m/n/10 )$\T1/ptm/m
 /n/10 .
  []
 
 
-Overfull \hbox (3.79758pt too wide) in paragraph at lines 106--107
+Overfull \hbox (3.79758pt too wide) in paragraph at lines 113--114
 \T1/ptm/m/n/10 is to enu-mer-ate all the pos-si-ble CDGs, and choose a deadlock
 -
  []
 
-
-Overfull \hbox (2.84814pt too wide) in paragraph at lines 117--118
+[4 <./figs/formulation_example.pdf>]
+Overfull \hbox (2.84814pt too wide) in paragraph at lines 124--125
 []\T1/ptm/m/n/10 In the next, we present our so-lu-tion for search-ing deadlock
 -
  []
 
-<figs/solution_example1_a.pdf, id=402, 241.90375pt x 205.76875pt>
+<figs/solution_example1_a.pdf, id=477, 241.90375pt x 205.76875pt>
 File: figs/solution_example1_a.pdf Graphic file (type pdf)
 
 <use figs/solution_example1_a.pdf>
-Package pdftex.def Info: figs/solution_example1_a.pdf used on input line 126.
+Package pdftex.def Info: figs/solution_example1_a.pdf used on input line 133.
 (pdftex.def)             Requested size: 176.40308pt x 150.05922pt.
 
-<figs/solution_example1_b.pdf, id=403, 382.42876pt x 141.52875pt>
+<figs/solution_example1_b.pdf, id=478, 382.42876pt x 141.52875pt>
 File: figs/solution_example1_b.pdf Graphic file (type pdf)
 
 <use figs/solution_example1_b.pdf>
-Package pdftex.def Info: figs/solution_example1_b.pdf used on input line 130.
+Package pdftex.def Info: figs/solution_example1_b.pdf used on input line 137.
 (pdftex.def)             Requested size: 226.79846pt x 83.93314pt.
 
-Underfull \vbox (badness 3302) has occurred while \output is active []
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [4 <./figs/formulation_example.pdf>]) (./evaluation.tex) (./related.tex) (./ma
-in.bbl)
-[5 <./figs/solution_example1_a.pdf> <./figs/solution_example1_b.pdf>]
-(./main.aux) ) 
+)
+(./evaluation.tex) (./related.tex) (./main.bbl [5 <./figs/solution_example1_a.p
+df> <./figs/solution_example1_b.pdf>]) [6
+
+] (./main.aux) ) 
 Here is how much of TeX's memory you used:
- 7966 strings out of 493089
- 117307 string characters out of 6134842
- 194758 words of memory out of 5000000
- 11194 multiletter control sequences out of 15000+600000
- 60707 words of font info for 65 fonts, out of 8000000 for 9000
+ 7997 strings out of 493089
+ 117943 string characters out of 6134842
+ 193758 words of memory out of 5000000
+ 11218 multiletter control sequences out of 15000+600000
+ 61785 words of font info for 66 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  61i,17n,96p,667b,511s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}<
-/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></
-usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></u
-sr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr
-/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/l
-ocal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/loc
-al/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/
-texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/tex
-live/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texl
-ive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texliv
-e/2015/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2015/
-texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2015/texmf-d
-ist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/
-type1/urw/times/utmr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/
-times/utmri8a.pfb>
-Output written on main.pdf (5 pages, 308270 bytes).
+{/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc
+}</usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb>
+</usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><
+/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></u
+sr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr
+/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/l
+ocal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/loca
+l/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/t
+exlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/te
+xlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texl
+ive/2015/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/201
+5/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2015/texmf
+-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/font
+s/type1/urw/times/utmr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/ur
+w/times/utmri8a.pfb>
+Output written on main.pdf (6 pages, 334939 bytes).
 PDF statistics:
- 508 PDF objects out of 1000 (max. 8388607)
- 344 compressed objects within 4 object streams
+ 562 PDF objects out of 1000 (max. 8388607)
+ 385 compressed objects within 4 object streams
  0 named destinations out of 1000 (max. 500000)
- 66 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 81 words of extra memory for PDF output out of 10000 (max. 10000000)
 
