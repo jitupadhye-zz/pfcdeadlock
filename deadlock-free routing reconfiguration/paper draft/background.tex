@@ -22,3 +22,24 @@ PFC deadlock can be avoided by adopting a deadlock-free routing function $\textb
 %\subsection{Classification of PFC Deadlock}\label{subsec:deadlockclassification}
 %
 %PFC Deadlock can be classified into 
+
+\subsection{Deadlock Time in 40Gbps Network}\label{subsec:deadlocktime}
+
+\begin{figure}[t]
+	\centering
+	\subfloat[short for lof][Topology and flows.]{
+		\includegraphics[width=0.27\textwidth] {figs/deadlock_time_a}
+	}
+	\subfloat[short for lof][Buffer dependency graph.]{
+		\includegraphics[width=0.22\textwidth] {figs/deadlock_time_b}
+	}
+	\caption{Measurement of deadlock time in a 3-switch network.}\label{fig:deadlocktime}
+	
+\end{figure}
+
+Switches deployed in current DCNs are shallow-buffered commodity switches with only about 8-12MB buffer. As the link capacity goes up to 40Gbps or even more,  switch buffer can be consumed in just a few milliseconds under congestion. This fact also indicates that once cyclic buffer dependency is met, deadlock can occur within a very short time.
+
+We did a packet-level NS-3 simulation to measure how long it will take to create a PFC deadlock. We choose simulation instead of real testbed experiment because we need a well-controlled environment for our measurement. 
+As shown In Fig.~\ref{fig:deadlocktime}(a), our simulation is performed ina 3-switch network. The link capacity is 40Gbps, and each switch has 12MB buffer. We inject three UDP fows with infinite traffic demand into the network simultaneously. The paths taken by these flows form a cyclic buffer dependency as shown in Fig.~\ref{fig:deadlocktime}(b).
+
+Our measurement shows that, when PFC threshold is statically set to 40KB, deadlock occurs in only 0.065ms. If we use dynamic PFC threshold, under which switch buffer can be fully utilized, deadlock occurs in about 0.18ms. The results indicate that once we have cyclic buffer dependency in the network, deadlock can occur in a very short time in 40Gbps DCNs.
