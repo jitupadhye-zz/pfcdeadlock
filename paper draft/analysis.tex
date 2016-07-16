@@ -31,30 +31,36 @@ prevent deadlock from happening.
 
 A routing loop can create cyclic buffer dependency if a flow is trapped in the loop.
 The simplest example is a two-hop loop between two switches, as shown in Figure~\ref{fig:loop}(a).
-Figure~\ref{fig:loop}(b) shows the buffer dependency relationship. Whether switch A can move
-the packets in ints receiving buffer {\em RX1} to egress depends on switch B's buffer {\em RX1}.
-\footnote{We focus on receiving buffer because PFC PAUSE triggers based on the occupancy of receiving buffer.}
-Switch B's {\em RX1} also depends on switch A's {\em RX1}. The deadlock happens when
-both of the involved buffers reach the PFC threshold at the same time and PAUSE the links.
+We then plot buffer dependency graph (Figure~\ref{fig:loop}(b)), $RX$ represents input 
+queue (or port). Each directed line represents a buffer dependency from the source TX to the 
+destination TX. For example, packets buffered in $RX1$ of switch A will be sent to either $RX1$ 
+of B, and vice versa. So in Figure~\ref{fig:loop}(b), two directed lines are drawn between A and B.
+Switch A's dependency on switch B means whether switch A can move
+the packets in its receiving buffer {\em RX1} to egress depends on switch B's buffer {\em RX1}.\footnote{We 
+focus on receiving buffer because PFC PAUSE triggers based on the occupancy of receiving buffer.}
+The switches can send packets to the other side only 
+when the other side's buffer utilization is under PFC PAUSE threshold. The deadlock happens when
+both of the involved buffers reach the PFC threshold at the same time and PAUSE the links.  
 
 
-However, this cyclic buffer dependency may not always turn into that state. The flow
+However, this cyclic buffer dependency may not always turn into deadlock state. The flow
 sending rate, the TTL (time-to-live) of packets and the length of the loop together 
-determine whether there will be deadlock and how fast the deadlock forms. 
-For example, we run a simple experiment on two switches that are connected by a 
-40Gbps link. All packets have initial TTL of 16 and are injected into switch A. We find that, 
+determine whether there will be deadlock. In our testbed, we run a simple experiment on 
+two switches that are connected by a 40Gbps link and configured with a routing loop. 
+All packets have initial TTL of 16 and are injected into one of the switches. We find that, 
 only if the packet injection rate exceeds 5Gbps, there can occur deadlock. 
 
-In order to analyze this single flow in routing loop case, we develop a mechanism called 
+In order to analyze deadlock occurrence in the cases of routing loop, we develop a mechanism called 
 {\em boundary state analysis}. It yields accurate prediction of whether deadlock forms,
 as shown below.
 
 \para{Boundary state analysis.} 
-On any of the switch in the loop, packets are injected from previous hop and ``drained'' by the next hop. If the draining
-rate cannot catch up the injecting rate, packets will continuously build up a queue in the
-buffer. In a loop, as long as one switch triggers PFC, Deadlock will occur in the end. 
-We define {\em Boundary state}, in which the injecting rate and draining rate are balanced on every
-switch, and larger injecting rate leads to deadlock because draining rate cannot catch up.
+On any of the switches in the loop, packets are injected by the previous hop and drained by the next hop. 
+If the draining rate is smaller than the injecting rate, packets will continuously queue up in the
+switch buffers. In a loop, once one switch buffers enough packets and triggers PFC, the PFC will soon
+cascade through the whole loop and forms deadlock. 
+We define {\em boundary state}, in which the injecting rate and draining rate are balanced on every
+switch, and any larger injecting rate leads to deadlock because draining rate cannot catch up.
 
 We build the boundary state model as illustrated in 
 Figure~\ref{fig:loop}(c). The variables are described in Table~\ref{tab:stable_state}.
@@ -113,8 +119,8 @@ r > r_d = \frac{nB}{TTL}
 \end{equation}
 
 This matches what we observe in testbed experiment: with $B=40Gbps$, $n=2$ and
-$TTL=16$, the flow injecting rate must be at least $5Gbps$. With larger bandwidth,
-shorter loop length or smaller initial TTL values, the threshold can be higher.
+$TTL=16$, the flow injecting rate must be at least $5Gbps$ to cause deadlock. With larger bandwidth,
+shorter loop length or smaller initial TTL values, the threshold of $r$ can be higher.
 As long as the flow rate is smaller than the threshold, no deadlock will form.
 As shown in Section~\ref{sec:mitigation}, we may utilize this property to avoid deadlock, 
 even if routing loop occurs. 
@@ -122,14 +128,20 @@ even if routing loop occurs.
 \subsection{Case 2: Traffic Matrix Affects Deadlock}
 
 Multiple flows may create a cyclic buffer dependency even if there is no routing loop.
-Figure~\ref{fig:case1}(a) shows an example. With Flow 1 and Flow 2, the four switches' receiving buffers $RX1$ 
-depend on the buffer in their next hop -- they can send packets to the next hop only 
-when the next hop's buffer utilization is under PFC PAUSE threshold, as shown in 
-Figure~\ref{fig:case1}(b). In such case, the boundary state analysis does not yield meaningful
+Figure~\ref{fig:case1}(a) shows a simple example with four switches A, B, C and D. 
+Flow 1 starts at a host (not shown) attached to A, passes through B and C, and ends at a 
+host attached to D. Flow 2 starts at a host attached to C, passes through D and A, and 
+ends at a host attached to B.
+Similar to the previous case, we can draw the dependency lines between switches. As shown in 
+Figure~\ref{fig:case1}(b), there is a cyclic buffer dependency among the four switches, i.e., 
+dependencies from RX1 of A to RX1 of B, then to RX1 of C, then to RX1 of D, and finally back to RX1 of A.
+
+
+In this example, the boundary state analysis does not yield meaningful
 results. In fact, without any rate limiting on the flows, one can easily analyze that the 
 stable throughput of each flow is $B/2$. However, it is not easy to tell whether deadlock 
-will occur. For example, one may argue that switch A's $RX1$ will generate PFC PAUSE, and 
-these PAUSE may cascade from A to D, then to C, B and finally back to A, creating deadlock.
+will occur. For example, one may suspect that switch A's $RX1$ will generate PFC PAUSE, and 
+these PAUSE frames may cascade from A to D, then to C, B and finally back to A, thus creating deadlock.
 To understand such scenarios, we must analyze and simulate them at packet level.
 
 
@@ -196,41 +208,35 @@ On L3, flow-level analysis cannot capture the difference from that in Figure~\re
 \label{fig:case2}
 \end{figure*}
 
-In our simulations, we configure static routing on all switches and have flow 1 start at a host (not shown) 
-attached to A, passes through B and C, and end at a host attached to D. Flow 2 starts at a host attached 
-to C, passes through D and A, and ends at a host attached to B.  To evaluate whether there will be 
-deadlock in the worst case, both flows are UDP flows with infinite traffic demand. Link capacity of 
+In our simulations, we configure static routing on all switches so that flow paths are enforced. 
+Both flows are UDP flows with infinite traffic demand. Link capacity of 
 all links is 40Gbps. All the switches have 12MB buffer. PFC threshold is statically set to 40KB for 
 each ingress queue. These parameters affect how fast deadlock forms (if any), but do not affect whether deadlock forms.
 
-Buffer dependency graph of case 1 is drawn in Figure~\ref{fig:case1}(b). In the figure, RX represents input 
-queue (or port), while TX represents output queue (or port). Each directed line represents 
-a buffer dependency from the source TX to the destination TX. For example, packets buffered in TX1 of 
-A will be sent to either TX1 or TX2 of B, so in Figure~\ref{fig:case1}(b), two directed lines are drawn 
-there between A and B. Similarly, we can draw the dependency lines between other switches. As we can 
-see in Figure~\ref{fig:case1}(b), there is a cyclic buffer dependency among the four switches, i.e., 
-dependencies from TX1 of A to TX1 of B, then to TX1 of C, then to TX1 of D, and finally back to TX1 of A.
-
-In Figure~\ref{fig:case1}(c), we plot the PFC pause events at four links L1, L2, L3 and L4. Basically, 
-if link $Li$ (i=1,2,3,4) is paused at time t, we plot a point at location (t, i). Pause events at 
+In Figure~\ref{fig:case1}(c), we plot the PFC pause events at four links L1, L2, L3 and L4. 
+If link $Li, (i=1,2,3,4)$ is paused at time $t$, we plot a point at location $(t, i)$. Pause events at 
 different links are plotted with different colors and of different heights. As we can observe, links 
 L2 and L4 are paused continuously, while the other two links L1 and L3 never get paused. In this case, 
 deadlock will never occur as no packet will be paused permanently.
 
-To understand the pause pattern in Figure~\ref{fig:case1}(c), we sample the instant buffer occupancy of 
-both flows at TX1 queues of A, B, C and D every 1us. In Figure~\ref{fig:case1}(d), we draw the instant 
-buffer occupancy of flow 2 at TX1 of A. Buffer occupancy of flow 1 is not drawn in Figure~\ref{fig:case1}(d) 
-as it does not contribute to the pause of link L1 (Note that PFC works in a per ingress queue fashion). 
-
+To understand the pause pattern, we sample the instantaneous buffer occupancy of 
+both flows at RX1 queues of A, B, C and D every 1us. In Figure~\ref{fig:case1}(d), we draw the instant 
+buffer occupancy of flow 2 at RX1 of A. 
+%Buffer occupancy of flow 1 is not drawn
+%as it does not contribute to the pause of link L1 (Note that PFC works in a per ingress queue fashion). 
 Similarly, in Figure~\ref{fig:case1}(e), Figure~\ref{fig:case1}(f) and Figure~\ref{fig:case1}(g), we draw 
-the instant buffer occupancy of interested flows at TX1 queues of B, C and D, respectively. As 
+the instant buffer occupancy of interested flows at RX1 queues of B, C and D, respectively. As 
 flow 1 and flow 2 are symmetric, we only present the analysis for Figure~\ref{fig:case1}(d) and 
 Figure~\ref{fig:case1}(e) to show why Link L4 is paused continuously but link L1 never gets paused.
-
-As shown in Figure~\ref{fig:case1}(d), buffer occupancy of flow 2 at TX1 of A fluctuates between 10KB 
+As shown in the these figures, buffer occupancy of flow 2 at RX1 of A fluctuates between 10KB 
 and 55KB around the PFC threshold, so link L4 will get paused intermittently. In contrast, buffer 
 occupancy of flow 1 at TX1 of B is well below the PFC threshold (fluctuates between 0KB and 18KB), 
-hence link L1 will never be paused.
+hence link L1 will never be paused. 
+
+The takeaway is that, without packet-level analysis, we cannot predict whether there is deadlock in this example
+simply from cyclic buffer dependency and flow-level analysis. This is because we cannot predict 
+the instantaneous buffer occupancy (and whether PFC is triggered) from flow-level analysis, 
+which only focuses on {\em average} state of flows.
 
 %In Figure~\ref{fig:case1}(a), packets of flow 1 and flow 2 will build up at TX1 of A as both flows are competing for the capacity of link L1. Once the buffer occupancy of flow 2 exceeds the PFC threshold, RX1 of A will generate a pause frame to TX1 of D to stop packet transmission over link L4.
 %
@@ -240,17 +246,17 @@ hence link L1 will never be paused.
 
 
 
-\textbf{Slightly different traffic matrix leads to deadlock:} as shown in Figure~\ref{fig:case2}(a), based on the previous case, we 
+\para{Slightly different traffic matrix leads to deadlock:} as shown in Figure~\ref{fig:case2}(a), based on the previous case, we 
 add another flow (flow 3) to run over switches B and C in sequence. All the three flows are UDP 
 flows with infinite traffic demand. Buffer dependency graph of case 2 is drawn in Figure~\ref{fig:case2}(b). 
-Compared with case 1, one additional dependency from TX1 of B to TX1 of C is added, but it
-is outside the cyclic buffer dependency. The cyclic buffer dependency remains unchanged.
+Compared with case 1, one additional dependency from RX2 of B to TX2 of C is added, but it
+is outside the cyclic buffer dependency. The cyclic buffer dependency itself remains unchanged.
 
 Pause events at four links L1, L2, L3 and L4 are plotted In Figure~\ref{fig:case2}(c). As we can see, in 
 this case four links are all paused. To check whether deadlock will occur in this case, we stop the three 
-flows after a sufficient long period (1000ms). What we find is that, pause events are continuously 
-generated at all the four links even after three flows stop sending new packets (not shown in the figure). 
-This means that a deadlock has been created among switches A, B, C and D.
+flows after a sufficient long period (1000ms). We find that pause events are continuously 
+generated at all the four links even after three flows stop sending new packets. 
+This means that a deadlock has been created among the four switches.
 
 The bizarre thing is, if we apply the stable state flow analysis based on PFC fairness,\footnote{PFC
 ensures per-hop per-port fairness. If two ingress flows compete for the same egress port, each flow gets
@@ -262,7 +268,7 @@ case (Figure~\ref{fig:case1}).
 
 Flow-level stable state analysis cannot capture such behavior. We can only get answers from the 
 packet-level analysis. Unfortunately, we have not yet found any analytic tools that can precisely
-describe the PFC behaviors in this example. Looking at the packet traces, we only roughly know that 
+describe the PFC behaviors in these two example. Looking at the packet traces, we only roughly know that 
 after adding flow 3, flow 1 has to share the bandwidth of link L2 with flow 3 and this may cause
 different PFC patterns on link L1 without affecting the average throughput of flow 1 and flow 2.
 But this change in pattern makes PFC cascade towards L3 and finally L4.
