@@ -5,15 +5,15 @@ The growing demand for online services and cloud computing has driven today's
 datacenter networks (DCNs) to a large scale with hundreds of thousands of
 servers and thousands of switches. With this enormous number of network devices,
 network failure and device upgrade become the norm rather than the
-exception~\cite{zupdate, ming-paper}. To maintain connectivity in face of
+exception~\cite{zupdate, netpilot}. To maintain connectivity in face of
 failures or device upgrades/updates, routing needs to reconfigured. It has been
 well-recognized that updating large networks is not easy, especially if one
 wants to ensure that there is no transient congestion~\cite{zupdate} or
-blackholes~\cite{jrex-papers}.
+blackholes~\cite{dionysus}.
 
 At the same time, as DCNs enter the 40/100Gbps era, RDMA is currently being
 deployed for achieving ultra-low latency, high throughput and low CPU
-overhead~\cite{dcqcn,timely,cx-sigcomm2016}.  To enable efficient operation,
+overhead~\cite{dcqcn,timely,rdmaatscale}.  To enable efficient operation,
 RDMA usually runs over a  lossless L2 network, enabled by PFC~\cite{dcqcn}.
 
 It is well known that use of PFC can lead to deadlocks~\cite{tcp-bolt}.  A
@@ -24,7 +24,7 @@ of or even the whole DCN.
 
 It was mistakenly assumed that tree-structured data center networks are not
 subject to this problem. However, it has recently been demonstrated that this is
-not the case~\cite{cx-sigcomm2016}. Still, under static circumstances (i.e.,
+not the case~\cite{rdmaatscale}. Still, under static circumstances (i.e.,
 when both of the network topology and the routing function are fixed), deadlocks
 are rare, and can be avoided by using a routing scheme that ensures there is no
 cycle in the buffer dependency graph~\cite{tcp-bolt}.
@@ -37,7 +37,7 @@ deadlock-free routing function.
 This is because during the routing reconfiguration process, due to the
 asynchronous updates of switch rules, an arbitrary combination of old and new
 paths may be in effect at the same time.  As has been shown
-in~\cite{zupdate,jrex-papers}, this may induce congestion, loops etc. -- and it
+in~\cite{zupdate,dionysus}, this may induce congestion, loops etc. -- and it
 may also induce a circular dependency among switch buffers. This can lead to
 deadlock, which we refer to as \textit{reconfiguration-induced deadlock}.
 
