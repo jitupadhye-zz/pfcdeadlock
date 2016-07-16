@@ -1,22 +1,65 @@
 %\vspace{-0.1in}
 \section{Introduction}\label{sec:intro}
 
-The growing demand for online services and cloud computing has driven today's datacenter networks (DCNs) to a large scale with hundreds of thousands
-of servers and thousands of switches. With this enormous number of network devices, network failure and device upgrade become the norm rather than the exception.
+The growing demand for online services and cloud computing has driven today's
+datacenter networks (DCNs) to a large scale with hundreds of thousands of
+servers and thousands of switches. With this enormous number of network devices,
+network failure and device upgrade become the norm rather than the
+exception~\cite{zupdate, ming-paper}. To maintain connectivity in face of
+failures or device upgrades/updates, routing needs to reconfigured. It has been
+well-recognized that updating large networks is not easy, especially if one
+wants to ensure that there is no transient congestion~\cite{zupdate} or
+blackholes~\cite{jrex-papers}.
 
-Network reconfiguration will be needed when there is  failure or upgrade of links/nodes, new switch onboarding, load balancer reconfiguration, etc. To support this, the network's routing function, which includes all the paths packets can take in the network, are often needed to be reconfigured for the purpose of either maintaining the connectivity of the network or better serving the current network traffic.
+At the same time, as DCNs enter the 40/100Gbps era, RDMA is currently being
+deployed for achieving ultra-low latency, high throughput and low CPU
+overhead~\cite{dcqcn,timely,cx-sigcomm2016}.  To enable efficient operation,
+RDMA usually runs over a  lossless L2 network, enabled by PFC~\cite{dcqcn}.
 
-On the other hand, as DCNs enter the 40/100Gbps era, RDMA is currently being deployed for achieving ultra-low latency, high throughput and low CPU overhead. To enable efficient operation, RDMA usually runs over a  lossless L2 network. The using of a lossless L2 network introduces the deadlock problem into the DCNs, which refers to a standstill situation where a set of switch buffers form a permanent cyclic waiting dependency and no packet can get drained at any of these buffers. Once deadlock occurs, no packet can be delivered through a part of or even the whole DCN.
+It is well known that use of PFC can lead to deadlocks~\cite{tcp-bolt}.  A
+deadlock is a standstill situation where a set of switch buffers form a
+permanent cyclic waiting dependency and no packet can get drained at any of
+these buffers. Once deadlock occurs, no packet can be delivered through a part
+of or even the whole DCN.
 
-Under static circumstances (i.e., when both of the network topology and the routing function are fixed), deadlock can be avoided by using a routing function that contains no cycle in the corresponding buffer dependency graph. 
+It was mistakenly assumed that tree-structured data center networks are not
+subject to this problem. However, it has recently been demonstrated that this is
+not the case~\cite{cx-sigcomm2016}. Still, under static circumstances (i.e.,
+when both of the network topology and the routing function are fixed), deadlocks
+are rare, and can be avoided by using a routing scheme that ensures there is no
+cycle in the buffer dependency graph~\cite{tcp-bolt}.
 
-Under dynamic circumstances, however, deadlock may occur during reconfiguration process when transitioning from an old deadlock-free routing function $R_s$ to a new deadlock-free routing function $R_t$. This is because during the routing reconfiguration process, due to the asynchronous updates of switch rules, any paths included in $R_s \cup R_t$ may take effect at the same time. When $R_s \cup R_t$ contains a cycle in the corresponding buffer dependency graph, deadlock may occur if the routing reconfiguration process is not well planed. We refer to this kind of deadlock as \textit{reconfiguration-induced deadlock}.
+However, we have discovered that under dynamic circumstances (e.g. during
+network reconfiguration), however, deadlock may occur during reconfiguration
+process when transitioning from an old deadlock-free routing to a new
+deadlock-free routing function. 
 
-Reconfiguration-induced deadlock can be avoided by imposing some constraints on the ordering of configuration actions during the reconfiguration process. For example, deadlock-free can be guaranteed by removing all the paths included in $R_s$ first before adding any new path included in $R_t$. Alternatively, we can remove some paths in $R_s$ to reduce the routing function into $R_s \cap R_t$ at first, and then add the new paths included in $R_t$ to finish the reconfiguration procss. 
+This is because during the routing reconfiguration process, due to the
+asynchronous updates of switch rules, an arbitrary combination of old and new
+paths may be in effect at the same time.  As has been shown
+in~\cite{zupdate,jrex-papers}, this may induce congestion, loops etc. -- and it
+may also induce a circular dependency among switch buffers. This can lead to
+deadlock, which we refer to as \textit{reconfiguration-induced deadlock}.
 
-The speed of routing reconfiguration is important as it determines the response time to a network failure. Although both of the above approaches can ensure deadlock-free, they will lead to a slow routing reconfiguration process as multiple staitc intermediate stages are needed. 
+Note that this is a far more serious problem that blackholes or congestion.
+Those conditions are transient -- they dissipate as new routing take effect
+fully. Deadlock, howver is {\em not} transient - once formed, new routing does
+not alleviate it, since no packts are being transmitted among deadlocked
+switches!
 
-In this paper, we  develop an approach for achieving fast deadlock-free routing reconfiguration. It is based on two observations: 1) there exist multiple  
-valid orderings that is deadlock-free; and 2) choosing an ordering with minimum order dependencies among configuration actions can lead to fast reconfiguration. Our approach is general and can be applied to arbitrary DCNs, including Fat-tree, VL2, HyperX, Jellyfish, etc.
+Reconfiguration-induced deadlock can be avoided by imposing some constraints on
+the ordering of configuration actions during the reconfiguration process. For
+example, given two deadlock-free routing matrices $R_{old}$ and $R_{new}$,
+reconfiguration-induced deadlocks can be avoided by removing all paths in
+$R_{old}$ and then setting up $R_{new}$. This, of course, is highly disruptive.
+Ideally, we want to come up with a scheme that moves us from $R_{old}$ to
+$R_{new}$ without ever creating a circular buffer dependency, while causing
+minimal disruption to traffic. Typically, we want to complete the
+reconfiguration as quickly as possible: i.e. in fewest number of steps. 
 
-
+In this paper, we  develop an approach for achieving fast deadlock-free routing
+reconfiguration as quickly as possible. It is based on two observations: 1)
+there exist multiple  valid orderings that is deadlock-free; and 2) choosing an
+ordering with minimum order dependencies among configuration actions can lead to
+fast reconfiguration. Our approach is general and can be applied to arbitrary
+DCNs, including Fat-tree, VL2, HyperX, Jellyfish, etc. 
