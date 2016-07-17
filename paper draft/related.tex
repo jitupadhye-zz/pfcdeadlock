@@ -12,14 +12,16 @@ how to prevent PFC deadlock from happening in the lossless Ethernet has been poi
 but not well addressed. In this paper, we aim to get deeper understanding on deadlock 
 and possible mitigations.
 
-\para{Deadlock-free routing.} To avoid deadlock in lossless networks, previous 
-literatures~\cite{tcpbolt,karol2003prevention,lash,sancho2004,wu2003fault} focus on deadlock-free routing, 
-{\em i.e.,} with any traffic matrix, packet formats or flow rates, no deadlock 
-can occur. It is also proved that eliminating cyclic buffer dependency is a necessary and
-sufficient condition for deadlock-free routing~\cite{deadlockfree}. However, deadlock-free
-routing is a loose condition for preventing deadlock, and it is challenging to eliminate 
-cyclic buffer dependency in practice. Our work explores how we may control the flows,
-packet formats and switch configurations to avoid deadlock even if routing is not deadlock-free.
+\para{Deadlock-free routing.} To avoid deadlock in lossless networks, previous
+work~\cite{tcpbolt,karol2003prevention,lash,sancho2004,wu2003fault} has focused
+on deadlock-free routing: i.e. deadlock freedom regardless of traffic pattern
+etc. It has also been proven that that eliminating cyclic buffer dependency is a
+necessary and sufficient condition for deadlock-free
+routing~\cite{deadlockfree}. However, deadlock-free routing is difficult to
+implement in practice -- since it is challenging to eliminate cyclic buffer
+dependency in face of arbitrary bugs and failures. Our work explores how we may
+control the flows, packet formats and switch configurations to avoid deadlock
+even if routing is not deadlock-free.
 
 
 
