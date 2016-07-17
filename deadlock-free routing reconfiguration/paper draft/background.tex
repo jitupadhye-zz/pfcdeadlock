@@ -13,11 +13,9 @@ Due to the backpressue paradigm of PFC~\cite{tcp-bolt,dcqcn}, data transmission 
 
 \subsection{Cyclic Buffer Dependency}\label{subsec:cyclicbd}
 
-Cyclic buffer dependency is a well-known necessary condition for deadlock problem~\cite{gerla1980flow,dally}.
+Cyclic buffer dependency is a well-known necessary condition for deadlock problem~\cite{gerla1980flow,dally}. For a given DCN topology $N$ and a routing function $R$, we can construct the corresponding buffer dependency graph as follows. For any two ingress queues $RX_1$ and $RX_2$ in $N$, if there exists a path $p$ that traverses $RX_1$ and  $RX_2$ consecutively, we add a directed dependency edge from $RX_1$ to $RX_2$.  If there are cycles in the constructed buffer dependency graph, we say ($N$, $R$) has cyclic buffer dependency. PFC deadlock could occur when there is cyclic buffer dependency.
 
-For a given DCN topology $\textbf{N}$ and a routing function $\textbf{R}$, we can construct the corresponding buffer dependency graph as follows. For any two ingress queues $RX_1$ and $RX_2$ in $\textbf{N}$, if there exists a path $p$ that traverses $RX_1$ and  $RX_2$ consecutively, we add a directed dependency edge from $RX_1$ to $RX_2$.  If there are cycles in the constructed buffer dependency graph, we say ($\textbf{N}$, $\textbf{R}$) has cyclic buffer dependency. PFC deadlock could occur when there is cyclic buffer dependency.
-
-PFC deadlock can be avoided by adopting a deadlock-free routing function $\textbf{R}$ that will not create cyclic buffer dependency. Many algorithms have been proposed in the past for producing deadlock-free routing functions for a given network topology~\cite{dally,flich2012survey,tcp-bolt}.
+PFC deadlock can be avoided by adopting a deadlock-free routing function $R$ that will not create cyclic buffer dependency. Many algorithms have been proposed in the past for producing deadlock-free routing functions for a given network topology~\cite{dally,flich2012survey,tcp-bolt}.
 
 %\subsection{Classification of PFC Deadlock}\label{subsec:deadlockclassification}
 %
@@ -34,6 +32,7 @@ PFC deadlock can be avoided by adopting a deadlock-free routing function $\textb
 		\includegraphics[width=0.22\textwidth] {figs/deadlock_time_b}
 	}
 	
+	\vspace{-0.1in}
 		\subfloat[short for lof][Time to create a PFC deadlock.]{
 			\includegraphics[width=0.45\textwidth] {figs/deadlock_time_c}
 		}
@@ -44,6 +43,7 @@ PFC deadlock can be avoided by adopting a deadlock-free routing function $\textb
 Switches deployed in current DCNs are shallow-buffered commodity switches with only about 8-12MB buffer. As the link capacity goes up to 40Gbps or even more,  switch buffer can be consumed in just a few milliseconds under congestion. This fact also indicates that once cyclic buffer dependency is met, deadlock can occur within a very short time.
 
 We did a packet-level NS-3 simulation to measure how long it will take to create a PFC deadlock. We choose simulation instead of real testbed experiment because we need a well-controlled environment for conducting accurate measurement. 
-As shown In Fig.~\ref{fig:deadlocktime}(a), our simulation is performed ina 3-switch network. The link capacity is 40Gbps, and each switch has 12MB buffer. We inject three UDP fows with infinite traffic demand into the network simultaneously. The paths taken by these flows form a cyclic buffer dependency as shown in Fig.~\ref{fig:deadlocktime}(b).
+
+As shown In Fig.~\ref{fig:deadlocktime}(a), our simulation is performed in a 3-switch network. The link capacity is 40Gbps, and each switch has 12MB buffer. We inject three UDP fows with infinite traffic demand into the network simultaneously. The paths taken by these flows form a cyclic buffer dependency as shown in Fig.~\ref{fig:deadlocktime}(b).
 
 As shown in Fig.~\ref{fig:deadlocktime}(c), PFC deadlock occurs in less than 0.2ms when setting various PFC thresholds. Note that 160KB is already a sufficiently large PFC threshold in practice~\cite{dcqcn}. The results indicate that once we have cyclic buffer dependency in the network, PFC deadlock can occur in a very short time under 40Gbps DCNs.
