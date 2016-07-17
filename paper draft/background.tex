@@ -5,15 +5,15 @@ why we must study the necessary and sufficient condition of it.
 
 \para{Lossless Ethernet relies on PFC.} 
 Modern data center networks require efficient network stacks in order to support 
-40Gbps or even higher bandwidth. RDMA over Ethernet, or RoCE, is the most popular
-solution and has been deployed in both Google and Microsoft data centers~\cite{dcqcn, timely}.
-The key property of such network is that it runs on lossless Ethernet, meaning
-that no packet is dropped due to congestion. This is realized by PFC 
+40Gbps or even higher bandwidth. RDMA over Ethernet, or RoCE, is one of the most popular
+solutions and has been deployed in both Google and Microsoft data centers~\cite{dcqcn, timely}.
+The key property of RoCE is that it runs on lossless Ethernet, meaning
+that no packet is dropped due to congestion. This is achieved by enabling PFC 
 (Priority-based Flow Control).
 
-PFC introduces PAUSE mechanism, with which the switch can pause an incoming link
+PFC introduces PAUSE mechanism, with which a switch can pause an incoming link
 when its ingress buffer occupancy reaches a preset threshold. Properly tuned, the 
-buffer will never overflow, and no packet will be dropped due to full buffer.
+buffer will never be full, and no packet will be dropped due to full buffer.
 As shown below, deadlock may occur in such lossless networks.
 
 
@@ -22,15 +22,15 @@ In this paper, we define deadlock as a permanent state in which a subset of link
 by PFC, and none of the packets in the involved buffers can ever move even there is 
 no more packet being sent into these links.
 
-\para{PFC may lead to deadlock, if PFC-paused links form a circle.}
-In a PFC-enabled network, if a subset of links congest and the buffer usage reach
+\para{PFC may lead to deadlock, if paused links form a circle.}
+In a PFC-enabled network, if a subset of link congests and the corresponding switch queue lengths reach
 the PFC threshold at the same time, the links are all paused. If these links happen
-to form a complete circle, the network has a deadlock. No packet can moves because 
+to form a complete circle, the network has a deadlock. No packet can move because 
 the links are paused, even if there is no more new traffic injected into this circle.
 
-This essentially means {\em cyclic buffer dependency}. Any one link is waiting for its next
+This essentially means {\em cyclic buffer dependency}. Every link is waiting for its next
 hop to RESUME the link, while this depends on the buffer status of the next hop. However,
-the next hop buffer depend on the next next hop and wait for the RESUME
+the next hop buffer depends on the further next hop and wait for its RESUME,
 so that it can send out packets to lower the buffer usage. This goes on, and in the end, 
 any stuck buffer depends on itself to move, thus forming a deadlock.
 

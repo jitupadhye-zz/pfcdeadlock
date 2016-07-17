@@ -21,7 +21,7 @@ that have different TTL values by at least $X$ to different priority classes, th
 within a priority class. Since PFC PAUSE operates based on priority classes, the deadlock threshold
 of injecting rate $r$ is effectively increased.
 
-In worst case scenarios, the effective TTL may still be larger than the size of loop, meaning
+In worst-case scenarios, the effective TTL may still be larger than the size of loop, meaning
 that some $r$ smaller than $B$ leads to deadlock. We may consider rate limiting to keep
 $r$ below the threshold $NB/TTL$, as discussed below.
 
@@ -71,11 +71,11 @@ This trade-off is less understood and worthy of further study.
 The recent transport protocols, DCQCN~\cite{dcqcn} and TIMELY~\cite{timely} are designed to reduce 
 the possibility of PFC generation. But due to the feedback 
 latency introduced by the end-to-end delay, and the fact that both algorithms react only after the 
-congestions been generated (through either queue length or latency increase), they cannot prevent PFC 
+congestions have been generated (through either queue length or latency increase), they cannot prevent PFC 
 from been generated. 
 
 One possible way to further preventing PFC from been generated is to integrate DCQCN together with 
-phantom queuing. By reacting to the phantom queues which assume lower link speed, DCQCN can generate 
+phantom queuing. By reacting to the phantom queues that assume lower link speed, DCQCN can generate 
 congestion signals much earlier. 
 
 \para{Other possible mechanisms.} In future work, a deeper understanding of tighter conditions 

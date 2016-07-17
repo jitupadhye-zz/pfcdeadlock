@@ -44,7 +44,7 @@ both of the involved buffers reach the PFC threshold at the same time and PAUSE 
 
 
 However, this cyclic buffer dependency may not always turn into deadlock state. The flow
-sending rate, the TTL (time-to-live) of packets and the length of the loop together 
+ rate, the TTL (time-to-live) of packets and the length of the loop together 
 determine whether there will be deadlock. In our testbed, we run a simple experiment on 
 two switches that are connected by a 40Gbps link and configured with a routing loop. 
 All packets have initial TTL of 16 and are injected into one of the switches. We find that, 
@@ -175,7 +175,7 @@ To understand such scenarios, we must analyze and simulate them at packet level.
 \label{fig:case1}
 \end{figure*}
 
- \textbf{Simulation setup}: To create a well controlled experimental environment, 
+ \textbf{Simulation setup}: To create a well-controlled experimental environment, 
  we did our deadlock case study using packet-level NS-3 simulations. 
  
  In our modified NS-3 simulator, we implement PFC protocol ({\em i.e.,} IEEE 802.1 Qbb protocol). 
@@ -268,7 +268,7 @@ case (Figure~\ref{fig:case1}).
 
 Flow-level stable state analysis cannot capture such behavior. We can only get answers from the 
 packet-level analysis. Unfortunately, we have not yet found any analytic tools that can precisely
-describe the PFC behaviors in these two example. Looking at the packet traces, we only roughly know that 
+describe the PFC behaviors in these two examples. Looking at the packet traces, we only roughly know that 
 after adding flow 3, flow 1 has to share the bandwidth of link L2 with flow 3 and this may cause
 different PFC patterns on link L1 without affecting the average throughput of flow 1 and flow 2.
 But this change in pattern makes PFC cascade towards L3 and finally L4.
@@ -318,7 +318,7 @@ any analytic tools that are at packet-level and work for above cases.
 
 \subsection{Case 3: Rate Limiting Mitigates Deadlock}
 
-In the last deadlock example (Figure~\ref{fig:case2}), if we additionally rate-limit flow 3, deadlock
+In the last deadlock example (Figure~\ref{fig:case2}), if we additionally limit the rate of flow 3, deadlock
 may be avoided.  As shown in Figure~\ref{fig:case3}(a), we add a rate limiter to switch C's
 outgoing port TX2. This rate limiter on switch C pushes back flow 3 by generating PFC PAUSE
 at port RX2 towards switch B (and switch B further pushes back the host). 
