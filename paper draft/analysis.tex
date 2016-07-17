@@ -23,7 +23,7 @@
 
 Although cyclic buffer dependency is a necessary condition for deadlock, it is not a
 sufficient condition. In this section, we present our case studies in which cyclic 
-buffer dependency is present, but deadlock occurrence still depends on other factors. We demonstrate 
+buffer dependency is present, but deadlock formation still depends on other factors. We demonstrate 
 that 1) a looping flow that generates cyclic buffer dependency does not always lead to deadlock. 
 The length of loop, flow rates and packet Time-To-Live (TTL) affects whether 
 the deadlock forms. 2) Multiple flows may cause cyclic buffer dependency,
@@ -53,9 +53,9 @@ However, this cyclic buffer dependency may not always turn into deadlock state. 
 determine whether there will be deadlock. In our testbed, we run a simple experiment on 
 two switches that are connected by a 40Gbps link and configured with a routing loop. 
 All packets have initial TTL of 16 and are injected into one of the switches. We find that, 
-only if the packet injection rate exceeds 5Gbps, there can occur deadlock. 
+only if the packet injection rate exceeds 5Gbps, there can form deadlock. 
 
-In order to analyze deadlock occurrence in the cases of routing loop, we develop a mechanism called 
+In order to analyze deadlock formation in the cases of routing loop, we develop a mechanism called 
 {\em boundary state analysis}. It yields accurate prediction of whether deadlock forms,
 as shown below.
 
@@ -144,7 +144,7 @@ dependencies from RX1 of A to RX1 of B, then to RX1 of C, then to RX1 of D, and 
 In this example, the boundary state analysis does not yield meaningful
 results. Because the flows do not have any rate limiting, one can easily analyze that the 
 stable throughput of each flow is $B/2$. However, it is not easy to tell whether deadlock 
-will occur. For example, one may suspect that switch A's $RX1$ will generate PFC PAUSE, and 
+will form. For example, one may suspect that switch A's $RX1$ will generate PFC PAUSE, and 
 these PAUSE frames may cascade from A to D, then to C, B and finally back to A, thus creating deadlock.
 To understand such scenarios, we must analyze and simulate them at packet level.
 
@@ -201,7 +201,7 @@ In Figure~\ref{fig:case1}(c), we plot the PFC pause events at four links L1, L2,
 If link $Li, (i=1,2,3,4)$ is paused at time $t$, we plot a point at location $(t, i)$. Pause events at 
 different links are plotted with different colors and of different heights. As we can observe, links 
 L2 and L4 are paused continuously, while the other two links L1 and L3 never get paused. In this case, 
-deadlock will never occur as no packet will be paused permanently.
+deadlock will never form as no packet will be paused permanently.
 
 To understand the pause pattern, we sample the instantaneous buffer occupancy of 
 both flows at RX1 queues of A, B, C and D every 1us. In Figure~\ref{fig:case1}(d), we draw the instant 
@@ -267,7 +267,7 @@ the flow-level analysis shows that the average throughput of flow 1 and flow 2 s
     \includegraphics[width=0.24\textwidth] {figs/buffer_occupancy_B_limit3G.eps}
 }
 \vspace{-0.15in}
-\caption{Different rate limiting determines whether the deadlock occurs.}
+\caption{Different rate limiting determines whether the deadlock forms.}
 \vspace{-0.15in}
 \label{fig:case3}
 \end{figure*}
@@ -280,7 +280,7 @@ Compared with case 1, one additional dependency from RX2 of B to TX2 of C is add
 is outside the cyclic buffer dependency. The cyclic buffer dependency itself remains unchanged.
 
 Pause events at four links L1, L2, L3 and L4 are plotted In Figure~\ref{fig:case2}(c). As we can see, in 
-this case four links are all paused. To check whether deadlock will occur in this case, we stop the three 
+this case four links are all paused. To check whether deadlock will form in this case, we stop the three 
 flows after a sufficient long period (1000ms). We find that pause events are continuously 
 generated at all the four links even after three flows stop sending new packets. 
 This means that a deadlock has been created among the four switches.
@@ -405,7 +405,7 @@ why when we stop the flows, all the four links can be resumed from the pauses.
 
 \para{Summary:} From all the examples in this section, we summarize that cyclic buffer dependency is
  a loose condition for deadlock. The traffic demand matrix, TTL and flow rates all affect the deadlock
- occurrence. While we cannot obtain the tightest condition ({\em i.e., necessary and sufficient condition}), 
+ formation. While we cannot obtain the tightest condition ({\em i.e., necessary and sufficient condition}), 
 we know that a tighter condition should include those factors, and that these factors can be utilized
 for deadlock mitigation. In Section~\ref{sec:mitigation}, we discuss potential deadlock mitigations in 
 addition to avoiding cyclic buffer dependency.
