@@ -3,83 +3,68 @@
 \label{sec:mitigation}
 \secspace
 
-Since cyclic buffer dependency is a loose condition for deadlock, there are
-mitigation mechanisms that avoid deadlock even if cyclic buffer dependency is present.
-The examples and analysis in Section~\ref{sec:analysis}
-inspire us with some of the following potential deadlock mitigations.
+Since cyclic buffer dependency is just a necessary condition for deadlock, there
+are mitigation mechanisms that avoid deadlock even if cyclic buffer dependency
+is present.  The examples and analysis in Section~\ref{sec:analysis} inspire us
+with some of the following potential deadlock mitigations.
 
+\para{TTL-based mitigation for deadlock caused by loops.} In a routing loop,
+deadlock formation becomes less likely with smaller TTL (see
+Equation~\ref{eq:condition}).  Thus, the most straightforward mitigation is to
+reduce packets' initial TTL values.  For example, in an $N$-hop routing loop, if
+the initial TTL is not larger than $N$, no deadlock will form because the
+deadlock threshold for $r$ is $B$, which can never be exceeded.
 
-\para{TTL-based mitigation for deadlock caused by loops.} In a routing loop, 
-the smaller TTL, the less possible deadlock forms (see Equation~\ref{eq:condition}).
-Thus, the most straightforward mitigation is to reduce packets' initial TTL values.
-For example, in an $N$-hop routing loop, if the initial TTL is not larger than $N$,
-no deadlock will form because the deadlock threshold for $r$ is $B$, which can
-never be exceeded.
+In practice, we may not be able to guarantee that initial TTL values are always
+smaller than the size of the loop. However, by proper switch buffer management,
+we may make {\em class-specific} TTL much smaller than the actual TTL values.
+For example, if we assign packets that have different TTL values by at least $X$
+to different priority classes, the effective TTL becomes $X$ within a priority
+class. Since PFC PAUSE operates based on priority classes, the deadlock
+threshold of injecting rate $r$ is effectively increased.
 
-In practice, we may not be able to guarantee that initial TTL values are always smaller than
-the size of the loop. However, by proper switch buffer management, we may make {\em class-specific}
-TTL much smaller than the actual TTL values. For example, if we assign packets 
-that have different TTL values by at least $X$ to different priority classes, the effective TTL becomes $X$
-within a priority class. Since PFC PAUSE operates based on priority classes, the deadlock threshold
-of injecting rate $r$ is effectively increased.
+In worst-case scenarios, the effective TTL may still be larger than the size of
+loop, meaning that some $r$ smaller than $B$ leads to deadlock. We may consider
+rate limiting to keep $r$ below the threshold $NB/TTL$, as discussed below.
 
-In worst-case scenarios, the effective TTL may still be larger than the size of loop, meaning
-that some $r$ smaller than $B$ leads to deadlock. We may consider rate limiting to keep
-$r$ below the threshold $NB/TTL$, as discussed below.
+\para{Rate limiting.} Commodity switches support bandwidth shaping for each
+priority class or even particular flows. This can mitigate deadlock caused by
+both routing loops and multi-flow buffer dependency, as shown in
+Section~\ref{sec:analysis}. If we are able to predict the rate threshold for
+deadlock, we may bound the individual flow rate by that threshold on switches
+that are involved in cyclic buffer dependency. However, this requires
+intelligent rate limiting schemes to avoid over-punishing innocent flows. We
+leave this to future work.
 
-\para{Rate limiting.} Commodity switches support bandwidth shaping for each priority class
-or even particular flows. This can mitigate deadlock caused by both routing loops and multi-flow
-buffer dependency, as shown in Section~\ref{sec:analysis}. If we are able to predict the rate 
-threshold for deadlock, we may bound the individual flow rate by that threshold on switches 
-that are involved in cyclic buffer dependency. However, this requires intelligent rate
-limiting schemes to avoid over-punishing innocent flows. We leave this to future work.
+\para{Limiting PFC pause frames propagation:} PFC is well known for its HoL
+blocking problem. The damage of HoL and the potential deadlock caused by PFC is
+significant because the pause frames are generated near the destination or in
+the middle of the network, where network congestion usually happen. Hence if we
+can limit the PFC pause frame propagation -- or just generate them near the
+source, we can reduce the damage of both deadlock and HoL blocking. 
 
+Here we describe several possible ways of doing so: first, we can assign
+different PFC thresholds to the ports of a switch based on their position in the
+topology. Ports connecting to the downstream (i.e towards leaf) get smaller
+threshold, whereas ports connecting to the upstream get larger threshold.
+Second, we can use switches with larger threshold values at the higher tiers so
+that they can absorb small bursts instead of generating PFC pause frames. Third,
+again, we may classify packets with different TTL into different classes and
+assign them different PFC thresholds.  Unfortunately, these solutions may lead
+to other issues including the unfairness between long (across different high
+tier switches) and short ({\em e.g.,} within the same rack) flows.  This
+trade-off requires further study.
 
-\para{Limiting PFC pause frames near the source}
-PFC is well known for its HoL blocking problem. The damage of HoL and the potential deadlock caused 
-by PFC is significant because the pause frames are generated near the destination or in the middle of 
-the network, where network congestions usually happen. Hence if we can limit the PFC pause frame 
-generation near the source, we can reduce the damage of both deadlock and HoL blocking. 
+\para{Preventing PFC from been generated.} The recent transport protocols,
+DCQCN~\cite{dcqcn} and TIMELY~\cite{timely} are designed to reduce the
+possibility of PFC generation. But due to the feedback latency of end-to-end
+delay, neither algorithm can detect congestion instantaneously, and thus they
+cannot completely prevent PFC from been generated. 
 
-Here we describe several possible ways of doing so: first, we can assign different PFC thresholds to 
-the ports of a switch based on their positions. Ports connecting to the downstream get smaller threshold, 
-whereas ports connecting to the upstream get larger threshold. 
-Second, we can use switches with larger threshold values at the higher tiers so that they can absorb 
-temporal burstiness instead of generating PFC pause frames. Third, again, we may classify 
-packets with different TTL into different classes and assign them different PFC thresholds.
-Unfortunately, these solutions may lead to other issues including the unfairness between long (across 
-different high tier switches) and short ({\em e.g.,} within the same rack) flows. 
-This trade-off is less understood and worthy of further study.
+One possible way to further reduce PFC is to integrate DCQCN together with
+phantom queuing, like~\cite{Alizadeh12}. By reacting to the phantom queues that
+assume lower link speed, congestion signals are generated much earlier. 
 
-% using larger threshold values is tricky, 
-%as it does not push PFC back to the source for all cases.)
-
-%In Clos networks, a deadlock that involves high tiers can cause the most serious damage.
-%A natural mitigation is to limit the impact of PFC locally near servers. This reduces
-%the risk of deadlock as well as the impact once deadlock occurs.
-%The idea is to assign different PFC thresholds to different tiers and make PFC happen less
-%on higher tier. Also, higher tier switches may be allowed to ignore PFC or drop packets from
-%lower tier upon extreme cases.
-%The price is that this turns the network into partly
-%``lossy'' and may cause congestion drops.
-
-%Second, we may classify packets based on the TTL value they carry, and use TTL-based buffer 
-%management similar to that in \ref{karol2003prevention}. The smaller the TTL value of a packet, 
-%the smaller the chance that the packet will trigger PFC pause frames. Hence the TTL-based buffer 
-%management has the ability to limiting the pause frame generation near the source. But its fairness 
-%property is less understood and worthy of further study.
-
-\para{Preventing PFC from been generated.}
-The recent transport protocols, DCQCN~\cite{dcqcn} and TIMELY~\cite{timely} are designed to reduce 
-the possibility of PFC generation. But due to the feedback 
-latency introduced by the end-to-end delay, and the fact that both algorithms react only after the 
-congestions have been generated (through either queue length or latency increase), they cannot prevent PFC 
-from been generated. 
-
-One possible way to further reduce PFC is to integrate DCQCN together with 
-phantom queuing, like~\cite{Alizadeh12}. By reacting to the phantom queues that assume lower link speed, 
-congestion signals are generated much earlier. 
-
-\para{Other possible mechanisms.} In future work, a deeper understanding of tighter conditions 
-for deadlock may lead to more deadlock mitigation mechanisms. In future work, we are going to 
-investigate the tightest possible conditions -- necessary and sufficient condition for deadlock. 
+\para{Other possible mechanisms.} In future work, a deeper understanding of
+tighter conditions for deadlock may lead to more deadlock mitigation mechanisms
+-- this is the focus of our ongoing work.
