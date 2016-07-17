@@ -1,17 +1,25 @@
 \section{Related Work}
 
-\para{RDMA in datacenters.} RDMA has wide applications~\cite{farm} and is deployed inside 
-modern datacenters~\cite{timely,dcqcn,rdmascale}. The current deployment is based on
+\para{RDMA in datacenters.} RDMA has been used for improving application performance,
+including in-memory key value store~\cite{mitchell13atc, farm, kalia14sigcomm}, 
+Hadoop~\cite{hadooprdma} and HDBase~\cite{hdbaserdma}.
+It has been recently deployed inside modern datacenters~\cite{timely,dcqcn,rdmascale}, based on
 RoCE (RDMA over Converged Ethernet), which relies on PFC creating a lossless Ethernet.
 Recent works~\cite{timely,dcqcn} discuss the transport congestion control protocols. However,
 how to prevent PFC deadlock from happening in the lossless Ethernet has been pointed out 
-but not addressed. This work aims to get deeper understanding on deadlock and possible mitigations.
+but not well addressed. In this paper, we aim to get deeper understanding on deadlock 
+and possible mitigations.
 
-\para{Deadlock-free routing.} Avoiding deadlock in lossless networks is not a new research 
-topic. Previous research literatures~\cite{tcpbolt,karol2003prevention} focus on deadlock-free routing, 
+\para{Deadlock-free routing.} To avoiding deadlock in lossless networks, previous research 
+literatures~\cite{tcpbolt,karol2003prevention} focus on deadlock-free routing, 
 {\em i.e.,} with any traffic matrix, packet formats or flow rates, it is guaranteed that deadlock 
-does not occur. Main approaches including ensuring shortest-path tree-based routing, and 
-trying to avoid routing loops. 
+does not occur. It is also proved that no cyclic buffer dependency is a necessary and
+sufficient condition for deadlock-free routing~\cite{deadlockfree}. However, deadlock-free
+routing is a loose condition for preventing deadlock, and it is challenging to eliminate 
+cyclic buffer dependency in practice. Our work explores how we may control the flows,
+packet formats and switch configuration to avoid deadlock even if routing is not deadlock-free.
+
+
 
 
 
