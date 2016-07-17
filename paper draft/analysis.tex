@@ -1,17 +1,3 @@
-\section{Cyclic Buffer Dependency is insufficient for Deadlock}
-\label{sec:analysis}
-
-Although cyclic buffer dependency is a necessary condition for deadlock, it is not a
-sufficient condition. In this section, we present our case studies in which cyclic 
-buffer dependency is present, but deadlock occurrence still depends on other factors. We demonstrate 
-that 1) a looping flow that generates cyclic buffer dependency does not always lead to deadlock. 
-The length of loop, flow rates and packet Time-To-Live (TTL) affects whether 
-the deadlock forms. 2) Multiple flows may cause cyclic buffer dependency,
-but slightly different flow sets lead to different deadlock results. 3) Rate-limiting can
-prevent deadlock from happening.
-
-\subsection{Case 1: Flow Rate and TTL Determine Deadlock in a Routing Loop}
-
 \begin{figure*}[t]
 %\vspace{-0.1in}
 \centering
@@ -24,10 +10,29 @@ prevent deadlock from happening.
 \subfigure[Stable state model.]{
     \includegraphics[width=0.28\textwidth] {figs/loop_analysis}
 }
+\vspace{-0.15in}
 \caption{Single looping flow creates cyclic buffer dependency but may not create deadlock.}
+\vspace{-0.15in}
 \label{fig:loop}
 \end{figure*}
 
+\secspace
+\section{Cyclic Buffer Dependency is insufficient for Deadlock}
+\label{sec:analysis}
+\secspace
+
+Although cyclic buffer dependency is a necessary condition for deadlock, it is not a
+sufficient condition. In this section, we present our case studies in which cyclic 
+buffer dependency is present, but deadlock occurrence still depends on other factors. We demonstrate 
+that 1) a looping flow that generates cyclic buffer dependency does not always lead to deadlock. 
+The length of loop, flow rates and packet Time-To-Live (TTL) affects whether 
+the deadlock forms. 2) Multiple flows may cause cyclic buffer dependency,
+but slightly different flow sets lead to different deadlock results. 3) Rate-limiting can
+prevent deadlock from happening.
+
+\secspace
+\subsection{Case 1: Flow Rate and TTL Determine Deadlock in a Routing Loop}
+\secspace
 
 A routing loop can create cyclic buffer dependency if a flow is trapped in the loop.
 The simplest example is a two-hop loop between two switches, as shown in Figure~\ref{fig:loop}(a).
@@ -68,7 +73,9 @@ Figure~\ref{fig:loop}(c). The variables are described in Table~\ref{tab:stable_s
 
 \begin{table}[h]
 \centering
+\vspace{-0.1in}
 \caption{\small Stable state analysis variables}
+\vspace{-0.15in}
 \label{tab:stable_state}
 {\small
 \begin{tabular}{|c|c|}
@@ -87,37 +94,32 @@ $n$ & The length of the routing loop. \\
 \hline
 \end{tabular}
 }
+\vspace{-0.15in}
 \end{table}
 
 According to the boundary state definition, the injecting rate and draining rate
 must be equal on the first switch:
-
 \begin{equation}
 \small
 r + B - r_d = B
 \label{eq:rate}
 \end{equation}
-
 In addition, we consider the sum of TTL values of all packets in the system. 
 During the boundary state, it should remain stable. Therefore, the increase
 rate and decrease rate of the sum of TTL should be the same:
-
 \begin{equation}
 \small
 n * B = TTL * r
 \label{eq:ttl}
 \end{equation}
-
 Combining Equation~\ref{eq:rate}, Equation~\ref{eq:ttl}, and the fact that
 deadlock requires larger injecting rate than that in boundary state, we derive the 
 {\em necessary and sufficient condition} of deadlock in a routing loop scenario:
-
 \begin{equation}
 \small
 r > r_d = \frac{nB}{TTL}
 \label{eq:condition}
 \end{equation}
-
 This matches what we observe in testbed experiment: with $B=40Gbps$, $n=2$ and
 $TTL=16$, the flow injecting rate must be at least $5Gbps$ to cause deadlock. With larger bandwidth,
 shorter loop length or smaller initial TTL values, the threshold of $r$ can be higher.
@@ -125,7 +127,9 @@ As long as the flow rate is smaller than the threshold, no deadlock will form.
 As shown in Section~\ref{sec:mitigation}, we may utilize this property to avoid deadlock, 
 even if routing loop occurs. 
 
+\secspace
 \subsection{Case 2: Traffic Matrix Affects Deadlock}
+\secspace
 
 Multiple flows may create a cyclic buffer dependency even if there is no routing loop.
 Figure~\ref{fig:case1}(a) shows a simple example with four switches A, B, C and D. 
@@ -148,15 +152,14 @@ To understand such scenarios, we must analyze and simulate them at packet level.
 \begin{figure*}[t]
 %\vspace{-0.1in}
 \centering
-
 \subfigure[Topology and flows.] {
-    \includegraphics[width=0.4\textwidth] {figs/case1_topo.pdf}
+    \includegraphics[width=0.35\textwidth] {figs/case1_topo.pdf}
 }
 \subfigure[Buffer dependency graph.]{
     \includegraphics[width=0.24\textwidth] {figs/case1_buffer_dependency.pdf}
 }
 \subfigure[Pause events at four links.]{
-    \includegraphics[width=0.3\textwidth] {figs/case1_pause.eps}
+    \includegraphics[width=0.26\textwidth] {figs/case1_pause.eps}
 }
 
 \subfigure[Buffer occupancy at switch A.] {
@@ -171,8 +174,10 @@ To understand such scenarios, we must analyze and simulate them at packet level.
 \subfigure[Buffer occupancy at switch D.] {
     \includegraphics[width=0.23\textwidth] {figs/case1_buffer_occupancy_D.eps}
 }
+\vspace{-0.15in}
 \caption{There is no deadlock even though two flows create cyclic buffer dependency among four switches.}
 \label{fig:case1}
+\vspace{-0.15in}
 \end{figure*}
 
  \textbf{Simulation setup}: To create a well-controlled experimental environment, 
@@ -201,10 +206,11 @@ To understand such scenarios, we must analyze and simulate them at packet level.
 \subfigure[Pause events at four links.]{
     \includegraphics[width=0.3\textwidth] {figs/case2_pause.eps}
 }
+\vspace{-0.15in}
 \caption{Slightly different traffic matrix leads to deadlock, even though
-the flow-level stable state analysis shows the rates of flow 1 and flow 2 should not affected.
-On L3, flow-level analysis cannot capture the difference from that in Figure~\ref{fig:case1}.
+the flow-level analysis shows that the rates of flow 1 and flow 2 are not affected.
 }
+\vspace{-0.15in}
 \label{fig:case2}
 \end{figure*}
 
@@ -259,11 +265,11 @@ generated at all the four links even after three flows stop sending new packets.
 This means that a deadlock has been created among the four switches.
 
 The bizarre thing is, if we apply the stable state flow analysis based on PFC fairness,\footnote{PFC
-ensures per-hop per-port fairness. If two ingress flows compete for the same egress port, each flow gets
-half of the egress bandwidth.} it is easy to see that all flows should have 20Gbps, or $B/2$, throughput.
-Particular at switch D, the ``stable'' ingress and egress rate of flow 1 and flow 2 should remain the same.
-However, now switch D starts to generate PFC at RX1 towards switch C, as opposed to no PFC in the previous
-case (Figure~\ref{fig:case1}). 
+ensures per-hop per-port fairness. If packets from two ingress ports go to the same egress port, each ingress 
+port gets half of the egress bandwidth.} it is easy to see that all flows should have 20Gbps throughput.
+Particular at switch D, the stable ingress and egress rate of flow 1 and flow 2 should remain the same as
+the previous case (Figure~\ref{fig:case1}). However, now switch D starts to generate PFC at RX1 towards 
+switch C, as opposed to no PFC generated in the previous case. 
 
 
 Flow-level stable state analysis cannot capture such behavior. We can only get answers from the 
@@ -288,7 +294,7 @@ D, the first packet buffered in the head of TX1 is a packet of flow 2. If the ab
 no link can get resumed as all the TX1 queues are waiting for its downstream neighbors to release some 
 buffer to break the standstill condition.
 
-\textbf{Summary:} 
+\para{Summary:} 
 In the above multi-flow scenarios, cyclic buffer dependency can be created without 
 a routing loop. However, it is again not a sufficient condition for deadlock. The analysis of sufficient
 condition is complicated. Stable flow state analysis does not apply.
@@ -303,33 +309,64 @@ any analytic tools that are at packet-level and work for above cases.
 \centering
 
 \subfigure[Topology and flows.] {
-    \includegraphics[width=0.37\textwidth] {figs/case3_topo}
-}
-\subfigure[Buffer dependency.]{
-    \includegraphics[width=0.28\textwidth] {figs/case3_buffer_dependency}
+    \includegraphics[width=0.22\textwidth] {figs/deadlock_case_4_topo}
 }
 \subfigure[Pause events at four links.]{
-    \includegraphics[width=0.3\textwidth] {figs/case3_pause.eps}
+    \includegraphics[width=0.24\textwidth] {figs/pause_event_limit2G.eps}
 }
-
-\caption{\fixme{Different rate limiting determines whether the deadlock may happen.}.}
+\subfigure[2Gbps rate limiter]{
+    \includegraphics[width=0.24\textwidth] {figs/buffer_occupancy_B_limit2G.eps}
+}
+\subfigure[3Gbps rate limiter]{
+    \includegraphics[width=0.24\textwidth] {figs/buffer_occupancy_B_limit3G.eps}
+}
+\vspace{-0.15in}
+\caption{Different rate limiting determines whether the deadlock occurs.}
+\vspace{-0.15in}
 \label{fig:case3}
 \end{figure*}
 
+\secspace
 \subsection{Case 3: Rate Limiting Mitigates Deadlock}
+\secspace
 
 In the last deadlock example (Figure~\ref{fig:case2}), if we additionally limit the rate of flow 3, deadlock
-may be avoided.  As shown in Figure~\ref{fig:case3}(a), we add a rate limiter to switch C's
-outgoing port TX2. This rate limiter on switch C pushes back flow 3 by generating PFC PAUSE
-at port RX2 towards switch B (and switch B further pushes back the host). 
-Note that the PAUSE of flow 3 at L2 can cause Head-of-Line (HoL) blocking for flow 1 packets on
-the same link. if this HoL blocking is serious enough, the flow 1 packets can build up a queue 
-at at switch B and the PFC may cascade further .As a result, we 
-observe frequent PFC PAUSE on all L1, L2, L3 and L4, as shown in Figure~\ref{fig:case3}(b).
+may be avoided.  As shown in Figure~\ref{fig:case3}(a), we add a rate limiter to switch B's
+ingress port RX2. While the buffer dependency graph remains the same as Figure~\ref{fig:case2}(b), 
+slower flow 3 means that the congestion on switch B is reduced, PFC is less
+frequent and deadlock may be avoided. The question is, what is the maximum rate that can
+avoids deadlock?
+
+Again, using flow-level stable state analysis, we cannot get the answer. We use packet-level simulator
+to test different rate limiting values. We find that when the rate of flow 3 is no more than 2Gbps,
+there is no deadlock even though all links have frequent PAUSE (Figure~\ref{fig:case3}(b)).
+Note that, after zoom in Figure~\ref{fig:case3}(b), we can see that four links are {\em never} paused
+simultaneously at packet level. Why is 2Gbps different from higher rate, like 3Gbps?
+
+We plot the buffer occupancy of RX1 at switch B, and compare when we limit the rate of RX2 to 2Gbps
+(Figure~\ref{fig:case3}(c)) and 3Gbps (Figure~\ref{fig:case3}(d)). Interestingly, the buffer occupancy
+always fluctuates between 0 and a little above PFC threshold\footnote{This is because once PFC threshold is
+reached, the link is paused. It takes some time for the PAUSE to arrive the other side and become effective.
+The switch buffers additional packets due to this delay.} with 2Gbps rate limiter. While with 3Gbps rate
+limiter, after some fluctuation the buffer goes into deadlock, even though the peak buffer usage is the same 
+as 2Gbps case. Unfortunately, we cannot find any existing analysis tools that explain 
+what we have observed. 
+
+In short, while rate limiting mitigates deadlock, packet-level analysis is required for understanding
+the actual threshold. We are currently working on analysis tools, {\em e.g.,} a fluid model that 
+can describe PFC behavior, and will report it in future work.
 
 
-We test different rate limiting values, and find that when the rate limit is below \fixme{X},
-there is no deadlock even though all links have frequent PAUSE. \fixme{todo}
+
+%This rate limiter on switch C pushes back flow 3 by generating PFC PAUSE
+%at port RX2 towards switch B (and switch B further pushes back the host). 
+%Note that the PAUSE of flow 3 at L2 can cause Head-of-Line (HoL) blocking for flow 1 packets on
+%the same link. if this HoL blocking is serious enough, the flow 1 packets can build up a queue 
+%at at switch B and the PFC may cascade further .As a result, we 
+%observe frequent PFC PAUSE on all L1, L2, L3 and L4, as shown in Figure~\ref{fig:case3}(b).
+
+
+
 
 \if 0
 \textbf{Case 3:} In this case, we will show that even if all the four links are paused simultaneously, 
