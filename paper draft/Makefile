@@ -19,7 +19,7 @@ EPSFIGS = \
 
 EPSGRAPHS = $(wildcard figs/*.eps)
 
-all: $(PAPER).pdf
+all: $(PAPER).pdf $(TEXTFILES)
 
 $(PAPER).pdf:
 	$(LATEX)  $(PAPER).tex
