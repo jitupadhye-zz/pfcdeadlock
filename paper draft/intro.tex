@@ -28,15 +28,6 @@ switch, and meanwhile is waiting for its downstream switch to release some
 buffer and resume its packet transmission. A simple scenario is illustrated in
 Figure~\ref{fig:deadlock_example}.
 
-\begin{figure}
-\centering
-\includegraphics[width=0.4\textwidth] {figs/deadlock}
-\vspace{-0.15in}
-\caption{PFC-induced deadlock: simple illustration}
-\vspace{-0.15in}
-\label{fig:deadlock_example}
-\end{figure}
-
 It is easy to see that when deadlock occurs, no switch in the cycle can proceed.
 Further, throughput of the whole network or part of the network will go to zero
 due to the backpressure effect of PFC pause. 
@@ -49,7 +40,7 @@ misconfiguration (see detailed example in ~\cite{rdmascale}.). We now believe
 that deadlocks can also occur when transient loops form in clos structured
 networks. In our data centers, these can happen as BGP\footnote{In our data
 centers, we use BGP for routing, with each switch being a private AS.} re-routes
-around link failures. in SDN-based data centers, transient loops can occur
+around link failures. In SDN-based data centers, transient loops can occur
 during updates~\cite{dionysus}.
 
 Hence it is necessary to design some mechanism for handling the deadlock
@@ -71,6 +62,15 @@ to access more buffer classes as it travels greater distance in the network. It
 can be proved that as long as the number of buffer classes is no smaller than
 the hop count of the longest routing path, there will be no cyclic buffer
 dependency in the network.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.35\textwidth] {figs/deadlock}
+\vspace{-0.15in}
+\caption{PFC-induced deadlock: simple illustration}
+\vspace{-0.25in}
+\label{fig:deadlock_example}
+\end{figure}
 
 Both these approaches to deadlock prevention have some important drawbacks. For
 example, routing restriction based approach usually wastes link bandwidth and
@@ -102,3 +102,4 @@ for deadlock formation, which we conjecture to be far easier to ameliorate than
 the {\em necessary} conditions. As mentioned earlier, we do not yet have a precise
 characterization of the sufficient conditions. Yet, we have made some headway,
 which allows us to sketch a few possible solutions to the problem.
+

@@ -2,13 +2,13 @@
 %\vspace{-0.1in}
 \centering
 \subfigure[Topology and flows] {
-    \includegraphics[width=0.37\textwidth] {figs/loop_case_topo_and_flow}
+    \includegraphics[width=0.33\textwidth] {figs/loop_case_topo_and_flow}
 }
 \subfigure[Buffer dependency graph]{
-    \includegraphics[width=0.28\textwidth] {figs/loop_case_ingress_buffer_dependency}
+    \includegraphics[width=0.25\textwidth] {figs/loop_case_ingress_buffer_dependency}
 }
 \subfigure[Stable state model]{
-    \includegraphics[width=0.28\textwidth] {figs/loop_analysis}
+    \includegraphics[width=0.25\textwidth] {figs/loop_analysis}
 }
 \vspace{-0.15in}
 \caption{Single looping flow creates cyclic buffer dependency but may not create deadlock.}
@@ -16,8 +16,8 @@
 \label{fig:loop}
 \end{figure*}
 
-\secspace
-\section{Cyclic Buffer Dependency is insufficient for Deadlock}
+\secspacelarge
+\section{Case Studies: Cyclic Buffer Dependency is Insufficient for Deadlock}
 \label{sec:analysis}
 \secspace
 
@@ -153,13 +153,13 @@ To understand such scenarios, we must analyze and simulate them at packet level.
 %\vspace{-0.1in}
 \centering
 \subfigure[Topology and flows] {
-    \includegraphics[width=0.35\textwidth] {figs/case1_topo.pdf}
+    \includegraphics[width=0.3\textwidth] {figs/case1_topo.pdf}
 }
 \subfigure[Buffer dependency graph]{
-    \includegraphics[width=0.24\textwidth] {figs/case1_buffer_dependency.pdf}
+    \includegraphics[width=0.21\textwidth] {figs/case1_buffer_dependency.pdf}
 }
 \subfigure[Pause events at four links]{
-    \includegraphics[width=0.26\textwidth] {figs/case1_pause.eps}
+    \includegraphics[width=0.22\textwidth] {figs/case1_pause.eps}
 }
 
 \subfigure[Buffer occupancy at switch A] {
@@ -198,13 +198,13 @@ To understand such scenarios, we must analyze and simulate them at packet level.
 \centering
 
 \subfigure[Topology and flows] {
-    \includegraphics[width=0.33\textwidth] {figs/case2_topo}
+    \includegraphics[width=0.3\textwidth] {figs/case2_topo}
 }
 \subfigure[Buffer dependency graph]{
-    \includegraphics[width=0.24\textwidth] {figs/case2_buffer_dependency}
+    \includegraphics[width=0.22\textwidth] {figs/case2_buffer_dependency}
 }
 \subfigure[Pause events at four links]{
-    \includegraphics[width=0.27\textwidth] {figs/case2_pause.eps}
+    \includegraphics[width=0.24\textwidth] {figs/case2_pause.eps}
 }
 \vspace{-0.15in}
 \caption{Slightly different traffic matrix leads to deadlock, even though
