@@ -39,9 +39,8 @@ guarantees that (if the routing configuration is correct,) any traffic does not
 cause deadlock.
 
 \para{Unfortunately, achieving deadlock-free routing has high price, and may not even be viable.} 
-In previous work, to achieve deadlock-free routing is to completely avoid cyclic buffer dependency.
-It is proved that cyclic buffer dependency-free is a necessary and sufficient condition for deadlock-free 
-routing~\cite{deadlockfree}.
+Previous work achieves deadlock-free routing by eliminating cyclic buffer dependency.
+It is proved that if there is no cyclic buffer dependency, there is no deadlock~\cite{deadlockfree}.
 However, ensuring that there is always no cyclic buffer dependency is challenging.
 
 First, deadlock-free routing largely limits the choice of topology. For example, \cite{tcpbolt}
