@@ -41,14 +41,14 @@ in~\cite{zupdate,dionysus}, this may induce congestion, loops etc. -- and it
 may also induce a circular dependency among switch buffers. This can lead to
 deadlock, which we refer to as \textit{reconfiguration-induced deadlock}.
 
-Note that this is a far more serious problem that blackholes or congestion.
-Those conditions are transient -- they dissipate as new routing take effect
-fully. Deadlock, howver is {\em not} transient - once formed, new routing does
+Note that this is a far more serious problem than blackholes or congestion.
+Those conditions are transient -- they dissipate as new routing takes effect
+fully. Deadlock, however is {\em not} transient - once formed, new routing does
 not alleviate it, since no packts are being transmitted among deadlocked
 switches!
 
 Reconfiguration-induced deadlock can be avoided by imposing some constraints on
-the ordering of configuration actions during the reconfiguration process. For
+the ordering of configuration operations during the reconfiguration process. For
 example, given two deadlock-free routing matrices $R_{old}$ and $R_{new}$,
 reconfiguration-induced deadlocks can be avoided by removing all paths in
 $R_{old}$ and then setting up $R_{new}$. This, of course, is highly disruptive.
@@ -60,6 +60,6 @@ reconfiguration as quickly as possible: i.e. in fewest number of steps.
 In this paper, we  develop an approach for achieving fast deadlock-free routing
 reconfiguration as quickly as possible. It is based on two observations: 1)
 there exist multiple  valid orderings that is deadlock-free; and 2) choosing an
-ordering with minimum order dependencies among configuration actions can lead to
+ordering with minimum order dependencies among configuration operations can lead to
 fast reconfiguration. Our approach is general and can be applied to arbitrary
 DCNs, including Fat-tree, VL2, HyperX, Jellyfish, etc. 
