@@ -2,44 +2,40 @@
 \section{Deadlock in Lossless Network}
 \secspace
 
-In this section, we introduce the background of deadlock in lossless network,
-and why we must study the necessary and sufficient condition of deadlock.
+We now briefly discuss how deadlocks form in lossless networks, and why we must
+study the necessary and sufficient conditions of deadlock formation.
 
-\para{Lossless Ethernet relies on PFC.}
-Modern datacenter networks require efficient network stacks in order to support
-high bandwidth and low latency. RDMA over Ethernet, or RoCE, is one of the most
-popular solutions and has been deployed in Google and Microsoft
-datacenters~\cite{dcqcn, timely}.  The key property of RoCE is that it runs on a
-lossless Ethernet, in which no packet can be dropped due to congestion.
-Lossless is achieved by enabling PFC (Priority-based Flow Control). With the PFC
-PAUSE mechanism, a switch can pause an incoming link when its ingress buffer
-occupancy reaches a preset threshold. Properly tuned, the buffer is never full,
-and no packet is dropped due to insufficient buffer space.  Unfortunately,
-deadlock may occur in such lossless networks.
+\para{Lossless Ethernet relies on PFC.} Modern datacenter networks require
+efficient network stacks in order to support high bandwidth and low latency.
+RDMA over Ethernet, or RoCE, is one of the most popular solutions and has been
+deployed in Google and Microsoft datacenters~\cite{dcqcn, timely}.  The key
+property of RoCE is that it runs on a lossless Ethernet, in which no packet can
+be dropped due to congestion.  Lossless is achieved by enabling PFC
+(Priority-based Flow Control). With the PFC PAUSE mechanism, a switch can pause
+an incoming link when its ingress buffer occupancy reaches a preset threshold.
+Properly tuned, the buffer is never full, and no packet is dropped due to
+insufficient buffer space.  Unfortunately, deadlock may occur in such lossless
+networks.
 
-\para{PFC may lead to deadlock, if paused links form a loop.}
-In a PFC-enabled network, if a subset of link congests and the corresponding
-switch queue lengths reach the PFC threshold at the same time, the links are all
-paused. If these links happen to form a directed circle, a deadlock is created.
-No packets in the deadlock loop can move because the links in the circle are
-paused, even if there is no more new traffic injected into this circle.
+\para{PFC may lead to deadlock, if paused links form a cycle.} In a PFC-enabled
+network, if a subset of links congests and the corresponding switch queue
+lengths reach the PFC threshold at the same time, the links are all paused. If
+these links happen to form a directed cycle, a deadlock is created.  No packets
+in the deadlock loop can move because the links in the cycle are paused, even if
+there is no more new traffic injected into this cycle.
 
-This essentially means {\em cyclic buffer dependency}. Every link is waiting for
-its next hop to RESUME the link, while this depends on the buffer status of the
-next hop. However, the next hop buffer depends on the further next hop and wait
-for its RESUME, so that it can send out packets to lower the buffer usage. This
-goes on, and in the end, every stuck buffer depends on itself to move, thus
-forming a deadlock.
+This essentially means that there is {\em cyclic buffer dependency} -- every
+link is waiting for its next hop to RESUME the link, and since there is a cycle,
+no link makes progress. 
 
-To avoid deadlock, previous literatures have considered {\em deadlock-free
-routing}. It guarantees that (if the routing configuration is correct,) any
+To avoid deadlock, {\em deadlock-free routing}~\cite{tcp-bolt} has been
+proposed. It guarantees that (if the routing configuration is correct,) any
 traffic does not cause deadlock.
 
-\para{Unfortunately, achieving deadlock-free routing has high price, and may not
-even be viable.} Previous work achieves deadlock-free routing by eliminating
-cyclic buffer dependency.  It is proved that if there is no cyclic buffer
-dependency, there is no deadlock~\cite{deadlockfree}.  However, ensuring that
-there is always no cyclic buffer dependency is challenging.
+\para{Unfortunately, achieving deadlock-free routing is inefficient, and may not
+even be viable.} Deadlock-free routing is achieved by eliminating cyclic buffer
+dependency~\cite{deadlockfree}.  However, ensuring that there is never any
+cyclic buffer dependency is challenging.
 
 First, deadlock-free routing largely limits the choice of topology. For example,
 \cite{tcpbolt} proposes to only use tree-based topology and routing, and shows
@@ -50,24 +46,23 @@ other datacenter topology and routing schemes that are not
 tree-based~\cite{bcube, camcube, jellyfish}, and do not have deadlock-free
 guarantee.
 
-Second, upon bugs or misconfiguration, deadlock-free routing configuration may
+Second, due to bugs or misconfiguration, deadlock-free routing configuration may
 turn into deadlock-vulnerable. In fact, recent work has observed a PFC deadlock
-case in real-world datacenter environments\cite{rdmascale}. It is caused by the
+case in real-world datacenter environments\cite{rdmascale}, caused by the
 (unexpected) flooding of lossless class traffic. Furthermore, there are multiple
 reports of routing loops due to misconfiguration in today's production
 datacenters~\cite{everflow, libra}. If lossless traffic encounters any of these
-loops, cyclic buffer dependency is unavoidable and deadlock can form in
-milliseconds.
+loops, cyclic buffer dependency is unavoidable.
 
-In this paper, we argue that we accept the fact that cyclic buffer dependency
-may not be completely avoided,\footnote{In other words, deadlock-free routing
-may not always apply or work correctly.} and we try to understand more precise
-deadlock conditions. Our findings show that, even if there is cyclic buffer
-dependency, deadlock may not occur (see Section~\ref{sec:analysis}).  This means
-that cyclic buffer dependency is only a necessary but not sufficient condition
-for deadlock.  We initial work shows the occurrence of deadlock is affected by
-the packet TTL, the traffic matrix, as well as flow rate. Based on these
-findings, we propose several ways to avoid deadlock even when cyclic buffer
-dependency may happen. 
+In this paper, we argue that we should accept the fact that cyclic buffer
+dependency cannot be completely avoided,\footnote{In other words, deadlock-free
+routing may not always apply or work correctly.} and we should instead try to
+understand more precise deadlock conditions.  Our findings show that, even if
+there is cyclic buffer dependency, deadlock may not occur (see
+Section~\ref{sec:analysis}).  This means that cyclic buffer dependency is only a
+necessary but not sufficient condition for deadlock.  We show the occurrence of
+deadlock is affected by the packet TTL, the traffic matrix, as well as flow
+rate. Based on these findings, we propose several ways to avoid deadlock even in
+face of cyclic buffer dependency.
 
 
