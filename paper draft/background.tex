@@ -6,21 +6,19 @@ In this section, we explain the background of deadlock in lossless network, and
 why we must study the necessary and sufficient condition of it.
 
 \para{Lossless Ethernet relies on PFC.} 
-Modern data center networks require efficient network stacks in order to support 
-40Gbps or even higher bandwidth. RDMA over Ethernet, or RoCE, is one of the most popular
-solutions and has been deployed in both Google and Microsoft data centers~\cite{dcqcn, timely}.
+Modern datacenter networks require efficient network stacks in order to support 
+high bandwidth and low latency. RDMA over Ethernet, or RoCE, is one of the most popular
+solutions and has been deployed in Google and Microsoft datacenters~\cite{dcqcn, timely}.
 The key property of RoCE is that it runs on lossless Ethernet, meaning
 that no packet is dropped due to congestion. This is achieved by enabling PFC 
-(Priority-based Flow Control).
-
-PFC introduces PAUSE mechanism, with which a switch can pause an incoming link
+(Priority-based Flow Control). With PFC PAUSE mechanism, a switch can pause an incoming link
 when its ingress buffer occupancy reaches a preset threshold. Properly tuned, the 
-buffer will never be full, and no packet will be dropped due to full buffer.
-As shown below, deadlock may occur in such lossless networks.
+buffer is never full, and no packet is dropped due to insufficient buffer space.
+Unfortunately, deadlock may occur in such lossless networks.
 
 
 \para{Deadlock.}
-In this paper, we define deadlock as a permanent state in which a subset of links are all paused
+In this paper, we refer to deadlock as a permanent state in which a subset of links are all paused
 by PFC, and none of the packets in the involved buffers can ever move even there is 
 no more packet being sent into these links.
 
@@ -36,27 +34,28 @@ the next hop buffer depends on the further next hop and wait for its RESUME,
 so that it can send out packets to lower the buffer usage. This goes on, and in the end, 
 any stuck buffer depends on itself to move, thus forming a deadlock.
 
-To avoid deadlock, previous work has considered {\em deadlock-free routing}. Deadlock-free
-routing guarantees that (if the routing configuration is correct,) any traffic does not
+To avoid deadlock, previous literatures have considered {\em deadlock-free routing}. It 
+guarantees that (if the routing configuration is correct,) any traffic does not
 cause deadlock.
 
 \para{Unfortunately, achieving deadlock-free routing has high price, and may not even be viable.} 
 In previous work, to achieve deadlock-free routing is to completely avoid cyclic buffer dependency.
-It is proved that cyclic buffer dependency-free is necessary and sufficient to deadlock-free routing.
-However, ensuring there is always no cyclic buffer dependency is challenging.
+It is proved that cyclic buffer dependency-free is a necessary and sufficient condition for deadlock-free 
+routing~\cite{deadlockfree}.
+However, ensuring that there is always no cyclic buffer dependency is challenging.
 
 First, deadlock-free routing largely limits the choice of topology. For example, \cite{tcpbolt}
-proposes to only use tree-based datacenter topology and routing, and shows that it is deadlock-free. 
+proposes to only use tree-based topology and routing, and shows that it is deadlock-free. 
 However, tree-based topology and routing has well-known problems including oversubscription~\cite{fattree},
 large path length~\cite{jellyfish} and vulnerable to failures.
 Thus, there are a number of other datacenter topology and routing schemes that are not 
-tree-based~\cite{bcube, camcube, jellyfish} and do not have deadlock-free guarantee. 
+tree-based~\cite{bcube, camcube, jellyfish}, and do not have deadlock-free guarantee. 
 
 Second, upon bugs or misconfiguration, deadlock-free routing configuration may turn into
 deadlock-vulnerable. In fact, recent work has observed a PFC deadlock case in production
 datacenter environments\cite{rdmascale}. It is caused by (unexpected) flooding of 
-lossless class traffic. Furthermore, there are multiple reports of routing loops in today's non-RDMA
-production datacenters~\cite{everflow, libra}, due to misconfiguration. If lossless traffic encounters
+lossless class traffic. Furthermore, there are multiple reports of routing loops due to misconfiguration
+in today's production datacenters~\cite{everflow, libra}. If lossless traffic encounters
 any of these loops, cyclic buffer dependency is unavoidable and deadlock can form in milliseconds.
 
 In this paper, we argue that we accept the fact that cyclic buffer dependency may not be completely 

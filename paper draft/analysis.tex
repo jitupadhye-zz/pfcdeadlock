@@ -1,13 +1,13 @@
 \begin{figure*}[t]
 %\vspace{-0.1in}
 \centering
-\subfigure[Topology and flows.] {
+\subfigure[Topology and flows] {
     \includegraphics[width=0.37\textwidth] {figs/loop_case_topo_and_flow}
 }
-\subfigure[Buffer dependency graph.]{
+\subfigure[Buffer dependency graph]{
     \includegraphics[width=0.28\textwidth] {figs/loop_case_ingress_buffer_dependency}
 }
-\subfigure[Stable state model.]{
+\subfigure[Stable state model]{
     \includegraphics[width=0.28\textwidth] {figs/loop_analysis}
 }
 \vspace{-0.15in}
@@ -142,7 +142,7 @@ dependencies from RX1 of A to RX1 of B, then to RX1 of C, then to RX1 of D, and 
 
 
 In this example, the boundary state analysis does not yield meaningful
-results. In fact, without any rate limiting on the flows, one can easily analyze that the 
+results. Because the flows do not have any rate limiting, one can easily analyze that the 
 stable throughput of each flow is $B/2$. However, it is not easy to tell whether deadlock 
 will occur. For example, one may suspect that switch A's $RX1$ will generate PFC PAUSE, and 
 these PAUSE frames may cascade from A to D, then to C, B and finally back to A, thus creating deadlock.
@@ -152,26 +152,26 @@ To understand such scenarios, we must analyze and simulate them at packet level.
 \begin{figure*}[t]
 %\vspace{-0.1in}
 \centering
-\subfigure[Topology and flows.] {
+\subfigure[Topology and flows] {
     \includegraphics[width=0.35\textwidth] {figs/case1_topo.pdf}
 }
-\subfigure[Buffer dependency graph.]{
+\subfigure[Buffer dependency graph]{
     \includegraphics[width=0.24\textwidth] {figs/case1_buffer_dependency.pdf}
 }
-\subfigure[Pause events at four links.]{
+\subfigure[Pause events at four links]{
     \includegraphics[width=0.26\textwidth] {figs/case1_pause.eps}
 }
 
-\subfigure[Buffer occupancy at switch A.] {
+\subfigure[Buffer occupancy at switch A] {
     \includegraphics[width=0.23\textwidth] {figs/case1_buffer_occupancy_A.eps}
 }
-\subfigure[Buffer occupancy at switch B.] {
+\subfigure[Buffer occupancy at switch B] {
     \includegraphics[width=0.23\textwidth] {figs/case1_buffer_occupancy_B.eps}
 }
-\subfigure[Buffer occupancy at switch C.] {
+\subfigure[Buffer occupancy at switch C] {
     \includegraphics[width=0.23\textwidth] {figs/case1_buffer_occupancy_C.eps}
 }
-\subfigure[Buffer occupancy at switch D.] {
+\subfigure[Buffer occupancy at switch D] {
     \includegraphics[width=0.23\textwidth] {figs/case1_buffer_occupancy_D.eps}
 }
 \vspace{-0.15in}
@@ -197,18 +197,18 @@ To understand such scenarios, we must analyze and simulate them at packet level.
 %\vspace{-0.1in}
 \centering
 
-\subfigure[Topology and flows.] {
-    \includegraphics[width=0.37\textwidth] {figs/case2_topo}
+\subfigure[Topology and flows] {
+    \includegraphics[width=0.33\textwidth] {figs/case2_topo}
 }
-\subfigure[Buffer dependency graph.]{
-    \includegraphics[width=0.27\textwidth] {figs/case2_buffer_dependency}
+\subfigure[Buffer dependency graph]{
+    \includegraphics[width=0.24\textwidth] {figs/case2_buffer_dependency}
 }
-\subfigure[Pause events at four links.]{
-    \includegraphics[width=0.3\textwidth] {figs/case2_pause.eps}
+\subfigure[Pause events at four links]{
+    \includegraphics[width=0.27\textwidth] {figs/case2_pause.eps}
 }
 \vspace{-0.15in}
 \caption{Slightly different traffic matrix leads to deadlock, even though
-the flow-level analysis shows that the rates of flow 1 and flow 2 are not affected.
+the flow-level analysis shows that the average throughput of flow 1 and flow 2 should not be affected.
 }
 \vspace{-0.15in}
 \label{fig:case2}
@@ -289,9 +289,9 @@ But this change in pattern makes PFC cascade towards L3 and finally L4.
 
 Once all the four links are paused simultaneously, there is a chance that no link can get resumed. 
 For example, it is possible that when simultaneous pause happens, at switch A and switch B, the 
-first packet buffered in the head of TX1 is a packet of flow 1, and meanwhile, at switch C and switch 
-D, the first packet buffered in the head of TX1 is a packet of flow 2. If the above condition occurs, 
-no link can get resumed as all the TX1 queues are waiting for its downstream neighbors to release some 
+first packet buffered in the head is a packet of flow 1, and meanwhile, at switch C and switch 
+D, the first packet buffered in the head is a packet of flow 2. 
+In this case, all the queues are waiting for its downstream neighbors to release some 
 buffer to break the standstill condition.
 
 \para{Summary:} 
@@ -308,16 +308,16 @@ any analytic tools that are at packet-level and work for above cases.
 %\vspace{-0.1in}
 \centering
 
-\subfigure[Topology and flows.] {
+\subfigure[Topology and flows] {
     \includegraphics[width=0.22\textwidth] {figs/deadlock_case_4_topo}
 }
-\subfigure[Pause events at four links.]{
+\subfigure[Pause events at four links]{
     \includegraphics[width=0.24\textwidth] {figs/pause_event_limit2G.eps}
 }
-\subfigure[2Gbps rate limiter]{
+\subfigure[2Gbps rate limiter, no deadlock]{
     \includegraphics[width=0.24\textwidth] {figs/buffer_occupancy_B_limit2G.eps}
 }
-\subfigure[3Gbps rate limiter]{
+\subfigure[3Gbps rate limiter, deadlock]{
     \includegraphics[width=0.24\textwidth] {figs/buffer_occupancy_B_limit3G.eps}
 }
 \vspace{-0.15in}
@@ -345,8 +345,8 @@ simultaneously at packet level. Why is 2Gbps different from higher rate, like 3G
 
 We plot the buffer occupancy of RX1 at switch B, and compare when we limit the rate of RX2 to 2Gbps
 (Figure~\ref{fig:case3}(c)) and 3Gbps (Figure~\ref{fig:case3}(d)). Interestingly, the buffer occupancy
-always fluctuates between 0 and a little above PFC threshold\footnote{This is because once PFC threshold is
-reached, the link is paused. It takes some time for the PAUSE to arrive the other side and become effective.
+always fluctuates between 0 and a little above PFC threshold\footnote{It takes some time for PFC PAUSE 
+to arrive the other side and become effective after PFC threshold is reached.
 The switch buffers additional packets due to this delay.} with 2Gbps rate limiter. While with 3Gbps rate
 limiter, after some fluctuation the buffer goes into deadlock, even though the peak buffer usage is the same 
 as 2Gbps case. Unfortunately, we cannot find any existing analysis tools that explain 

@@ -12,9 +12,9 @@ inspire us with some of the following potential deadlock mitigations.
 \para{TTL-based mitigation for deadlock caused by loops.} In a routing loop, 
 the smaller TTL, the less possible deadlock forms (see Equation~\ref{eq:condition}).
 Thus, the most straightforward mitigation is to reduce packets' initial TTL values.
-For example, with an $N$-hop routing loop, if the initial TTL is not larger than $N$,
-no deadlock will form because the deadlock threshold for $r$ is $B$. The flow throughput
-can never exceed the threshold.
+For example, in an $N$-hop routing loop, if the initial TTL is not larger than $N$,
+no deadlock will form because the deadlock threshold for $r$ is $B$, which can
+never be exceeded.
 
 In practice, we may not be able to guarantee that initial TTL values are always smaller than
 the size of the loop. However, by proper switch buffer management, we may make {\em class-specific}
@@ -77,8 +77,8 @@ congestions have been generated (through either queue length or latency increase
 from been generated. 
 
 One possible way to further preventing PFC from been generated is to integrate DCQCN together with 
-phantom queuing. By reacting to the phantom queues that assume lower link speed, DCQCN can generate 
-congestion signals much earlier. 
+phantom queuing, like~\cite{Alizadeh12}. By reacting to the phantom queues that assume lower link speed, 
+congestion signals are generated much earlier. 
 
 \para{Other possible mechanisms.} In future work, a deeper understanding of tighter conditions 
 for deadlock may lead to more deadlock mitigation mechanisms. In future work, we are going to 
