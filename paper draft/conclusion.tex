@@ -1,1 +1,12 @@
-\section{Conclusion and Future Work}
+\section{Conclusion}
+
+In this paper, we study the deadlock problem in lossless network, and try to answer
+this question: how can we avoid deadlock even if there is cyclic buffer dependency in
+the network? We demostarte a few case studies in which deadlock occurence depends on
+factors other than cyclic buffer dependency. In light of these examples, we discuss 
+potential deadlock mitigation mechanisms including TTL-based, rate limiting and reducing
+PFC propagation. We plan to further study the 
+necessary and sufficient conditions for deadlock, derive analysis tools that quickly determine
+deadlock occurence without running packet-level simulation, and develop and compare
+different deadlock mitigation mechanisms in future work.
+
