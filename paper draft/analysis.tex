@@ -239,10 +239,10 @@ and 55KB around the PFC threshold, so link L4 will get paused intermittently. In
 occupancy of flow 1 at TX1 of B is well below the PFC threshold (fluctuates between 0KB and 18KB), 
 hence link L1 will never be paused. 
 
-The takeaway is that, without packet-level analysis, we cannot predict whether there is deadlock in this example
-simply from cyclic buffer dependency and flow-level analysis. This is because we cannot predict 
-the instantaneous buffer occupancy (and whether PFC is triggered) from flow-level analysis, 
-which only focuses on {\em average} state of flows.
+The takeaway is that, we cannot simply predict deadlock based on the existence of cyclic buffer dependency
+and flow-level stable state analysis. This is because we cannot predict 
+the instantaneous buffer occupancy (and whether PFC is triggered) from flow-level analysis that only 
+focuses on {\em average} flow throughput.
 
 %In Figure~\ref{fig:case1}(a), packets of flow 1 and flow 2 will build up at TX1 of A as both flows are competing for the capacity of link L1. Once the buffer occupancy of flow 2 exceeds the PFC threshold, RX1 of A will generate a pause frame to TX1 of D to stop packet transmission over link L4.
 %

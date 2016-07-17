@@ -47,15 +47,15 @@ To avoid long-term packet loss during link replacement, the network traffic pass
 
 In the first step, part of the traffic from switch T3 to switch T2 is migrated to a non-shortest path p2 because link L2-T2 is down and the alternative shortest paths cannot accommodate all the traffic, as shown in Fig.~\ref{fig:treecase}(a). In the second step, part of the traffic from switch T1 to switch T4 is migrated to a non-shortest path p3 because link L3-T4 is down and the alternative shortest paths cannot accommodate all the traffic, as shown in Fig.~\ref{fig:treecase}(b).
 
-Let $\textbf{R}_{old} = \{p1, p2\}$, and $\textbf{R}_{new} = \{p3, p4\}$. It is easy to check both $\textbf{R}_{old}$ and $\textbf{R}_{new}$ are deadlock-free routing functions. 
+Let $R_{old} = \{p1, p2\}$, and $R_{new} = \{p3, p4\}$. It is easy to check both $R_{old}$ and $R_{new}$ are deadlock-free routing functions. 
 
-\textbf{Cyclic buffer dependency during reconfiguration process:} In order to proceed from the first step to the second step, a routing reconfiguration is required to transition the routing function from $\textbf{R}_{old}$ to $\textbf{R}_{new}$.
+\textbf{Cyclic buffer dependency during reconfiguration process:} In order to proceed from the first step to the second step, a routing reconfiguration is required to transition the routing function from $R_{old}$ to $R_{new}$.
 
 During the reconfiguration process, different executed orders of configuration operations will lead to different intermediate routing functions. Specifically, if path p3 is added to the routing function before path p2 is removed, the intermediate routing configuration shown in Fig.~\ref{fig:nontreecase}(c) will be created. If path p4 is added to the routing function before path p1 is removed, the intermediate routing configuration shown in Fig.~\ref{fig:nontreecase}(d) will be created.  
 
 The intermediate routing configuration shown in Fig.~\ref{fig:nontreecase}(c) introduces a cyclic buffer dependency.  To help readers understand this, in Fig.~\ref{fig:treecase}(e), we draw the buffer dependency among four switches L2, L3, S1 and S2. We reposit the locations of these four switches and draw both ingress queues (RX) and egress queues (TX) for the purpose of better explanation. As we can see, there is a cyclic buffer dependency among the ingress queues. This indicates that the network is now exposed to the danger of PFC deadlock.
 
-\textbf{Deadlock-free reconfiguration schemes:} In Fig.~\ref{fig:nontreecase}(f), we present two possible deadlock-free reconfiguration schmes. The first scheme is to remove all the paths in $\textbf{R}_{old}$ before adding any new paths in $\textbf{R}_{new}$. This scheme will lead to a slow reconfiguration process as all the operations of adding new paths are delayed by the operations of removing old paths. 
+\textbf{Deadlock-free reconfiguration schemes:} In Fig.~\ref{fig:nontreecase}(f), we present two possible deadlock-free reconfiguration schmes. The first scheme is to remove all the paths in $R_{old}$ before adding any new paths in $R_{new}$. This scheme will lead to a slow reconfiguration process as all the operations of adding new paths are delayed by the operations of removing old paths. 
 
 The second scheme only requires path p2 to be removed before path p3 is added. All the other paths not mentioned can be updated freely without any order constraint. Hence the speed of routing reconfiguration can be improved.
 
@@ -90,24 +90,26 @@ The second scheme only requires path p2 to be removed before path p3 is added. A
 	\vspace{-0.2in}
 \end{figure}
 
-\begin{figure}[t]
-	\centering
-	\includegraphics[width=0.45\textwidth] {figs/nontreecase_dfschemes}
-	\caption{Three deadlock-free reconfiguration schemes.}\label{fig:dfschemes}
-	\vspace{-0.2in}
-\end{figure}
+As shown in Fig.~\ref{fig:nontreecase}(a), in this example we consider a 4-node network N. This topology can be a subgraph of many non-tree based DCNs, like HyperX~\cite{hyperx}, Jellyfish~\cite{jellyfish} and BCube~\cite{bcube}.
 
-As shown in Fig.~\ref{fig:nontreecase}(a), in this example we consider a 4-node network \textbf{N}. This topology can be a subgraph of many non-tree based DCNs, like HyperX~\cite{hyperx}, Jellyfish~\cite{jellyfish} and BCube~\cite{bcube}.
+Fig.~\ref{fig:nontreecase}(b)-(e) are four spanning trees \textbf{T1}-\textbf{T4} which specify the routing paths that can be used in N. For example, path p1 is a legal routing path specified in \textbf{T1}.  We use $R_i$ to denote the set of paths specified in tree \textbf{Ti}. Let $R_{old} = R_1 \cup R_2$, and $R_{new} = R_3 \cup R_4$. It is easy to check both $R_{old}$ and $R_{new}$ are deadlock-free routing functions. 
 
-Fig.~\ref{fig:nontreecase}(b)-(e) are four spanning trees \textbf{T1}-\textbf{T4} which specify the routing paths that can be used in \textbf{N}. For example, path p1 is a legal routing path specified in \textbf{T1}.  We use $\textbf{R}_i$ to denote the set of paths specified in tree \textbf{Ti}. Let $\textbf{R}_{old} = \textbf{R}_1 \cup \textbf{R}_2$, and $\textbf{R}_{new} = \textbf{R}_3 \cup \textbf{R}_4$. It is easy to check both $\textbf{R}_{old}$ and $\textbf{R}_{new}$ are deadlock-free routing functions. 
-
-\textbf{Reconfiguration scenario:} Initially, $\textbf{R}_s$ are used as the routing function of \textbf{N}. Due to the failure of link S2-S3, switch S3 becomes unreachable. To maintain connectivity of the network, network operator now wants to perform a routing reconfiguration to transition the routing function from $\textbf{R}_{old}$ to $\textbf{R}_{new}$.
+\textbf{Reconfiguration scenario:} Initially, $R_s$ are used as the routing function of N. Due to the failure of link S2-S3, switch S3 becomes unreachable. To maintain connectivity of the network, network operator now wants to perform a routing reconfiguration to transition the routing function from $R_{old}$ to $R_{new}$.
 
 \textbf{Cyclic buffer dependency during reconfiguration process:} During the reconfiguration process, if path p2 in \textbf{T3} and path p3 in \textbf{T4} are added to the routing function before path p1 in \textbf{T1} is removed, a cyclic buffer dependency will be generated, as shown in Fig.~\ref{fig:nontreecase}(f).
 
 \textbf{Deadlock-free reconfiguration schemes:} In Fig.~\ref{fig:dfschemes}, we present three possible deadlock-free reconfiguration schmes. The first scheme is to remove all the paths in \textbf{T1} and \textbf{T2} before adding any new paths in \textbf{T3} and \textbf{T4}. This scheme will lead to a slow reconfiguration process as all the operations of adding new paths are delayed by the operations of removing old paths. 
 
 The second scheme only requires path p1 to be removed before paths p2 and p3 are added. All the other paths not mentioned can be updated freely without any order constraint. Hence the speed of routing reconfiguration can be improved. The third scheme is an optimized reconfiguration scheme in terms of imposing minimum order constraints on the configuration operations. The intuition here is that as long as paths p1, p2 and p3 do not take effect at the same, deadlock-free can be well guaranteed. 
+
+
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=0.45\textwidth] {figs/nontreecase_dfschemes}
+	\caption{Three deadlock-free reconfiguration schemes.}\label{fig:dfschemes}
+	\vspace{-0.2in}
+\end{figure}
 
 %While for this example it may seem easy to find a deadlock-free reconfiguration scheme that requires minimum order constraints, in general it is difficult as there are combinatorial such schemes to be checked.
 

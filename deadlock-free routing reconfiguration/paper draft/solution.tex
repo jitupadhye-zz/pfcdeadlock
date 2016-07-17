@@ -11,13 +11,14 @@ During the routing reconfiguration process, to avoid routing blackhole~\cite{eve
 	\centering
 	\includegraphics[width=0.45\textwidth] {figs/CDG}
 	\caption{Representing the two deadlock-free reconfiguration schemes in Fig~\ref{fig:treecase}(f) using two configuration dependency graphs.}\label{fig:cdg}
+	\vspace{-0.15in}
 \end{figure}
 
 \begin{figure}[t]
 	\centering
 	
 	\subfloat[short for lof][Topology and path.] {
-		\includegraphics[width=0.24\textwidth] {figs/relationship_or_a}
+		\includegraphics[width=0.22\textwidth] {figs/relationship_or_a}
 	}
 	\subfloat[short for lof][Deadlock-free scheme and Corresponding CDG.]{
 		\includegraphics[width=0.24\textwidth] {figs/relationship_or_b}
@@ -25,21 +26,21 @@ During the routing reconfiguration process, to avoid routing blackhole~\cite{eve
 	
 	
 	\caption{An example to show the OR relationship. Node $oi$ is the operation to configure path $pi$.}\label{fig:orrelationship}
-	
+	\vspace{-0.2in}
 \end{figure}
 
-In this part, we define \textit{configuration dependency graph} (CDG) to represent any possible routing reconfiguration schemes at the path level. CDG is a directed graph $G_c(V_c,E_c)$, where each node in $V_c$ represents a configuration operation, and each arc in $E_c$ represents an operation dependency. 
+In this part, we define \textit{configuration dependency graph} (CDG) to represent any possible routing reconfiguration schemes at the path level. CDG is a directed graph $G_c(V_c,E_c)$, where each node in $V_c$ represents a configuration operation, and each edge in $E_c$ represents an operation dependency. 
 
-In Fig.~\ref{fig:cdg},  we use two CDGs to represent the two deadlock-free reconfiguration schemes in Fig~\ref{fig:treecase}(f). In the first reconfiguration scheme, it requires paths $p1$ and $p2$ to be removed before paths $p3$ and $p4$ are added, hence we use four arcs $o1\rightarrow o3$, $o1\rightarrow o4$, $o2\rightarrow o3$, $o2 \rightarrow o4$ in CDG 1 to capture the order dependencies among operations. In the second reconfiguration scheme, it only requires paths $p2$ to be removed before path $p3$ is added. So only one arc$ o2 \rightarrow o3$ is needed in CDG2.
+In Fig.~\ref{fig:cdg},  we use two CDGs to represent the two deadlock-free reconfiguration schemes in Fig~\ref{fig:treecase}(f). In the first reconfiguration scheme, it requires paths $p1$ and $p2$ to be removed before paths $p3$ and $p4$ are added, hence we use four edges $o1\rightarrow o3$, $o1\rightarrow o4$, $o2\rightarrow o3$, $o2 \rightarrow o4$ in CDG 1 to capture the order dependencies among operations. In the second reconfiguration scheme, it only requires paths $p2$ to be removed before path $p3$ is added. So only one edge $ o2 \rightarrow o3$ is needed in CDG 2.
  
 
 
 In order to represent any possible routing reconfiguration schemes, our CDG should be able to describe both the ``OR" and ``AND" relationship that could be used in a reconfiguration scheme, as we are going to explained in the next.
 
 \textbf{OR relationship}: It refers to the dependency relationship that a path can be added after any path in a path set is removed. In Fig.~\ref{fig:orrelationship}, we use an example to illustrate this OR relationship. Fig.~\ref{fig:orrelationship}(a) includes a 4-switch network and four paths $p1$, $p2$, $p3$ and $p4$, where $\{p1, p2, p3\}\subseteq 
-\textbf{R}_{old}$ and $\{p4\}\subseteq \textbf{R}_{new}$. In Fig.~\ref{fig:orrelationship}(b), a feasible deadlock-free reconfiguration scheme is presented. In order to avoid cyclic buffer dependency, the scheme requires that at least one path in $\{p1, p2, p3\}$ should be removed before path $p4$ is added. This is the "OR" relationship that could be used in a reconfiguration scheme.
+R_{old}$ and $\{p4\}\subseteq R_{new}$. In Fig.~\ref{fig:orrelationship}(b), a feasible deadlock-free reconfiguration scheme is presented. In order to avoid cyclic buffer dependency, the scheme requires that at least one path in $\{p1, p2, p3\}$ should be removed before path $p4$ is added. This is the "OR" relationship that could be used in a reconfiguration scheme.
 
-To capture the ``OR" relationship in a CDG, we can duplicate the operation that ``partially" depends on other operations into several mirror operations. As shown in the CDG of Fig~\ref{fig:orrelationship}(b), operation o4 is duplicated into three mirror operations o4, o4' and o4''. Operations $o1$, $o2$ and $o3$ are pointed to different mirror operations of $o4$. During the reconfiguration process, as long as one operation in $\{o1, o2, o3\}$ finishes, the operation to add path $p4$ can start immediately as one of the three mirror operations is released.
+To capture the ``OR" relationship in the CDG, we can duplicate the operation that ``partially" depends on other operations into several mirror operations. As shown in the CDG of Fig~\ref{fig:orrelationship}(b), operation o4 is duplicated into three mirror operations o4, o4' and o4''. Operations $o1$, $o2$ and $o3$ are pointed to different mirror operations of $o4$. During the reconfiguration process, as long as one operation in $\{o1, o2, o3\}$ finishes, the operation to add path $p4$ can start immediately as one of the three mirror operations is released.
 
 
 \begin{figure}[t]
@@ -53,39 +54,41 @@ To capture the ``OR" relationship in a CDG, we can duplicate the operation that 
 	}
 	
 	
-	\caption{An example to show the OR relationship. Node $oi$ is the operation to configure path $pi$. }\label{fig:andrelationship}
-	
+	\caption{An example to show the AND relationship. Node $oi$ is the operation to configure path $pi$. }\label{fig:andrelationship}
+	\vspace{-0.2in}
 \end{figure}
 
-\textbf{AND relationship}: It refers to the dependency relationship that a path can be added after all the paths in a path set are removed. In Fig~\ref{fig:orrelationship}, we use an example to illustrate this AND relationship. As shown in Fig.~\ref{fig:andrelationship}(a), five paths $p1$, $p2$, $p3$, $p4$ and $p5$ traverses a 4-switch network. Both path $p4$ and $p5$ go through S4, S1 and S2 consecutively, but ends at different hosts (not drawn in the figure). In this example, we have $\{p4, p5\}\subseteq \textbf{R}_{old}$ and $\{p2\}\subseteq \textbf{R}_{new}$. Paths $p1$, $p3$ are not involved by the routing reconfiguration.  In Fig.~\ref{fig:orrelationship}(b), a feasible deadlock-free reconfiguration scheme is presented. In order to avoid cyclic buffer dependency, the scheme requires that both of paths $p4$ and $p5$ to be removed before path $p2$ is added. This is the "AND" relationship that could be used in a reconfiguration scheme.
+\textbf{AND relationship}: It refers to the dependency relationship that a path can be added after all the paths in a path set are removed. In Fig~\ref{fig:andrelationship}, we use an example to illustrate this AND relationship. As shown in Fig.~\ref{fig:andrelationship}(a), five paths $p1$, $p2$, $p3$, $p4$ and $p5$ traverses a 4-switch network. Both path $p4$ and $p5$ go through S4, S1 and S2 consecutively, but ends at different hosts (not drawn in the figure). In this example, we have $\{p4, p5\}\subseteq R_{old}$ and $\{p2\}\subseteq R_{new}$. Paths $p1$, $p3$ are not involved in the routing reconfiguration.  In Fig.~\ref{fig:andrelationship}(b), a feasible deadlock-free reconfiguration scheme is presented. In order to avoid cyclic buffer dependency, the scheme requires that both of paths $p4$ and $p5$ to be removed before path $p2$ is added. This is the "AND" relationship that could be used in a reconfiguration scheme.
 
-To capture the ``AND" relationship in a CDG, we can let multiple operations point to a single operation, as shown  in the CDG of Fig~\ref{fig:orrelationship}(b). During the reconfiguration process, operation $o2$ will start only after both operations $o4$ and $o5$ finish.
+To capture the ``AND" relationship in a CDG, we can let multiple operations point to a single operation, as shown  in the CDG of Fig~\ref{fig:andrelationship}(b). During the reconfiguration process, operation $o2$ will start only after both operations $o4$ and $o5$ finish.
 
 \subsection{Construction of Deadlock-free Configuration Dependency Graph}\label{subsec:dfcdg}
 
-In this part, we present our solution for constructing deadlock-free CDGs. We will also show that if the time to configure any single path can be known in advance or can be accurately estimated, the fastest deadlock-free CDG can be found in polynomial time.
+In this part, we present our solution for constructing deadlock-free CDGs. We will also show that if the time to configure a single path can be known in advance or can be accurately estimated, the fastest deadlock-free CDG can be constructed in polynomial time.
 
-As each link is exactly corresponding to an ingress queue in DCNs, in our solution we use $d_{lx,ly}$ to represent the buffer dependency from the ingress queue connected with link $lx$ to the ingress queue connected with link $ly$. We denote a buffer dependency $d_{lx,ly}$ as $d^{old}_{lx,ly}$, if it is created by a path in $R_{old}$. And as $d^{new}_{lx,ly}$ if created by a path in $R_{new}$.
+Our solution is designed based on the following important observation: \textit{For any cycle in the network, as long as an old buffer dependency edge is permanently removed from the cycle before a different new buffer dependency edge is added to the cycle, there will be no cyclic buffer dependency in the cycle during the routing reconfiguration process.}
 
-Our solution is motivated by the observation: \textit{For any topology cycle that could have cyclic buffer dependency during routing reconfiguration, if one buffer dependency edge is permanently removed from the cycle before another different buffer dependency edge is added to the cycle, then cyclic buffer dependency will never be created in this cycle.} 
+This observation can help us to ensure deadlock-free without removing all the paths in $R_{old}$ at first. Before we introduce our solution, we define a few notations used in our solution.
+
+Buffer dependency edges are among ingress queues. As a network link is exactly corresponding to an ingress queue, we use $d_{lx,ly}$ to denote the buffer dependency edge from the ingress queue connected with link $lx$ to the ingress queue connected with link $ly$. We denote a buffer dependency $d_{lx,ly}$ as $d^{o}_{lx,ly}$, if it is created by a path in $R_{old}$. And as $d^{n}_{lx,ly}$ if it is created by a path in $R_{new}$.
+
+We use $D_{o}$ to denote the set of all buffer dependency edges related to the paths in $R_{old}$, and $D_{n}$ to denote the set of all buffer dependency edges related to the paths in $R_{new}$. $O(d^{o}_{lx,ly})$ is the set of operations that can remove the buffer dependency edge $d^{o}_{lx,ly}$ from the network, and $O(d^{n}_{la,lb})$ is the set of operations that can add the buffer dependency edge $d^{n}_{la,lb}$ to the network.
+
 
 
 Our solution consists of 3 steps as follows.
 
-\textbf{Step-1: Searching for all the active buffer dependencies.} For every topology cycle that could have cyclic buffer dependency during routing reconfiguration, we find out all the buffer dependencies created by the paths in $R_{old}$ (denoted as $D_{old}$), and all the active buffer dependencies created by the paths in $R_{new}$ (denoted as $D_{new}$). 
+\textbf{Step-1: Building $D_{o}$ and $D_{n}$.} We enumerate all the paths in $R_{old}$ and $R_{new}$ to build $D_{o}$ and $D_{n}$. If a buffer dependency edge included in $D_{o}$ is also included in $D_{n}$, we delete it from $D_{o}$ as this edge cannot be permanently removed.
 
-If a buffer dependency included in $D_{old}$ is also included in $D_{new}$, we delete it from $D_{old}$ as this buffer dependency cannot be permanently removed.
+\textbf{Step-2: Constructing a raw deadlock-free CDG.}  For every pair of edges ($d^{o}_{lx,ly}$,  $d^{n}_{la,lb}$), to ensure $d^{o}_{lx,ly}$ is removed from the cycle before  $d^{n}_{la,lb}$ is added to the cycle in the raw CDG, we perform two actions. 
 
-\textbf{Step-2: Constructing a raw deadlock-free CDG.} Let $O(d^{old}_{lx,ly})$ be the set of operations to remove the dependency $d^{old}_{lx,ly}$, and $O(d^{new}_{lm,ln})$ be the set of operations to add the dependency $d^{new}_{lm,ln}$.
+First,  for any operation $oi$ in $O(d^{o}_{lx,ly})$, we create a mirror operation denoted as $oi'$ in the raw CDG. Do the same for any operation $oj$ in $O(d^{n}_{la,lb})$ (denoted as $oj'$).  Second, we add a dependency edge from $oi'$ to $oj'$ for every such pair of operations.
 
-For every pair of buffer dependencies ($d^{old}_{lx,ly}$,  $d^{new}_{lm,ln}$), to ensure $d^{old}_{lx,ly}$ is removed from the cycle before  $d^{new}_{lm,ln}$ is added to the cycle in the raw CDG, we perform two actions. 
+\textbf{Step-3: Deriving deadlock-free CDG(s) from the raw deadlock-free CDG.}  For each connected subgraph in the raw CDG we construct in step-2,  its operation dependency edges ensure that one old buffer dependency edge is permanently removed from a cycle before a new buffer dependency edge is added to the same cycle. This means that each subgraph stand alone can ensure deadlock-free for a certain cycle.  
 
-First,  for any operation $oi$ in $O(d^{old}_{lx,ly})$, we create a mirror operation oi' in the raw CDG. Do the same for any operation $oj$ in $O(d^{new}_{lm,ln})$. Second, for every operation pair $(oi', oj')$, where oi' comes from $O(d^{old}_{lx,ly})$, and oj' comes from $O(d^{new}_{lm,ln})$, we add a dependency edge from $oi'$ to $oj'$ in the raw CDG.
+Assuming the network contains $n$ cycles, a deadlock-free CDG can be created by picking $n$ subgraphs from the raw CDG,  with each subgraph corresponding for a cycle in the network. Different combinations is corresponding to different deadlock-free CDGs.
 
-\textbf{Step-3: Deriving deadlock-free CDG(s) from the raw deadlock-free CDG.}  For each connected subgraph in the raw CDG we construct,  its dependency edges ensure that one buffer dependency edge is permanently removed from a cycle before another different buffer dependency edge is added to the same cycle. This means that each subgraph in the raw CDG can ensure deadlock-free for a certain cycle. We can derive deadlock-free CDG(s)
-by picking enough subgraphs in the raw CDGs that can guarantee deadlock-free for every cycle in the network.
-
-\textbf{Calculation of fastest deadlock-free CDG}: If the time of any single configuration operation is already known, then we can easily calculate the configuration time of any subgraph in the raw CDG. In this case, By choosing a subgraph with minimum configuration time for each cycle, we can produce a fastest deadlock-free CDG.
+\textbf{Calculation of fastest deadlock-free CDG}: If the time of any single configuration operation is already known, then we can easily calculate the total configuration time of any subgraph in the raw CDG. In this case, By choosing a subgraph with minimum configuration time for each cycle, we can produce a fastest deadlock-free CDG in polynomial time.
 
 \begin{figure}[t]
 	\centering
@@ -97,17 +100,17 @@ by picking enough subgraphs in the raw CDGs that can guarantee deadlock-free for
 		\includegraphics[width=0.22\textwidth] {figs/solution_example_b}
 	}
 	
-	\caption{An example to illustrate the solution. The network topology is a 4-node network. In this example, we simply assume the time cost to configure a path is equal to the number of switches this path traverses.}\label{fig:solution_example}
+	\caption{An example to illustrate the solution. In this example, we simply assume the time cost to configure a path is equal to the number of switches this path traverses.}\label{fig:solution_example}
 	\vspace{-0.2in}
 \end{figure}
 
-In Fig.~\ref{fig:solution_example}, we have an example to show how our solution works. As shown in Fig.~\ref{fig:solution_example}(a), the network topology is a 4-node network. The path setting is $\{p1, p3\}\subseteq \textbf{R}_{old}$ and $\{p2, p4\}\subseteq \textbf{R}_{new}$. It is easy to calculate $D_{old}=\{d^{old}_{l1,l2},  d^{old}_{l3,l4}\}$, and $D_{new}=\{d^{new}_{l2,l3},  d^{new}_{l3,l4},  d^{new}_{l4,l1}\}$.  According to the algorithm in step-1, $d^{old}_{l3,l4}$ will be deleted from $D_{old}$ as there exists a buffer dependency $d^{new}_{l3,l4}$ in $D_{new}$.
+In Fig.~\ref{fig:solution_example}, we have an example to show how our solution works. As shown in Fig.~\ref{fig:solution_example}(a), there are four paths traversing a 4-node network. We have $\{p1, p3\}\subseteq R_{old}$ and $\{p2, p4\}\subseteq R_{new}$. It is easy to calculate $D_{o}=\{d^{o}_{l1,l2},  d^{o}_{l3,l4}\}$, and $D_{n}=\{d^{n}_{l2,l3},  d^{n}_{l3,l4},  d^{n}_{l4,l1}\}$.  According to the algorithm in step-1, $d^{o}_{l3,l4}$ will be deleted from $D_{o}$ as we have $d^{n}_{l3,l4}$ in $D_{n}$.
 
-For all the remaining buffer dependencies, their corresponding operations are as follows: $O(d^{old}_{l1,l2}) = \{o1\}$, $O(d^{new}_{l2,l3}) = \{o2\}$, $O(d^{new}_{l3,l4}) = \{o2\}$ and $O(d^{new}_{l4,l1}) = \{o4\}$. Then according to step-2, for every pair of buffer dependencies ($d^{old}_{lx,ly}$,  $d^{new}_{lm,ln}$), we create some mirror operations as well as the corresponding dependency edges. The created raw CDG can be found in Fig~\ref{fig:solution_example}(b) (Note that one redundant subgraph $o1'' \rightarrow o2'$ is not drawn).  
+For all the remaining buffer dependency edges, their corresponding operations are as follows: $O(d^{o}_{l1,l2}) = \{o1\}$, $O(d^{n}_{l2,l3}) = \{o2\}$, $O(d^{n}_{l3,l4}) = \{o2\}$ and $O(d^{n}_{l4,l1}) = \{o4\}$. Then according to step-2, for every pair of edges ($d^{o}_{lx,ly}$,  $d^{n}_{la,lb}$), we create some mirror operations as well as the corresponding dependency edges in the raw CDG. The raw CDG can be found in Fig~\ref{fig:solution_example}(b) (Note that one redundant subgraph $o1'' \rightarrow o2'$ is not drawn).  
 
-As we can find, every subgraph in the the raw CDG remove one old buffer dependency from the cycle before adding a new buffer dependency to the  cycle. Hence we can derive two deadlock-free CDGs from the raw CDG, with each CDG exactly including all the operation dependencies specified in one of the two subgraphs.
+As we can find, every connected subgraph in the raw CDG exactly removes one old buffer dependency edge from the cycle before adding a new buffer dependency edge to the  cycle. Hence we can derive two deadlock-free CDGs from the raw CDG: CDG 1 only includes the dependency $o1\rightarrow o2$, while CDG 2 only includes the dependency $o1'\rightarrow o4$.
 
-As shown in Fig.~\ref{fig:solution_example}, if we know the time of any single operation, the total configuration time of any subgraph in the raw CDG can be easily calculated. Then we can produce a fastest deadlock-free CDG with minimum configuration time, as shown in Fig.~\ref{fig:solution_example}(b).
+As shown in Fig.~\ref{fig:solution_example}, if we know the time of any single operation, the total configuration time of any subgraph in the raw CDG can be easily calculated. For example, operations in subgraph $o1 \rightarrow o2$ needs 7 time units to finish, while operations in subgraph $o1' \rightarrow o4$ only needs 6 time units to finish.  Then we can produce a fastest deadlock-free CDG with 6 configuration time, as shown in Fig.~\ref{fig:solution_example}(b).
 
 
 %\subsection{Fast Deadlock-free Reconfiguration For a Single Cycle}\label{subsec:dfrforsc}
