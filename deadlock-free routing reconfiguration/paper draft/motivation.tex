@@ -2,7 +2,7 @@
 
 
 
-While PFC deadlock can be avoided by leveraging a routing function that introduces no cycle in the buffer dependency graph. However, this approach cannot eliminate the cyclic buffer dependency that may arises during routing reconfiguration process.
+While PFC deadlock can be avoided by leveraging a routing function that introduces no cycle in the buffer dependency graph. However, this approach cannot eliminate the cyclic buffer dependency that may arise during routing reconfiguration process.
 
 In this part, we use examples to show 1) cyclic buffer dependency can be generated for both tree based and non-tree based DCNs when the routing reconfiguration is not well planed; 2) a bad deadlock-free reconfiguration plan will lead to a slow reconfiguration process.
 
@@ -18,6 +18,7 @@ In this part, we use examples to show 1) cyclic buffer dependency can be generat
 		\includegraphics[width=0.24\textwidth] {figs/deadlock_tree_b}
 	}
 	
+	\vspace{-0.1in}
 	\subfloat[short for lof][Intermediate routing configuration 1.] {
 		\includegraphics[width=0.24\textwidth] {figs/deadlock_tree_c}
 	}
@@ -25,6 +26,8 @@ In this part, we use examples to show 1) cyclic buffer dependency can be generat
 		\includegraphics[width=0.24\textwidth] {figs/deadlock_tree_d}
 	}
 	
+	
+	\vspace{-0.1in}
 	\subfloat[short for lof][Buffer dependency graph.]{
 		\includegraphics[width=0.2\textwidth] {figs/deadlock_tree_e}
 	}
@@ -33,7 +36,7 @@ In this part, we use examples to show 1) cyclic buffer dependency can be generat
 	}
 	
 	\caption{Reconfiguration-induced deadlock case for tree topology.}\label{fig:treecase}
-	
+	\vspace{-0.2in}
 \end{figure}
 
 Fig.~\ref{fig:treecase}(a) shows a small Leaf-Spine topology, which is a typical tree based DCN topology.
@@ -72,6 +75,7 @@ The second scheme only requires path p2 to be removed before path p3 is added. A
 		\includegraphics[width=0.16\textwidth] {figs/deadlock_nontree_c}
 	}
 	
+	\vspace{-0.1in}
 	\subfloat[short for lof][Spanning tree \textbf{T3}.] {
 		\includegraphics[width=0.16\textwidth] {figs/deadlock_nontree_d}
 	}
@@ -83,14 +87,14 @@ The second scheme only requires path p2 to be removed before path p3 is added. A
 	}
 	
 	\caption{Reconfiguration-induced deadlock case for non-tree topology.}\label{fig:nontreecase}
-	
+	\vspace{-0.2in}
 \end{figure}
 
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=0.45\textwidth] {figs/nontreecase_dfschemes}
 	\caption{Three deadlock-free reconfiguration schemes.}\label{fig:dfschemes}
-	
+	\vspace{-0.2in}
 \end{figure}
 
 As shown in Fig.~\ref{fig:nontreecase}(a), in this example we consider a 4-node network \textbf{N}. This topology can be a subgraph of many non-tree based DCNs, like HyperX~\cite{hyperx}, Jellyfish~\cite{jellyfish} and BCube~\cite{bcube}.

@@ -70,21 +70,6 @@ As each link is exactly corresponding to an ingress queue in DCNs, in our soluti
 Our solution is motivated by the observation: \textit{For any topology cycle that could have cyclic buffer dependency during routing reconfiguration, if one buffer dependency edge is permanently removed from the cycle before another different buffer dependency edge is added to the cycle, then cyclic buffer dependency will never be created in this cycle.} 
 
 
-\begin{figure}[t]
-	\centering
-	
-	\subfloat[short for lof][Topology and paths.] {
-		\includegraphics[width=0.45\textwidth] {figs/solution_example_a} 
-	}
-	
-	\subfloat[short for lof][Raw CDG and Fastest CDG.] {
-		\includegraphics[width=0.45\textwidth] {figs/solution_example_b}
-	}
-	
-	\caption{An example to illustrate the solution. The network topology is a 4-node network. In this example, we simply assume the time cost to configuring a path is equal to the number of switches this path traverses in the network.}\label{fig:solution_example}
-	
-\end{figure}
-
 Our solution consists of 3 steps as follows.
 
 \textbf{Step-1: Searching for all the active buffer dependencies.} For every topology cycle that could have cyclic buffer dependency during routing reconfiguration, we find out all the buffer dependencies created by the paths in $R_{old}$ (denoted as $D_{old}$), and all the active buffer dependencies created by the paths in $R_{new}$ (denoted as $D_{new}$). 
@@ -100,9 +85,21 @@ First,  for any operation $oi$ in $O(d^{old}_{lx,ly})$, we create a mirror opera
 \textbf{Step-3: Deriving deadlock-free CDG(s) from the raw deadlock-free CDG.}  For each connected subgraph in the raw CDG we construct,  its dependency edges ensure that one buffer dependency edge is permanently removed from a cycle before another different buffer dependency edge is added to the same cycle. This means that each subgraph in the raw CDG can ensure deadlock-free for a certain cycle. We can derive deadlock-free CDG(s)
 by picking enough subgraphs in the raw CDGs that can guarantee deadlock-free for every cycle in the network.
 
-If the time of any single configuration operation is already known, then we can easily calculate the configuration time of any subgraph in the raw CDG. In this case, By choosing a subgraph with minimum configuration time for each cycle, we can produce a fastest deadlock-free CDG.
+\textbf{Calculation of fastest deadlock-free CDG}: If the time of any single configuration operation is already known, then we can easily calculate the configuration time of any subgraph in the raw CDG. In this case, By choosing a subgraph with minimum configuration time for each cycle, we can produce a fastest deadlock-free CDG.
 
-
+\begin{figure}[t]
+	\centering
+	
+	\subfloat[short for lof][Topology and paths.] {
+		\includegraphics[width=0.26\textwidth] {figs/solution_example_a} 
+	}
+	\subfloat[short for lof][Raw CDG and Fastest CDG.] {
+		\includegraphics[width=0.22\textwidth] {figs/solution_example_b}
+	}
+	
+	\caption{An example to illustrate the solution. The network topology is a 4-node network. In this example, we simply assume the time cost to configure a path is equal to the number of switches this path traverses.}\label{fig:solution_example}
+	\vspace{-0.2in}
+\end{figure}
 
 In Fig.~\ref{fig:solution_example}, we have an example to show how our solution works. As shown in Fig.~\ref{fig:solution_example}(a), the network topology is a 4-node network. The path setting is $\{p1, p3\}\subseteq \textbf{R}_{old}$ and $\{p2, p4\}\subseteq \textbf{R}_{new}$. It is easy to calculate $D_{old}=\{d^{old}_{l1,l2},  d^{old}_{l3,l4}\}$, and $D_{new}=\{d^{new}_{l2,l3},  d^{new}_{l3,l4},  d^{new}_{l4,l1}\}$.  According to the algorithm in step-1, $d^{old}_{l3,l4}$ will be deleted from $D_{old}$ as there exists a buffer dependency $d^{new}_{l3,l4}$ in $D_{new}$.
 

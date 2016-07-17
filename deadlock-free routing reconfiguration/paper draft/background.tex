@@ -13,7 +13,7 @@ Due to the backpressue paradigm of PFC~\cite{tcp-bolt,dcqcn}, data transmission 
 
 \subsection{Cyclic Buffer Dependency}\label{subsec:cyclicbd}
 
-Cyclic buffer dependency is a well-known necessary condition for deadlock problem~\cite{gerla1980flow}.
+Cyclic buffer dependency is a well-known necessary condition for deadlock problem~\cite{gerla1980flow,dally}.
 
 For a given DCN topology $\textbf{N}$ and a routing function $\textbf{R}$, we can construct the corresponding buffer dependency graph as follows. For any two ingress queues $RX_1$ and $RX_2$ in $\textbf{N}$, if there exists a path $p$ that traverses $RX_1$ and  $RX_2$ consecutively, we add a directed dependency edge from $RX_1$ to $RX_2$.  If there are cycles in the constructed buffer dependency graph, we say ($\textbf{N}$, $\textbf{R}$) has cyclic buffer dependency. PFC deadlock could occur when there is cyclic buffer dependency.
 
@@ -23,7 +23,7 @@ PFC deadlock can be avoided by adopting a deadlock-free routing function $\textb
 %
 %PFC Deadlock can be classified into 
 
-\subsection{Deadlock Time in 40Gbps Network}\label{subsec:deadlocktime}
+\subsection{Deadlock Time in High-speed Network}\label{subsec:deadlocktime}
 
 \begin{figure}[t]
 	\centering
@@ -38,7 +38,7 @@ PFC deadlock can be avoided by adopting a deadlock-free routing function $\textb
 			\includegraphics[width=0.45\textwidth] {figs/deadlock_time_c}
 		}
 	\caption{Measurement of the time to create a PFC deadlock in a 3-switch network.}\label{fig:deadlocktime}
-	
+	\vspace{-0.2in}
 \end{figure}
 
 Switches deployed in current DCNs are shallow-buffered commodity switches with only about 8-12MB buffer. As the link capacity goes up to 40Gbps or even more,  switch buffer can be consumed in just a few milliseconds under congestion. This fact also indicates that once cyclic buffer dependency is met, deadlock can occur within a very short time.

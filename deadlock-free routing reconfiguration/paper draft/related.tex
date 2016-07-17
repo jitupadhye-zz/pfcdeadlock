@@ -1,3 +1,12 @@
 \section{Related Works}\label{sec:related}
 
-\todo{to be added.}
+\textbf{RDMA DCNs}: In recent years, both Microsoft~\cite{dcqcn,rdmaatscale} and Google~\cite{timely} are deploying RDMA in their data centers. Unlike traditional TCP, the operation of RDMA needs a lossless network where deadlock is a potential threat. Prevention of deadlock has been demonstrated to be  a hard task even for tree-structured DCNs as the cause for deadlock can be very complicated in practice~\cite{rdmaatscale}.
+
+\textbf{Deadlock-free routing algorithms}: Many algorithms~\cite{tcp-bolt,dally,flich2012survey,sancho2004} of varying complexity and generality have been proposed in the past for producing routing functions that contain no cyclic buffer dependency. While these algorithms can well address the deadlock problem under static circumstances, they cannot eliminate the cyclic buffer dependency that may arise during routing reconfiguration process, as we have demonstrated in Section~\ref{sec:reconfigdeadlock}.
+
+%The necessary condition for avoiding deadlock in lossless network is to eliminate cyclic buffer dependency, as proved by Dally and Sietz~\cite{dally}. 
+
+%\textbf{Congestion-free network update}: Network updates are frequent in DCNs. To avoid packet loss during DCN updates, zUpdate~\cite{zupdate} presents a solution for performing congestion-free network-wide traffic migration. zUpdate may lead to a slow update process as it requires multiple static intermediate stages. Dionysus~\cite{dionysus}, instead, achieves fast  network updates by dynamically scheduling the updates based on runtime differences in the update speeds of different switches. The context of these works is lossy network, where PFC deadlock is not a concern.
+
+\textbf{Deadlock-free routing reconfiguration}: Several deadlock-free routing reconfiguration schemes~\cite{automatic,lysne2005methodology,doublescheme} have been proposed for interprocessor communication networks~\cite{gara2005overview} and high-performance computing systems~\cite{infiniband}. However, these schemes are not desired for large-scale DCNs as they either require multiple static stages for guaranteeing deadlock-free reconfiguration~\cite{automatic,lysne2005methodology}, or require each switch to maintain two seperated routing tables for two virtual networks during routing reconfiguration process~\cite{doublescheme}. Compared with these schemes, our solution targets for achieving fast deadlock-free routing reconfiguration for arbitrary DCNs without expensive requirements for switch hardware. 
+
