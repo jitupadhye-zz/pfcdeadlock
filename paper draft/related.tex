@@ -2,15 +2,16 @@
 \section{Related Work}
 \secspace
 
-\para{RDMA in datacenters.} RDMA has been used for improving distributed application performance,
-like in-memory key value store~\cite{mitchell13atc, farm, kalia14sigcomm}, 
-Hadoop RPC~\cite{hadooprdma} and HBase~\cite{hbaserdma}.
-It has been recently deployed inside modern datacenters~\cite{timely,dcqcn,rdmascale}, based on
-RoCE (RDMA over Converged Ethernet), which relies on PFC creating a lossless Ethernet.
-Recent works~\cite{timely,dcqcn} discuss the transport congestion control protocols. However,
-how to prevent PFC deadlock from happening in the lossless Ethernet has been pointed out 
-but not well addressed. In this paper, we aim to get deeper understanding on deadlock 
-and possible mitigations.
+\para{RDMA in datacenters.} RDMA has been used for improving distributed
+application performance, like in-memory key value store~\cite{mitchell13atc,
+farm, kalia14sigcomm}, Hadoop RPC~\cite{hadooprdma} and HBase~\cite{hbaserdma}.
+It has been recently deployed inside modern
+datacenters~\cite{timely,dcqcn,rdmascale}, based on RoCE (RDMA over Converged
+Ethernet), which relies on PFC to create a lossless Ethernet.  Recent
+work~\cite{timely,dcqcn} discusses congestion control protocols for RoCEv2
+networks. The issue of deadlock is mentioned in these papers, but not directly
+addressed. In this paper, we aim to get deeper understanding on deadlock and
+possible mitigations.
 
 \para{Deadlock-free routing.} To avoid deadlock in lossless networks, previous
 work~\cite{tcpbolt,karol2003prevention,lash,sancho2004,wu2003fault} has focused
