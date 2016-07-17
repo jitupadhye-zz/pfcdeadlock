@@ -1,5 +1,8 @@
 %\vspace{-0.1in}
-\section{Introduction}\label{sec:intro}
+\secspace
+\section{Introduction}
+\secspace
+\label{sec:intro}
 
 In this rather atypical hotnets submission we $(a)$ discuss a problem that is
 quite (c)old, albeit one that has re-emerged in a new context, and $(b)$ admit
@@ -26,7 +29,11 @@ buffer and resume its packet transmission. A simple scenario is illustrated in
 Figure~\ref{fig:deadlock_example}.
 
 \begin{figure}
+\centering
+\includegraphics[width=0.4\textwidth] {figs/deadlock}
+\vspace{-0.15in}
 \caption{PFC-induced deadlock: simple illustration}
+\vspace{-0.15in}
 \label{fig:deadlock_example}
 \end{figure}
 
@@ -38,12 +45,12 @@ For a long time, it was believed that such deadlocks cannot occur in
 clos-structured data-center networks, since a loop cannot form in such networks
 with valley-free routing~\cite{dcqcn}.  However, it is now known that deadlocks
 can indeed occur in clos-structured network, typically as a result of
-misconfiguration (see detailed example in ~\cite{rdma-exp}.). We now believe
+misconfiguration (see detailed example in ~\cite{rdmascale}.). We now believe
 that deadlocks can also occur when transient loops form in clos structured
-networks. In our data centers, these can happen as BGP~\footnote{In our data
+networks. In our data centers, these can happen as BGP\footnote{In our data
 centers, we use BGP for routing, with each switch being a private AS.} re-routes
 around link failures. in SDN-based data centers, transient loops can occur
-during updates~\cite{xxx}.
+during updates~\cite{dionysus}.
 
 Hence it is necessary to design some mechanism for handling the deadlock
 problem when deploying RDMA in datacenter networks. 
