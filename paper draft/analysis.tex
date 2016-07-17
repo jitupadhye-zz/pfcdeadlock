@@ -192,28 +192,6 @@ To understand such scenarios, we must analyze and simulate them at packet level.
  device then stop sending any packet to this ingress queue unless 1) the pause frame has 
  expired; 2) or it has received a resume frame from this ingress queue.
 
-
-\begin{figure*}[t]
-%\vspace{-0.1in}
-\centering
-
-\subfigure[Topology and flows] {
-    \includegraphics[width=0.3\textwidth] {figs/case2_topo}
-}
-\subfigure[Buffer dependency graph]{
-    \includegraphics[width=0.22\textwidth] {figs/case2_buffer_dependency}
-}
-\subfigure[Pause events at four links]{
-    \includegraphics[width=0.24\textwidth] {figs/case2_pause.eps}
-}
-\vspace{-0.15in}
-\caption{Slightly different traffic matrix leads to deadlock, even though
-the flow-level analysis shows that the average throughput of flow 1 and flow 2 should not be affected.
-}
-\vspace{-0.15in}
-\label{fig:case2}
-\end{figure*}
-
 In our simulations, we configure static routing on all switches so that flow paths are enforced. 
 Both flows are UDP flows with infinite traffic demand. Link capacity of 
 all links is 40Gbps. All the switches have 12MB buffer. PFC threshold is statically set to 40KB for 
@@ -250,6 +228,49 @@ focuses on {\em average} flow throughput.
 %
 %Since packets of flow 1 buffered in TX1 of B can get transmitted at full link speed when link L2 is not paused, TX1 queue of B can not easily build up. As we can see in Figure~\ref{fig:case1}(e), buffer occupancy of flow 1 at TX1 of B fluctuates between 0KB and 18KB, which . Hence as we can see in Figure~\ref{fig:case1}(c), link L1 is never paused by RX1 of C.
 
+\begin{figure*}[t]
+%\vspace{-0.1in}
+\centering
+
+\subfigure[Topology and flows] {
+    \includegraphics[width=0.3\textwidth] {figs/case2_topo}
+}
+\subfigure[Buffer dependency graph]{
+    \includegraphics[width=0.22\textwidth] {figs/case2_buffer_dependency}
+}
+\subfigure[Pause events at four links]{
+    \includegraphics[width=0.24\textwidth] {figs/case2_pause.eps}
+}
+\vspace{-0.15in}
+\caption{Slightly different traffic matrix leads to deadlock, even though
+the flow-level analysis shows that the average throughput of flow 1 and flow 2 should not be affected.
+}
+\vspace{-0.2in}
+\label{fig:case2}
+\end{figure*}
+
+
+\begin{figure*}[t]
+%\vspace{-0.1in}
+\centering
+
+\subfigure[Topology and flows] {
+    \includegraphics[width=0.22\textwidth] {figs/deadlock_case_4_topo}
+}
+\subfigure[Pause events at four links]{
+    \includegraphics[width=0.24\textwidth] {figs/pause_event_limit2G.eps}
+}
+\subfigure[2Gbps rate limiter, no deadlock]{
+    \includegraphics[width=0.24\textwidth] {figs/buffer_occupancy_B_limit2G.eps}
+}
+\subfigure[3Gbps rate limiter, deadlock]{
+    \includegraphics[width=0.24\textwidth] {figs/buffer_occupancy_B_limit3G.eps}
+}
+\vspace{-0.15in}
+\caption{Different rate limiting determines whether the deadlock occurs.}
+\vspace{-0.15in}
+\label{fig:case3}
+\end{figure*}
 
 
 \para{Slightly different traffic matrix leads to deadlock:} as shown in Figure~\ref{fig:case2}(a), based on the previous case, we 
@@ -302,29 +323,6 @@ A slightly different matrix that does not significantly affect stable flow state
 to very different packet-level behavior, thus different deadlock results. 
 Though packet-level simulations help us understand these scenarios, we so far do not find
 any analytic tools that are at packet-level and work for above cases.
-
-
-\begin{figure*}[t]
-%\vspace{-0.1in}
-\centering
-
-\subfigure[Topology and flows] {
-    \includegraphics[width=0.22\textwidth] {figs/deadlock_case_4_topo}
-}
-\subfigure[Pause events at four links]{
-    \includegraphics[width=0.24\textwidth] {figs/pause_event_limit2G.eps}
-}
-\subfigure[2Gbps rate limiter, no deadlock]{
-    \includegraphics[width=0.24\textwidth] {figs/buffer_occupancy_B_limit2G.eps}
-}
-\subfigure[3Gbps rate limiter, deadlock]{
-    \includegraphics[width=0.24\textwidth] {figs/buffer_occupancy_B_limit3G.eps}
-}
-\vspace{-0.15in}
-\caption{Different rate limiting determines whether the deadlock occurs.}
-\vspace{-0.15in}
-\label{fig:case3}
-\end{figure*}
 
 \secspace
 \subsection{Case 3: Rate Limiting Mitigates Deadlock}
