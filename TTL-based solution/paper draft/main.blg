@@ -1,0 +1,54 @@
+This is BibTeX, Version 0.99d (TeX Live 2015)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: main.aux
+The style file: plain.bst
+Database file #1: reference.bib
+Warning--to sort, need author or key in pfcheadroom
+Warning--empty year in sizingrouterbuffer
+Warning--empty year in chuang1999matching
+Warning--empty year in rdmaatscale
+Warning--empty year in islip
+Warning--empty year in crtt
+Warning--empty year in dcqcn
+You've used 8 entries,
+            2118 wiz_defined-function locations,
+            530 strings with 5395 characters,
+and the built_in function-call counts, 2520 in all, are:
+= -- 206
+> -- 181
+< -- 0
++ -- 73
+- -- 64
+* -- 184
+:= -- 444
+add.period$ -- 23
+call.type$ -- 8
+change.case$ -- 56
+chr.to.int$ -- 0
+cite$ -- 15
+duplicate$ -- 89
+empty$ -- 176
+format.name$ -- 64
+if$ -- 493
+int.to.chr$ -- 0
+int.to.str$ -- 8
+missing$ -- 7
+newline$ -- 42
+num.names$ -- 14
+pop$ -- 83
+preamble$ -- 1
+purify$ -- 48
+quote$ -- 0
+skip$ -- 53
+stack$ -- 0
+substring$ -- 41
+swap$ -- 11
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 32
+warning$ -- 7
+while$ -- 14
+width$ -- 9
+write$ -- 74
+(There were 7 warnings)

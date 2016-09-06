@@ -1,0 +1,50 @@
+\begin{thebibliography}{1}
+
+\bibitem{pfcheadroom}
+Priority flow control: Build reliable layer 2 infrastructure.
+\newblock
+  \url{http://www.cisco.com/c/en/us/products/collateral/switches/nexus-7000-series-switches/white_paper_c11-542809.pdf
+  }.
+
+\bibitem{sizingrouterbuffer}
+Guido Appenzeller, Isaac Keslassy, and Nick McKeown.
+\newblock Sizing router buffers.
+\newblock In {\em Proceedings of the 2004 Conference on Applications,
+  Technologies, Architectures, and Protocols for Computer Communications},
+  SIGCOMM '04.
+
+\bibitem{chuang1999matching}
+Shang-Tse Chuang, Ashish Goel, Nick McKeown, and Balaji Prabhakar.
+\newblock Matching output queueing with a combined input/output-queued switch.
+\newblock {\em IEEE Journal on Selected Areas in Communications}.
+
+\bibitem{rdmaatscale}
+Chuanxiong Guo, Haitao Wu, Zhong Deng, Gaurav Soni, Jianxi Ye, Jitendra Padhye,
+  and Marina Lipshteyn.
+\newblock Rdma over commodity ethernet at scale.
+\newblock In {\em SIGCOMM '16}.
+
+\bibitem{islip}
+Nick McKeown.
+\newblock The islip scheduling algorithm for input-queued switches.
+\newblock {\em IEEE/ACM Trans. Netw.}
+
+\bibitem{tinytera}
+Nick McKeown, Martin Izzard, Adisak Mekkittikul, William Ellersick, and Mark
+  Horowitz.
+\newblock Tiny tera: a packet switch core.
+\newblock {\em IEEE Micro}, 1997.
+
+\bibitem{crtt}
+Curtis Villamizar and Cheng Song.
+\newblock High performance tcp in ansnet.
+\newblock {\em SIGCOMM Comput. Commun. Rev.}
+
+\bibitem{dcqcn}
+Yibo Zhu, Haggai Eran, Daniel Firestone, Chuanxiong Guo, Marina Lipshteyn,
+  Yehonatan Liron, Jitendra Padhye, Shachar Raindel, Mohamad~Haj Yahia, and
+  Ming Zhang.
+\newblock Congestion control for large-scale rdma deployments.
+\newblock In {\em SIGCOMM '15}.
+
+\end{thebibliography}
