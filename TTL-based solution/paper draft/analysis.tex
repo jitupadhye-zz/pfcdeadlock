@@ -39,34 +39,34 @@ According to the above parameters, when  $r_l=40Gbps$, the per port per priority
 
 \textbf{PFC headroom of a switch:} For a $n$ port switch which supports $k$ priority classes, PFC PAUSE is possible to be triggered at all ports and priority classes simultaneously. So we should at least reserve $n*k*b_{hr}$ buffers as PFC headroom at every switch. 
 
-For commodity switches like Arista 7050QX32 which has 32 full duplex 40Gbps ports, when supporting 8 priority classes, it requires about $32*8*22=5632$KB buffer per prioriry as the PFC headroom.
+For commodity switches like Arista 7050QX32 which has 32 full duplex 40Gbps ports, when supporting 8 priority classes, it requires about $32*8*22=5632$KB buffer as the PFC headroom.
 
-\subsection{Necessary Buffer for Achieving Work-Conservation}\label{subsec:bufferthroughput}
+\textbf{Reducing the PFC headroom}: For tree-based topologies like Fat-tree, packets of consecutive priority classes will not enter the same switch. So the number of priority classes a switch needs to support is halved.  This reduces the needed PFC headroom to $2816$KB, which is about $22.9\%$ of the total 12MB switch buffer.
 
-According to the rule-of-thumb~\cite{crtt,sizingrouterbuffer}, we at least need a buffer of size $b = C*RTT$ per port for achieving work-conservation, where RTT is the average round-trip time, and C is the link capacity. As our TTL-based solution allocates dedicated buffer to different priority classes, for a switch of n ports, when supporting $k$ priority classes, it demands a buffer of size $n*k*C*RTT$. 
 
-Assuming that the average RTT in the DCN is $50$us. For Arista 7050QX32 switch, when supporting 8 priority classes, we need to reserve a buffer of size $32*8*40Gbps*50us=64MB$. This apparently exceeds the total buffer size of most commodity switches. The key to solving this problem is to let packets of different priority classes share some buffer.
 
-On the other hand, we also need to ensure that PFC threshold is not reached before the switch has a chance to mark packets with ECN. This has been well discussed in DCQCN~\cite{dcqcn}. Basically, we can leverage a dynamic PFC thresholding scheme to dynamically share the switch buffer among different ports.
+%\subsection{Necessary Buffer for Achieving Work-Conservation}\label{subsec:bufferthroughput}
+%
+%According to the rule-of-thumb~\cite{crtt,sizingrouterbuffer}, we at least need a buffer of size $b = C*RTT$ per port for achieving work-conservation, where RTT is the average round-trip time, and C is the link capacity. As our TTL-based solution allocates dedicated buffer to different priority classes, for a switch of n ports, when supporting $k$ priority classes, it demands a buffer of size $n*k*C*RTT$. 
+%
+%Assuming that the average RTT in the DCN is $50$us. For Arista 7050QX32 switch, when supporting 8 priority classes, we need to reserve a buffer of size $32*8*40Gbps*50us=64MB$. This apparently exceeds the total buffer size of most commodity switches. The key to solving this problem is to let packets of different priority classes share some buffer.
+%
+%On the other hand, we also need to ensure that PFC threshold is not reached before the switch has a chance to mark packets with ECN. This has been well discussed in DCQCN~\cite{dcqcn}. Basically, we can leverage a dynamic PFC thresholding scheme to dynamically share the switch buffer among different ports.
 
-\subsection{Preliminary Solution For Reducing Buffer Demand}\label{subsec:solforreducebuffer}
-
-\textbf{Reducing the PFC headroom}: For tree-based topologies like Fat-tree, packets of consecutive priority classes will not enter the same switch. So the number of priority classes a switch needs to support is halved. In addition, if we enforce that every switch drops the packets bounced back by the immediate downstream devices, a switch needs to support only $1/4$ of the total priority classes in use.
-
-\textbf{Reducing the necessary buffer for achieving work-conservation}: The main problem here is that our TTL-based solution allocates dedicated buffer to different priority classes. To solve this problem, instead of simply allocating dedicated buffer to different priority classes, we can let packets of different priority classes to have both dedicated and shared buffer.
-
-Specifically, we divide the switch buffer into $k+1$ partitions. The first $k$ partitions are dedicated for the k priority classes, correspondingly. The $k+1$ partition is shared by all the priority classes. If a packet is classified as priority class $i$, at first the switch will check whether partion $i$ has enough spare buffer to accommodate this packet. If yes, this packet will be placed in partition $i$. Otherwise, the switch will place this packet in partition $k+1$.
-
-The original dynamic PFC thresholding scheme cannot be directly applied under the new buffer allocation scheme. Hence we modify it as follows. Let $b_i$ be the size of partition $i$, $t^i_{PFC}$ be the PFC threshold for priority class $i$, $s_i$ be the amount of buffer of partition $i$ that is currently occupied. We have
-
-\begin{eqnarray} \label{eqn:pfcthreshold}
-t^i_{PFC} &=& \alpha\frac{b_i}{\sum_{j=1}^k b_j} (b_{k+1}-s_{k+1}) + \alpha (b_i-s_i)
-\end{eqnarray}
-
-The intuition behind Equation~\ref{eqn:pfcthreshold} is to share the buffer of partition $k+1$ among different priority classes with respect to the weight $\frac{b_i}{\sum_{j=1}^k b_j}$. As for the buffer of dedicated partitions, we follow the idea of original dynamic PFC thresholding scheme to dynamically share it among different ports within the same priority class.
-
-Under the new buffer allocation scheme and the new dynamic PFC thresholding scheme, the buffer needed for achieving work-conservation is reduced to 
-$n*C*RTT$, which is within the buffer capacity of most commodity switches.
+%\textbf{Reducing the necessary buffer for achieving work-conservation}: The main problem here is that our TTL-based solution allocates dedicated buffer to different priority classes. To solve this problem, instead of simply allocating dedicated buffer to different priority classes, we can let packets of different priority classes to have both dedicated and shared buffer.
+%
+%Specifically, we divide the switch buffer into $k+1$ partitions. The first $k$ partitions are dedicated for the k priority classes, correspondingly. The $k+1$ partition is shared by all the priority classes. If a packet is classified as priority class $i$, at first the switch will check whether partion $i$ has enough spare buffer to accommodate this packet. If yes, this packet will be placed in partition $i$. Otherwise, the switch will place this packet in partition $k+1$.
+%
+%The original dynamic PFC thresholding scheme cannot be directly applied under the new buffer allocation scheme. Hence we modify it as follows. Let $b_i$ be the size of partition $i$, $t^i_{PFC}$ be the PFC threshold for priority class $i$, $s_i$ be the amount of buffer of partition $i$ that is currently occupied. We have
+%
+%\begin{eqnarray} \label{eqn:pfcthreshold}
+%t^i_{PFC} &=& \alpha\frac{b_i}{\sum_{j=1}^k b_j} (b_{k+1}-s_{k+1}) + \alpha (b_i-s_i)
+%\end{eqnarray}
+%
+%The intuition behind Equation~\ref{eqn:pfcthreshold} is to share the buffer of partition $k+1$ among different priority classes with respect to the weight $\frac{b_i}{\sum_{j=1}^k b_j}$. As for the buffer of dedicated partitions, we follow the idea of original dynamic PFC thresholding scheme to dynamically share it among different ports within the same priority class.
+%
+%Under the new buffer allocation scheme and the new dynamic PFC thresholding scheme, the buffer needed for achieving work-conservation is reduced to 
+%$n*C*RTT$, which is within the buffer capacity of most commodity switches.
 %\textbf{ Case of multiple priority classes:} When $k$ priority classes are enabled simultaneously at a single port, we cannot simply calculate the PFC headroom of a switch as $k*b_{hr}$. The reason is that in this case packets of any priority class cannot be transmitted at full line rate as the bandwidth is now shared by $k$ priority classes. Let $r_i$ be the packet transmission rate of priority class $i$, $1\leq i \leq k$. The per port PFC headroom of priority class $i$ can be expressed using the following equation
 %
 %\begin{eqnarray} \label{eqn:mpriority}

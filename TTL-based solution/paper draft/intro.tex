@@ -70,7 +70,7 @@ Let $d$ be the number of hops of the longest legal routing path in the network, 
 	\item Let $ttl_i$ be the TTL value of a packet $p$ at its $i$-$th$ hop ($i \geq 0$). If $ttl_i = 0$, packet $p$ will be dropped by the receiving switch or server. At every hop, the priority class of any incoming packet $p$ is calculated as $\lambda_p = ttl_0 - ttl_i $. Packet $p$ will be buffered and queued according to the calculated priority class $\lambda_p$ at every hop.
 \end{enumerate}
 
-\subsection{Proof of Deadlock-free}\label{subsec:proof}
+\subsection{Proof of Deadlock-free Property}\label{subsec:proof}
 In this part, we are going to prove that our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
 
 In our proof, we use $p_{size}$, $p_{ttl}$ and $p_{dst}$ to denote the size, the TTL value and the destination of a packet $p$, respectively. Any ingress queue $q_{in}^{i,j}$ and any egress queue $q_{out}^{i,j}$ are viewed as packet sets. According to the switch model, we have $q_{in}^{i}=\cup_{j=1}^{k}q_{in}^{i,j}$, and $q_{out}^{i}=\cup_{j=1}^{k}q_{out}^{i,j}$.
@@ -124,9 +124,9 @@ Let $t_{cost}(f)$ be the time cost of performing switch function $f$. In the fol
 	\item \textbf{PFC threshold is no smaller than maximum transmission unit (MTU):} Formally, we have $t_{PFC}\ge s_{MTU}$.
 	
 	\item \textbf{Finite packet scheduling time:} We assume that packet scheduling functions can decide the next packet to be processed within finite time. Formally, $f^{in}_{sche}$ and $f^{out}_{sche}$ should satisfy the following constraints at any network node:
-		\begin{align} \label{eqn:schecon}
-    	t_{cost}(f^{in}_{sche}(q_{in}^{i})) < \infty ,1\leq i \leq n\\
-	    t_{cost}(f^{out}_{sche}(q_{out}^{i})) < \infty, 1\leq i \leq n
+		\begin{align} 
+    	t_{cost}(f^{in}_{sche}(q_{in}^{i})) < \infty ,1\leq i \leq n \label{eqn:schecon1}\\
+	    t_{cost}(f^{out}_{sche}(q_{out}^{i})) < \infty, 1\leq i \leq n \label{eqn:schecon2}
 		\end{align}
 		
 	\item \textbf{No selection of duplicated packet:} the packet scheduling function $f^{in}_{sche}$ will not select the same packet twice. Formally, 
@@ -172,8 +172,8 @@ Let $t_{cost}(f)$ be the time cost of performing switch function $f$. In the fol
    
    \textbf{Legal buffer state:} We say $BS_u$ is a legal buffer state for node $u$ when the following two conditions are satisfied:
    \begin{align} \label{eqn:legalstatecon}
-    |q_{in}^{i}|<\infty\quad  \text{and}\quad   |q_{out}^{i}|<\infty, \quad 1\leq i \leq n \\
-    |q_{in}^{i,j}|\leq t_{PFC}, \quad 1\leq i \leq n, 1\leq j \leq k
+    |q_{in}^{i}|<\infty\quad  \text{and}\quad   |q_{out}^{i}|<\infty, \quad 1\leq i \leq n
+%    |q_{in}^{i,j}|\leq t_{PFC}, \quad 1\leq i \leq n, 1\leq j \leq k \label{eqn:legalstatecon2}
    \end{align}
    
    We say $BS_N$ is a legal buffer state when the buffer state of every node in $N$ is legal.
@@ -193,25 +193,32 @@ Let $t_{cost}(f)$ be the time cost of performing switch function $f$. In the fol
   
     \subsubsection{Proof of deadlock-free}
     
-%     \textbf{Lemma 1}: for arbitrary non-deadlocked buffer state $BS_N(t)$, when no new packets are injected into the network since $t$, there exists a finite $t_0>t$, $BS_N(t_0)=BS^0_N$.
-%     
-%      \textbf{Proof}: Assuming that there does not exist a finite $t_0>t$, $BS_N(t_0)=BS^0_N$. As $BS_N(t)$ is a non-deadlocked buffer state, according to Equation~\ref{eqn:deadlockstatedef}, $BS_N(t)$ will not converge into any fixed non-empty buffer state. 
-%      
-%      Let $BS_N(t_1), \dots, BS_N(t_i), \dots$ be the buffer states $BS_N(t)$ will transition to in sequence since $t$. Let $Sum_{TTL}(BS_N(t))$ be the sum of TTL values of all packets 
-%      
-%      We consider any transition from $BS_N(t_i)$ to $BS_N(t_{i+1})$, $i>0$,
-%      
-%      \textbf{}
+
     
     \textbf{Claim:} our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
   
-    \textbf{Proof:} To prove our TTL-based solution is deadlock-free, we prove by contradiction that no legal buffer state $BS_N(t)$ is deadlocked buffer state under our TTL-based solution.
+    \textbf{Proof:} To prove our TTL-based solution is deadlock-free, we prove by contradiction that no legal buffer state can be deadlocked buffer state under our TTL-based solution.
     
-    Assuming there exists a legal buffer state  $BS_N(t)$ which is also a deadlocked buffer state under our TTL-based solution. If no new packets are injected into the network since $t$, according to Equation~\ref{eqn:deadlockstatedef}, $BS_N(t)$ will converge into a fixed non-empty buffer state $BS_N(t_0)$ at some finite time $t_0>t$. 
+    Assuming there exists a legal buffer state  $BS_N(t)$ which is also a deadlocked buffer state under our TTL-based solution. If no new packets are injected into the network since $t$, according to Equation~(\ref{eqn:deadlockstatedef}), $BS_N(t)$ will converge into a fixed non-empty buffer state $BS_N(t_0)$ at some finite time $t_0>t$. 
     
-   According to Equations (6)-(9), any unscheduled packet remaining in any VIQ will be forwarded to some VIQ within some finite time. Assuming that there is no packet
+    
+   \textbf{Case 1:} All the VEQs in $BS_N(t_0)$ is empty. As $BS_N(t_0) \neq BS^0_N$, $BS_N(t_0)$ has at least one non-empty VIQ. As $BS_N(t)$ is a legal buffer state, accroding to Equation~(\ref{eqn:legalstatecon}), there are finite number of packets queued in non-empty VIQs of $BS_N(t_0)$. Then according to Equations~(\ref{eqn:schecon1}), (\ref{eqn:nodupschedule}) and (\ref{eqn:fwdcon}), any unscheduled packet remaining in any VIQ will be forwarded to some VEQ within finite time at some finite time $t_2>t_0$. This means that $BS_N(t_0)$ will transition to some other buffer state, which violates the fact that $\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
    
-   As we have $\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0) \quad \text{and} \quad BS_N(t_0) \neq BS^0_N.$ All the packets remaining in $N$ must have been forwarded to their destined VEQs. Otherwise, $BS_N(t_0)$  buffer
+   \textbf{Case 2:} There exist some non-empty VEQs (at least one) in $BS_N(t_0)$. Let $q_{out}^{i,m}$ be the queue of highest priority class among all the non-empty VEQ queues ($m\leq k$). Under our TTL-based solution, packets in $q_{out}^{i,m}$ will not be paused by PFC PAUSE messages as packets can only be paused by packets of higher priority class. According to Equations~(\ref{eqn:schecon2}) and (\ref{eqn:transcon}), packets in $q_{out}^{i,m}$ will be transmitted to next hop within finite time. This means that $BS_N(t_0)$ will transition to some other buffer state  at some finite time $t_2>t_0$, which violates the fact that $\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
+   
+   Based on the above discussion, the assumption we made will cause contradiction in both cases. Hence $BS_N(t)$ is not a deadlocked buffer state under our TTL-based solution. So our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
+    
+    
+    
+    %     \textbf{Lemma 1}: for arbitrary non-deadlocked buffer state $BS_N(t)$, when no new packets are injected into the network since $t$, there exists a finite $t_0>t$, $BS_N(t_0)=BS^0_N$.
+    %     
+    %      \textbf{Proof}: Assuming that there does not exist a finite $t_0>t$, $BS_N(t_0)=BS^0_N$. As $BS_N(t)$ is a non-deadlocked buffer state, according to Equation~\ref{eqn:deadlockstatedef}, $BS_N(t)$ will not converge into any fixed non-empty buffer state. 
+    %      
+    %      Let $BS_N(t_1), \dots, BS_N(t_i), \dots$ be the buffer states $BS_N(t)$ will transition to in sequence since $t$. Let $Sum_{TTL}(BS_N(t))$ be the sum of TTL values of all packets 
+    %      
+    %      We consider any transition from $BS_N(t_i)$ to $BS_N(t_{i+1})$, $i>0$,
+    %      
+    %      \textbf{}
     
 %\textcolor{red}{To be added.}
 

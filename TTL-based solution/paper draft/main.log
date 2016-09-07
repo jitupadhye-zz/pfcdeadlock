@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.8.27)  7 SEP 2016 00:10
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.8.27)  7 SEP 2016 08:21
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -789,13 +789,28 @@ Overfull \hbox (2.91716pt too wide) in paragraph at lines 146--147
 []\T1/ptm/b/n/10 Finite packet trans-mis-sion time when no PFC pause:
  []
 
-) (./analysis.tex
+
+Overfull \hbox (7.54128pt too wide) in paragraph at lines 205--206
+[]\T1/ptm/b/n/10 Case 1: \T1/ptm/m/n/10 All the VEQs in $\OML/cmm/m/it/10 BS[]\
+OT1/cmr/m/n/10 (\OML/cmm/m/it/10 t[]\OT1/cmr/m/n/10 )$ \T1/ptm/m/n/10 is empty.
+ As $\OML/cmm/m/it/10 BS[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 t[]\OT1/cmr/m/n/10 
+) \OMS/cmsy/m/n/10 6\OT1/cmr/m/n/10 =
+ []
+
+
+Overfull \hbox (11.02704pt too wide) in paragraph at lines 205--206
+\T1/ptm/m/n/10 nite num-ber of pack-ets queued in non-empty VIQs of $\OML/cmm/m
+/it/10 BS[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 t[]\OT1/cmr/m/n/10 )$\T1/ptm/m/n/1
+0 .
+ []
+
+[3]) (./analysis.tex
 Overfull \hbox (1.3396pt too wide) in paragraph at lines 13--14
 \T1/ptm/b/n/10 side (de-noted as $\OML/cmm/m/it/10 t[]$\T1/ptm/b/n/10 )\T1/ptm/
 m/n/10 : The trans-mis-sion of the PAUSE
  []
 
-[3]
+
 Overfull \hbox (14.00122pt too wide) in paragraph at lines 17--18
 \T1/ptm/b/n/10 side (de-noted as $\OML/cmm/m/it/10 t[]$\T1/ptm/b/n/10 )\T1/ptm/
 m/n/10 : It is easy to know $\OML/cmm/m/it/10 t[] \OT1/cmr/m/n/10 = \OML/cmm/m/
@@ -819,23 +834,12 @@ Overfull \hbox (11.49802pt too wide) in paragraph at lines 42--43
 sses,
  []
 
-
-Overfull \hbox (38.24742pt too wide) in paragraph at lines 56--57
-[]\T1/ptm/b/n/10 Reducing the nec-es-sary buffer for achiev-ing work-conservati
-on\T1/ptm/m/n/10 :
- []
-
-[4])
-Overfull \hbox (5.39723pt too wide) in paragraph at lines 68--197
-\T1/ptm/m/n/10 namic PFC thresh-old-ing scheme, the buffer needed for achiev-
- []
-
-(./main.bbl
+) (./main.bbl
 LaTeX Font Info:    Try loading font information for T1+pcr on input line 7.
  (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
-))
-[5
+)
+[4]) [5
 
 ] (./main.aux)
 
@@ -843,33 +847,32 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 7919 strings out of 493089
- 115763 string characters out of 6134842
- 196765 words of memory out of 5000000
- 11169 multiletter control sequences out of 15000+600000
+ 7918 strings out of 493089
+ 115735 string characters out of 6134842
+ 195765 words of memory out of 5000000
+ 11168 multiletter control sequences out of 15000+600000
  50145 words of font info for 59 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  61i,17n,96p,814b,370s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/te
-xlive/2015/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex7.pfb></usr/local
-/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/
-texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/te
-xlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texl
-ive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texliv
-e/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/2
-015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2015
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2015/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2015/te
-xmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2015/texmf-dist
-/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/
-type1/urw/times/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/
-times/utmr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmr
-i8a.pfb>
-Output written on main.pdf (5 pages, 202948 bytes).
+xlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/tex
+live/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/texli
+ve/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive
+/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2
+015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/2015
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2015/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2015/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2015/texmf
+-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2015/texmf-dist/fo
+nts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/typ
+e1/urw/times/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/tim
+es/utmr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmri8a
+.pfb>
+Output written on main.pdf (5 pages, 192632 bytes).
 PDF statistics:
- 108 PDF objects out of 1000 (max. 8388607)
- 78 compressed objects within 1 object stream
+ 104 PDF objects out of 1000 (max. 8388607)
+ 75 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  6 words of extra memory for PDF output out of 10000 (max. 10000000)
 
