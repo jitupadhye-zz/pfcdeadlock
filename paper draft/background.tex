@@ -1,21 +1,28 @@
-\secspacelarge
+%\secspacelarge
 \section{Deadlock in Lossless Network}
-\secspace
+%\secspace
 
 We now briefly discuss how deadlocks form in lossless networks, and why we must
 study the necessary and sufficient conditions of deadlock formation.
 
-\para{Lossless Ethernet relies on PFC.} Modern datacenter networks require
-efficient network stacks in order to support high bandwidth and low latency.
-RDMA over Ethernet, or RoCE, is one of the most popular solutions and has been
-deployed in Google and Microsoft datacenters~\cite{dcqcn, timely}.  The key
-property of RoCE is that it runs on a lossless Ethernet, in which no packet can
-be dropped due to congestion.  Lossless is achieved by enabling PFC
-(Priority-based Flow Control). With the PFC PAUSE mechanism, a switch can pause
+%\para{Lossless Ethernet relies on PFC.} Modern datacenter networks require
+%efficient network stacks in order to support high bandwidth and low latency.
+%RDMA over Ethernet, or RoCE, is one of the most popular solutions and has been
+%deployed in Google and Microsoft datacenters~\cite{dcqcn, timely}.  The key
+%property of RoCE is that it runs on a lossless Ethernet, in which no packet can
+%be dropped due to congestion.  Lossless is achieved by enabling PFC
+%(Priority-based Flow Control). With the PFC PAUSE mechanism, a switch can pause
+%an incoming link when its ingress buffer occupancy reaches a preset threshold.
+%Properly tuned, the buffer is never full, and no packet is dropped due to
+%insufficient buffer space.  Unfortunately, deadlock may occur in such lossless
+%networks.
+
+\para{Lossless Ethernet relies on PFC.} \textcolor{red}{RDMA over Ethernet, or RoCE, is one of the most popular RDMA solutions, and has been
+deployed in Google and Microsoft datacenters~\cite{dcqcn, timely}.  RoCE runs over a lossless Ethernet achieved by enabling PFC. With the PFC PAUSE mechanism, a switch can pause
 an incoming link when its ingress buffer occupancy reaches a preset threshold.
 Properly tuned, the buffer is never full, and no packet is dropped due to
 insufficient buffer space.  Unfortunately, deadlock may occur in such lossless
-networks.
+networks.}
 
 \para{PFC may lead to deadlock, if paused links form a cycle.} In a PFC-enabled
 network, if a subset of links congests and the corresponding switch queue
@@ -26,7 +33,7 @@ there is no more new traffic injected into this cycle.
 
 This essentially means that there is {\em cyclic buffer dependency} -- every
 link is waiting for its next hop to RESUME the link, and since there is a cycle,
-no link makes progress. 
+no link makes progress.
 
 To avoid deadlock, {\em deadlock-free routing}~\cite{tcpbolt} has been
 proposed. It guarantees that (if the routing configuration is correct,) any
@@ -38,13 +45,13 @@ dependency~\cite{deadlockfree}.  However, ensuring that there is never any
 cyclic buffer dependency is challenging.
 
 First, deadlock-free routing largely limits the choice of topology. For example,
-\cite{tcpbolt} proposes to only use tree-based topology and routing, and shows
+\textcolor{red}{Stephens et al. \cite{tcpbolt} proposes to only use tree-based topology and routing, and shows
 that it is deadlock-free.  However, tree-based topology and routing has
 well-known problems including oversubscription~\cite{fattree}, large path
-length~\cite{jellyfish} and vulnerable to failures.  Thus, there are a number of
-other datacenter topology and routing schemes that are not
+length~\cite{jellyfish} and vulnerability to failures.  Thus, there are a number of
+other datacenter topologies and routing schemes that are not
 tree-based~\cite{bcube, camcube, jellyfish}, and do not have deadlock-free
-guarantee.
+guarantee.}
 
 Second, due to bugs or misconfiguration, deadlock-free routing configuration may
 turn into deadlock-vulnerable. In fact, recent work has observed a PFC deadlock

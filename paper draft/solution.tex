@@ -1,7 +1,7 @@
-\secspacelarge
+%\secspacelarge
 \section{Potential Deadlock Mitigations}
 \label{sec:mitigation}
-\secspace
+%\secspace
 
 Since cyclic buffer dependency is just a necessary condition for deadlock, there
 are mitigation mechanisms that avoid deadlock even if cyclic buffer dependency
@@ -41,7 +41,7 @@ blocking problem. The damage of HoL and the potential deadlock caused by PFC is
 significant because the pause frames are generated near the destination or in
 the middle of the network, where network congestion usually happen. Hence if we
 can limit the PFC pause frame propagation -- or just generate them near the
-source, we can reduce the damage of both deadlock and HoL blocking. 
+source, we can reduce the damage of both deadlock and HoL blocking.
 
 Here we describe several possible ways of doing so: first, we can assign
 different PFC thresholds to the ports of a switch based on their position in the
@@ -59,11 +59,11 @@ trade-off requires further study.
 DCQCN~\cite{dcqcn} and TIMELY~\cite{timely} are designed to reduce the
 possibility of PFC generation. But due to the feedback latency of end-to-end
 delay, neither algorithm can detect congestion instantaneously, and thus they
-cannot completely prevent PFC from been generated. 
+cannot completely prevent PFC from been generated.
 
 One possible way to further reduce PFC is to integrate DCQCN together with
 phantom queuing, like~\cite{Alizadeh12}. By reacting to the phantom queues that
-assume lower link speed, congestion signals are generated much earlier. 
+assume lower link speed, congestion signals are generated much earlier.
 
 \para{Other possible mechanisms.} In future work, a deeper understanding of
 tighter conditions for deadlock may lead to more deadlock mitigation mechanisms
