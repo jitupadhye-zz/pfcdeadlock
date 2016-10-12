@@ -6,7 +6,9 @@
 %\documentclass[twocolumn,10pt]{IEEEtran}
 %\documentclass[twocolumn,10pt]{article}
 %\usepackage[sort,nocompress,space]{cite}
-\documentclass{sig-alternate-10pt}
+%\documentclass{sig-alternate-10pt}
+\documentclass{hotnets16-cr}
+
 %\documentclass[letterpaper,twocolumn,10pt]{article}
 \usepackage{epsfig,endnotes}
 %\usepackage[letterpaper]{geometry}
@@ -46,6 +48,7 @@
 
 
 \usepackage{url}
+\usepackage{acmcopyright}
 \usepackage[sort,space]{cite}
 \usepackage{lineno}
 \renewcommand\linenumberfont{\normalfont\bfseries\small}
@@ -121,7 +124,7 @@
 \newcommand{\parae}[1]{\paraspace\noindent{\em #1} }
 \newcommand{\parabe}[1]{\paraspace\noindent{\bf \em #1} }
 %\newcommand{\kai}[1]{{\color{blue}[Kai: #1]}}
-\newcommand{\todo}{\textcolor{red}}
+\newcommand{\revise}{\textcolor{black}}
 
 \def\naive{na\"\i ve}
 
@@ -187,11 +190,18 @@
 %\conferenceinfo{SIGCOMM,} {XXXXXX, XXXXX, XXXXX, XXXXX.} %
 %\CopyrightYear{2009} \crdata{1-59593-308-5/06/0009}
 
+\CopyrightYear{2016} 
+\setcopyright{acmcopyright}
+\conferenceinfo{HotNets-XV,}{November 09-10, 2016, Atlanta, GA, USA}
+\isbn{978-1-4503-4661-0/16/11}\acmPrice{\$15.00}
+\doi{http://dx.doi.org/10.1145/3005745.3005760}
+
 \title{Deadlocks in Datacenter Networks: Why Do They Form, and How to Avoid Them}
-\author{Paper \#67}
+\author{Shuihai Hu$^{1,2}$~~~Yibo Zhu$^{1}$~~~Peng Cheng$^{1}$~~~Chuanxiong Guo$^{1}$~~~Kun Tan$^{1}$\\~~~Jitendra Padhye$^{1}$~~~Kai Chen$^{2}$\\ 
+$^{1}$Microsoft ~~~$^{2}$Hong Kong University of Science and Technology}
+%\author{Paper \#67}
 \maketitle
 
-%\vspace{-0.2in}
 \input{abstract.tex}
 \input{intro.tex}
 \input{background.tex}

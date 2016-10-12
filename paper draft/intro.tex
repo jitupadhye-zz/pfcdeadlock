@@ -26,23 +26,29 @@ standstill situation: there is a cyclic buffer dependency among a set of
 switches. Any switch in the cycle holds all the buffer needed by its upstream
 switch, and meanwhile is waiting for its downstream switch to release some
 buffer and resume its packet transmission. A simple scenario is illustrated in
-Figure~\ref{fig:deadlock_example}. 
+Figure~\ref{fig:deadlock_example}.
 
 It is easy to see that when deadlock occurs, no switch in the cycle can proceed. Further, throughput of the whole network
 or part of the network will go to zero due to the backpressure
 effect of PFC pause.
 
-
+\begin{figure}
+	\centering
+	\includegraphics[width=0.3\textwidth] {figs/deadlock}
+	\vspace{-0.15in}
+	\caption{PFC-induced deadlock: simple illustration}
+	\vspace{-0.25in}
+	\label{fig:deadlock_example}
+\end{figure}
 
 It is often believed that such deadlocks cannot occur in
 clos-structured datacenter networks, since a loop cannot form in such networks
-with valley-free routing~\cite{dcqcn}.  \textcolor{red}{However, Guo et al.~\cite{rdmascale} has shown that
-deadlocks can indeed occur in such network, typically as a result of
-misconfiguration.} We now believe that deadlocks can also occur when transient
+with valley-free routing~\cite{dcqcn}.  \revise{However, Guo et al.~\cite{rdmascale} has shown that
+deadlocks can indeed occur in such network.} We now believe that deadlocks can also occur when transient
 loops form in clos structured networks. In our datacenters, these can happen as
 BGP\footnote{In our datacenters, we use BGP for routing, with each switch being
 a private AS.} re-routes around link failures. In SDN-based datacenters,
-transient loops can occur during updates~\cite{dionysus}. \textcolor{red}{While transient loops will disappear by themselves soon, deadlocks caused by them are not transient. Deadlocks cannot recover automatically even after the problems (misconfiguration, failures/updates, etc.) that cause them have been fixed.}
+transient loops can occur during updates~\cite{dionysus}. \revise{While transient loops will disappear by themselves soon, deadlocks caused by them are not transient. Deadlocks cannot recover automatically even after the problems (misconfiguration, failures/updates, etc.) that cause them have been fixed.}
 
 Hence some mechanism for handling the deadlock problem must be used when
 deploying RDMA in datacenter networks.  These mechanisms fall in two broad
@@ -62,14 +68,7 @@ can be proved that as long as the number of buffer classes is no smaller than
 the hop count of the longest routing path, there will be no cyclic buffer
 dependency.
 
-\begin{figure}
-\centering
-\includegraphics[width=0.3\textwidth] {figs/deadlock}
-\vspace{-0.15in}
-\caption{PFC-induced deadlock: simple illustration}
-\vspace{-0.25in}
-\label{fig:deadlock_example}
-\end{figure}
+
 
 %Both these approaches to deadlock prevention have some important drawbacks.
 %Approaches based on routing restriction usually waste link bandwidth and limit
@@ -79,13 +78,9 @@ dependency.
 %dependency gurantees a deadlock-free network, it may not be always feasible to
 %pay these costs.
 
-\textcolor{red}{Both approaches to deadlock prevention have some important drawbacks.
+Both approaches to deadlock prevention have some important drawbacks.
 Approaches based on routing restriction usually waste link bandwidth and limit
-throughput performance. Buffer management based approach 1) requires
-non-trivial complexity to be deployed in current production datacenters, and 2) is known to have flow unfairness problem and starvation problem. 
-These drawbacks can be viewed as the cost of eliminating cyclic buffer dependency in the network. While avoiding cycle buffer
-dependency guarantees a deadlock-free network, it may not be always feasible to
-pay these costs.}
+throughput performance. \revise{Buffer management based approach may require a lot of priority classes and switch buffer for networks of large diameters, While the commodity switches with shallow buffer can support at most 2 lossless traffic classes~\cite{rdmascale}.} These drawbacks can be viewed as the cost of eliminating cyclic buffer dependency in the network. While avoiding cycle buffer dependency guarantees a deadlock-free network, it may not be always feasible to pay these costs.
 
 Thus, we take step back and ask: Is cyclic buffer dependency a
 necessary condition for deadlock formation, or is it a sufficient condition? If
