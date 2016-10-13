@@ -6,7 +6,12 @@
 Since cyclic buffer dependency is just a necessary condition for deadlock, there
 are mitigation mechanisms that avoid deadlock even if cyclic buffer dependency
 is present.  The examples and analysis in Section~\ref{sec:analysis} inspire us
-with some of the following potential deadlock mitigations.
+with some of the following potential deadlock mitigations.  We stress that we
+have not been able to formally characterize the sufficient conditions for
+deadlock formation. Thus, the solutions presented below are {\em mitigations} --
+and essentially heuristic in nature. In future, we hope to fully characterize
+the sufficient conditions, and come up with more precise and efficient deadlock
+prevention solutions.
 
 \para{TTL-based mitigation for deadlock caused by loops.} In a routing loop,
 deadlock formation becomes less likely with smaller TTL (see
@@ -65,6 +70,3 @@ One possible way to further reduce PFC is to integrate DCQCN together with
 phantom queuing, like~\cite{Alizadeh12}. By reacting to the phantom queues that
 assume lower link speed, congestion signals are generated much earlier.
 
-\para{Other possible mechanisms.} In future work, a deeper understanding of
-tighter conditions for deadlock may lead to more deadlock mitigation mechanisms
--- this is the focus of our ongoing work.
