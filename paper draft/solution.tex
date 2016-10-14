@@ -3,8 +3,8 @@
 \label{sec:mitigation}
 \secspace
 
-Since cyclic buffer dependency is just a necessary condition for deadlock, there
-are mitigation mechanisms that avoid deadlock even if cyclic buffer dependency
+Since CBD is just a necessary condition for deadlock, there
+are mitigation mechanisms that avoid deadlock even if CBD
 is present.  The examples and analysis in Section~\ref{sec:analysis} inspire us
 with some of the following potential deadlock mitigations.  We stress that we
 have not been able to formally characterize the sufficient conditions for
@@ -37,7 +37,7 @@ priority class or even particular flows. This can mitigate deadlock caused by
 both routing loops and multi-flow buffer dependency, as shown in
 Section~\ref{sec:analysis}. If we are able to predict the rate threshold for
 deadlock, we may bound the individual flow rate by that threshold on switches
-that are involved in cyclic buffer dependency. However, this requires
+that are involved in CBD. However, this requires
 intelligent rate limiting schemes to avoid over-punishing innocent flows. We
 leave this to future work.
 

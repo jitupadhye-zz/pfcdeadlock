@@ -16,11 +16,11 @@ possible mitigations.
 \para{Deadlock-free routing.} To avoid deadlock in lossless networks, previous
 work~\cite{tcpbolt,karol2003prevention,lash,sancho2004,wu2003fault} has focused
 on deadlock-free routing: i.e. deadlock freedom regardless of traffic pattern
-etc. It has also been proven that that eliminating cyclic buffer dependency is a
+etc. It has also been proven that that eliminating CBD is a
 necessary and sufficient condition for deadlock-free
 routing~\cite{deadlockfree}. However, deadlock-free routing is difficult to
-implement in practice -- since it is challenging to eliminate cyclic buffer
-dependency in face of arbitrary bugs and failures. Our work explores how we may
+implement in practice -- since it is challenging to eliminate CBD in face of 
+arbitrary bugs and failures. Our work explores how we may
 control the flows, packet formats and switch configurations to avoid deadlock
 even if routing is not deadlock-free.
 
