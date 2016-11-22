@@ -34,9 +34,9 @@ proposed. It guarantees that (if the routing configuration is correct,) any
 traffic does not cause deadlock.
 
 \para{Unfortunately, achieving deadlock-free routing is inefficient, and may not
-even be viable.} Deadlock-free routing is achieved by eliminating cyclic buffer
-dependency~\cite{deadlockfree}.  However, ensuring that there is never any
-cyclic buffer dependency is challenging.
+even be viable.} Deadlock-free routing is achieved by eliminating Cyclic Buffer
+Dependency (CBD)~\cite{deadlockfree}.  However, ensuring that there is never any
+CBD is challenging.
 
 First, deadlock-free routing largely limits the choice of topology. \revise{For example,
 Stephens et al. \cite{tcpbolt} proposes to only use tree-based topology and routing, and shows
@@ -48,20 +48,20 @@ guarantee.}
 Second, due to bugs or misconfiguration, deadlock-free routing configuration may
 turn into deadlock-vulnerable. In fact, recent work has observed a PFC deadlock
 case in real-world tree-based datacenter\cite{rdmascale}, caused by the
-(unexpected) flooding of lossless class traffic. \revise{This case is a concrete example to show that even for tree-based topology, cyclic buffer dependency can still occur if up-down routing is not strictly followed.} Furthermore, there are multiple
+(unexpected) flooding of lossless class traffic. \revise{This case is a concrete example to show that even for tree-based topology, CBD can still occur if up-down routing is not strictly followed.} Furthermore, there are multiple
 reports of routing loops due to misconfiguration in today's production
 datacenters~\cite{everflow, libra}. If lossless traffic encounters any of these
-loops, cyclic buffer dependency is unavoidable.
+loops, CBD is unavoidable.
 
-In this paper, we argue that we should accept the fact that cyclic buffer
-dependency cannot be completely avoided,\footnote{In other words, deadlock-free
+In this paper, we argue that we should accept the fact that CBD
+cannot be completely avoided,\footnote{In other words, deadlock-free
 routing may not always apply or work correctly.} and instead try to
 understand more precise deadlock conditions.  Our findings show that even if
-there is cyclic buffer dependency, deadlock may not occur (see
-Section~\ref{sec:analysis}).  This means that cyclic buffer dependency is only a
+there is CBD, deadlock may not occur (see
+Section~\ref{sec:analysis}).  This means that CBD is only a
 necessary but not sufficient condition for deadlock.  We show the occurrence of
 deadlock is affected by the packet TTL, the traffic matrix, as well as flow
 rate. Based on these findings, we propose several ways to avoid deadlock even in
-face of cyclic buffer dependency.
+face of CBD.
 
 

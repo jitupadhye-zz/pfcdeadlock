@@ -11,22 +11,22 @@
     \includegraphics[width=0.25\textwidth] {figs/loop_analysis}
 }
 \vspace{-0.15in}
-\caption{Single looping flow creates cyclic buffer dependency but may not create deadlock.}
+\caption{Single looping flow creates CBD but may not create deadlock.}
 \vspace{-0.15in}
 \label{fig:loop}
 \end{figure*}
 
 \secspacelarge
-\section{Case Studies: Cyclic Buffer Dependency is Insufficient for Deadlock}
+\section{Case Studies: CBD is Insufficient for Deadlock}
 \label{sec:analysis}
 \secspace
 
-Although cyclic buffer dependency is a necessary condition for deadlock, it is not a
-sufficient condition. In this section, we present our case studies in which cyclic
-buffer dependency is present, but deadlock formation still depends on other factors. We demonstrate
-that 1) a looping flow that generates cyclic buffer dependency does not always lead to deadlock.
+Although CBD is a necessary condition for deadlock, it is not a
+sufficient condition. In this section, we present our case studies in which CBD
+is present, but deadlock formation still depends on other factors. We demonstrate
+that 1) a looping flow that generates CBD does not always lead to deadlock.
 The length of loop, flow rates and packet Time-To-Live (TTL) affects whether
-the deadlock forms. 2) Multiple flows may cause cyclic buffer dependency,
+the deadlock forms. 2) Multiple flows may cause CBD,
 but slightly different flow sets lead to different deadlock results. 3) Rate-limiting can
 prevent deadlock from happening.
 
@@ -47,7 +47,7 @@ prevent deadlock from happening.
 %when the other side's buffer utilization is under PFC PAUSE threshold. The deadlock happens when
 %both of the involved buffers reach the PFC threshold at the same time and PAUSE the links.
 
-A routing loop can create cyclic buffer dependency if a flow is trapped in the loop.
+A routing loop can create CBD if a flow is trapped in the loop.
 \revise{The simplest example is a two-hop loop between two switches, as shown in Figure~\ref{fig:loop}(a) ($RX$ represents input
 queue (or port), and $TX$ represents output queue (or port)). We then plot buffer dependency graph (Figure~\ref{fig:loop}(b)). Each directed line represents a buffer dependency from the source RX to the destination RX. For example, packets buffered in $RX1$ of switch A will be sent to $RX1$
 of B, and vice versa.} So in Figure~\ref{fig:loop}(b), two directed lines are drawn between A and B.
@@ -59,7 +59,7 @@ when the other side's buffer utilization is under PFC PAUSE threshold. The deadl
 both of the involved buffers reach the PFC threshold at the same time and PAUSE the links.
 
 
-However, this cyclic buffer dependency may not always turn into deadlock state. The flow
+However, this CBD may not always turn into deadlock state. The flow
  rate, the TTL (time-to-live) of packets and the length of the loop together
 determine whether there will be deadlock. In our testbed, we run a simple experiment on
 two switches that are connected by a 40Gbps link and configured with a routing loop.
@@ -170,19 +170,19 @@ even if routing loop occurs.
 		\includegraphics[width=0.23\textwidth] {figs/case1_buffer_occupancy_D.eps}
 	}
 	\vspace{-0.15in}
-	\caption{There is no deadlock even though two flows create cyclic buffer dependency among four switches.}
+	\caption{There is no deadlock even though two flows create CBD among four switches.}
 	\label{fig:case1}
 	\vspace{-0.2in}
 \end{figure*}
 
 
-Multiple flows may create a cyclic buffer dependency even if there is no routing loop.
+Multiple flows may create a CBD even if there is no routing loop.
 Figure~\ref{fig:case1}(a) shows a simple example with four switches A, B, C and D.
 Flow 1 starts at a host (not shown) attached to A, passes through B and C, and ends at a
 host attached to D. Flow 2 starts at a host attached to C, passes through D and A, and
 ends at a host attached to B.
 Similar to the previous case, we can draw the dependency lines between switches. As shown in
-Figure~\ref{fig:case1}(b), there is a cyclic buffer dependency among the four switches, i.e.,
+Figure~\ref{fig:case1}(b), there is a CBD among the four switches, i.e.,
 dependencies from RX1 of A to RX1 of B, then to RX1 of C, then to RX1 of D, and finally back to RX1 of A.
 
 
@@ -236,7 +236,7 @@ and 55KB around the PFC threshold, so link L4 will get paused intermittently. In
 occupancy of flow 1 at RX1 of B is well below the PFC threshold (fluctuates between 0KB and 18KB),
 hence link L1 never gets paused.}
 
-The takeaway is that, we cannot simply predict deadlock based on the existence of cyclic buffer dependency
+The takeaway is that, we cannot simply predict deadlock based on the existence of CBD
 and flow-level stable state analysis. This is because we cannot predict
 the instantaneous buffer occupancy (and whether PFC is triggered) from flow-level analysis that only
 focuses on {\em average} flow throughput.
@@ -295,7 +295,7 @@ the flow-level analysis shows that the average throughput of flow 1 and flow 2 s
 \para{Slightly different traffic matrix leads to deadlock:} \revise{as shown in Figure~\ref{fig:case2}(a), based on the previous scenario, We add another flow (flow 3) which enters the network at switch B and leaves at switch C. All the three flows are UDP
 flows with infinite traffic demand. Buffer dependency graph is drawn in Figure~\ref{fig:case2}(b).
 Compared with previous scenario, one additional dependency from RX2 of B to RX1 of C is added, but it
-is outside the cyclic buffer dependency. The cyclic buffer dependency itself remains unchanged.}
+is outside the CBD. The CBD itself remains unchanged.}
 
 Pause events at four links L1, L2, L3 and L4 are plotted in Figure~\ref{fig:case2}(c). As we can see, in
 this case four links are all paused. To check whether deadlock will form in this case, we stop the three
@@ -335,7 +335,7 @@ D, the first packet buffered in the head is a packet of flow 2. \revise{Once thi
 %buffer to break the standstill condition.
 
 \para{Summary:}
-In the above multi-flow scenarios, cyclic buffer dependency can be created without
+In the above multi-flow scenarios, CBD can be created without
 a routing loop. However, it is again not a sufficient condition for deadlock. The analysis of sufficient
 condition is complicated. Stable flow state analysis does not apply.
 A slightly different matrix that does not significantly affect stable flow state may lead
@@ -415,19 +415,19 @@ threshold. Hence link L1 is paused.
 
 As both TX1 and TX3 contribute to the pause on link L1, to create a deadlock, we need to ensure that
 packets buffered at both TX queues cannot get resumed. However, packets buffered at TX3 can always get
-transmitted within a finite time as it is not involved in any cyclic buffer dependency. This explains
+transmitted within a finite time as it is not involved in any CBD. This explains
 why when we stop the flows, all the four links can be resumed from the pauses.
 \fi
 
 %\textbf{Observation 3:} even if all the links in a cycle are paused simultaneously, it is not
 %sufficient to create a permanent deadlock.
 
-\para{Summary:} From all the examples in this section, we summarize that cyclic buffer dependency is
+\para{Summary:} From all the examples in this section, we summarize that CBD is
  a loose condition for deadlock. The traffic demand matrix, TTL and flow rates all affect the deadlock
  formation. While we cannot obtain the tightest condition ({\em i.e., necessary and sufficient condition}),
 we know that a tighter condition should include those factors, and that these factors can be utilized
 for deadlock mitigation. In Section~\ref{sec:mitigation}, we discuss potential deadlock mitigations in
-addition to avoiding cyclic buffer dependency.
+addition to avoiding CBD.
 
 %\subsection{Deadlock problem in RDMA DCNs}\label{subsec:deadlock_problem}
 %
