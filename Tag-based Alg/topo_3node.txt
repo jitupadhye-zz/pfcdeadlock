@@ -1,0 +1,6 @@
+A D empty B C
+B A E empty C
+C A empty B F
+D A
+E B
+F C
