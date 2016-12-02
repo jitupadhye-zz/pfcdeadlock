@@ -1,11 +1,11 @@
-generate topology of fattree(k):
+generate topology of fattree(k):  
 python gentopo_fattree.py k
 
-generate routes for fattree(k):
+generate routes for fattree(k):  
 python genroute_fattree.py k
 
-generate topology of bcube(n,k):
+generate topology of bcube(n,k):  
 python gentopo_bcube.py n k
 
-generate routes for bcube(n,k):
+generate routes for bcube(n,k):  
 python genroute_bcube.py n k
