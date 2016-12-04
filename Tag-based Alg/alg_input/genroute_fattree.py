@@ -1,5 +1,11 @@
+
+
 import sys
 import os
+
+if len(sys.argv) < 2:
+    print "genroute_fattree.py k"
+    sys.exit(1)
 
 k= int(sys.argv[1])
 TorNum = k*k/2
@@ -10,8 +16,8 @@ SwitchNum = TorNum + LeafNum + SpineNum
 ServerNum = ServerPerTor*TorNum
 LinkNum = ServerNum + LeafNum*k
 
-f_path = "D:\\simulation_code\\tagging_algorithm_input\\route_fattree.txt"
-out = open(f_path, "w")
+#f_path = "D:\\simulation_code\\tagging_algorithm_input\\route_fattree.txt"
+#out = open(f_path, "w")
 
 #print intro pod paths
 for pod in range(k):
@@ -25,12 +31,12 @@ for pod in range(k):
 				tor1 = (server1-SwitchNum)*2/k
 				tor2 = (server2-SwitchNum)*2/k
 				if tor1 == tor2:
-					out.write(str(server1) + " " + str(tor1) + " " + str(server2))
-					out.write("\n")
+					sys.stdout.write(str(server1) + " " + str(tor1) + " " + str(server2))
+					sys.stdout.write("\n")
 				else:
 					for leaf in range (firstleaf, lastleaf):
-						out.write(str(server1) + " " + str(tor1) + " " + str(leaf) + " " + str(tor2) + " " + str(server2))
-						out.write("\n")
+						sys.stdout.write(str(server1) + " " + str(tor1) + " " + str(leaf) + " " + str(tor2) + " " + str(server2))
+						sys.stdout.write("\n")
 
 
 						
@@ -55,6 +61,6 @@ for pod1 in range(k):
 						lastspine = firstspine + k/2
 						for spine in range(firstspine, lastspine):
 							leaf2 = TorNum + pod2*k/2 + leaf1 - firstleaf1
-							out.write(str(server1) + " " + str(tor1) + " " + str(leaf1) + " " + str(spine) + " " + str(leaf2) + " " + str(tor2) + " " + str(server2))
-							out.write("\n")
+							sys.stdout.write(str(server1) + " " + str(tor1) + " " + str(leaf1) + " " + str(spine) + " " + str(leaf2) + " " + str(tor2) + " " + str(server2))
+							sys.stdout.write("\n")
 		
