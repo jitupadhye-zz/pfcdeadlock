@@ -25,6 +25,9 @@ for tor in range(TorNum):
 	#print links to servers
 	for i in range(ServerPerTor):
 		sys.stdout.write(" " + str(SwitchNum+tor*ServerPerTor+i))
+		
+	sys.stdout.write(" empty")
+	
 	#print links to Leafs
 	for i in range(k/2):
 		pod = tor*2/k
@@ -38,6 +41,9 @@ for leaf in range(LeafNum):
 	for i in range(k/2):
 		pod = leaf*2/k
 		sys.stdout.write(" " + str(pod*k/2+i))
+		
+	sys.stdout.write(" empty")
+	
 	#print links to Spines
 	orderinpod = leaf%(k/2)
 	firstspine = orderinpod*k/2
