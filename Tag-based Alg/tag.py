@@ -33,3 +33,16 @@ class TTLTag():
         if current_tag != next_tag + 1:
             return False
         return True
+
+
+class ClosTag(TTLTag):
+
+    def get_new_tag(self, current_tag, last_hop, next_hop):
+        if "empty" not in self.ports:
+            return current_tag
+        if last_hop not in self.ports:
+            return current_tag
+        if self.ports[last_hop] > self.ports["empty"] and self.ports[next_hop] > self.ports["empty"]:
+            return current_tag - 1
+        else:
+            return current_tag

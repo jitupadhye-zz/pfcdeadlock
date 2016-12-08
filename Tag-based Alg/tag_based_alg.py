@@ -3,13 +3,17 @@
 import sys
 from copy import deepcopy
 from igraph import *
-from tag import TTLTag
 
 INIT_TAG = 8
 
 if len(sys.argv) < 3:
     print "tag_based_alg.py topo_file route_file"
     sys.exit(1)
+
+if len(sys.argv) >= 4:
+    from tag import ClosTag as TTLTag
+else:
+    from tag import TTLTag
 
 topo = {}
 f = open(sys.argv[1])
