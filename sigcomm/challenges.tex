@@ -1,7 +1,10 @@
 %\vspace{-0.1in}
-\section{Buffer Analysis}\label{sec:sol}
+\section{Challenges}\label{sec:challenges}
 
-\subsection{PFC Headroom}\label{subsec:pfcheadroom}
+\subsection{Must Adapt to Ethernet/IP Routing}
+
+
+\subsection{Limited number of lossless queues}\label{subsec:pfcheadroom}
 
 
 A PAUSE message sent from a receiver to an upstream sender needs some time to arrive and take effect. To avoid packet drops, the receiver (i.e., the sender of the PAUSE message) must reserve enough buffer to accommodate any packets it may receive during this time. In this part, we calculate the amout of buffer needed as the PFC headroom.

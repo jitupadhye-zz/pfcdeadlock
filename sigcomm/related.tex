@@ -1,0 +1,20 @@
+%\vspace{-0.1in}
+\section{Related Work}\label{sec:related}
+
+\para{RoCE and the need for PFC.}
+Here we emphasize that (at least current) RoCE cannot work well without PFC.
+The results in DCQCN and RDMA at scale (SIGCOMM'16) paper show packet drops
+are very harmful for RoCE performance.
+
+We may add a note saying that PFC has its fundamental advantage (e.g., no retransmission),
+if we could make it work well in practice, using PFC would be the right approach
+for RoCE. Our paper is trying to make this happen.
+
+\para{Circuit switching-based approaches.} Those solutions from HPC and InfiniBand
+work by preemption. This does not work in Ethernet and in practice.
+
+\para{Brute-force buffer layering solutions.} They use a lot of lossless queues. No one
+has discussed how they can be implemented in reality.
+
+\para{Summary: our differences.}
+

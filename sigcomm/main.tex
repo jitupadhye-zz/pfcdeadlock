@@ -110,11 +110,13 @@
 \newcommand{\paragraphb}[1]{\vspace{0.05in}\noindent{\bf #1}}
 
 \newcommand{\paraspace}{\vspace{0.05in}}
+\newcommand{\para}[1]{\paraspace\noindent{\bf #1} }
 \newcommand{\parab}[1]{\paraspace\noindent{\bf #1} }
 \newcommand{\parae}[1]{\paraspace\noindent{\em #1} }
 \newcommand{\parabe}[1]{\paraspace\noindent{\bf \em #1} }
 %\newcommand{\kai}[1]{{\color{blue}[Kai: #1]}}
 \newcommand{\todo}{\textcolor{red}}
+\newcommand\fixme[1]{{\color{red} #1}}
 
 \def\naive{na\"\i ve}
 
@@ -180,20 +182,22 @@
 %\conferenceinfo{SIGCOMM,} {XXXXXX, XXXXX, XXXXX, XXXXX.} %
 %\CopyrightYear{2009} \crdata{1-59593-308-5/06/0009}
 
-\title{TTL-based Buffer Management Scheme for Deadlock Prevention}
+\title{Practical PFC Deadlock Prevention in Datacenter Networks}
 \maketitle
 
 %\vspace{-0.2in}
 %\input{abstract.tex}
 \input{intro.tex}
-\input{analysis.tex}
+\input{related.tex}
+\input{challenges.tex}
 %\input{motivation.tex}
-%\input{solution.tex}
-%\input{sections/implementation.tex}
-%\input{evaluation.tex}
+\input{solution.tex}
+\input{generic.tex}
+\input{implementation.tex}
+\input{evaluation.tex}
 %\input{sections/application.tex}
 %\input{related.tex}
-%\input{conclusion.tex}
+\input{conclusion.tex}
 
 %\vspace{0.1in}
 %\section*{Acknowledgements}
