@@ -1,15 +1,17 @@
 %\vspace{-0.1in}
 \section{Challenges}\label{sec:challenges}
 
-\subsection{Must Adapt to Ethernet/IP Routing}
+\subsection{Adapting to Existing Ethernet/IP Routing}
 
+We do not force the network operator to change any routing configuration. Existing routing configuration has been designed in a way that 
+best fit the needs. But common routing may lead to deadlock. (Show our bouncing data from production here.)
 
 \subsection{Limited number of lossless queues}\label{subsec:pfcheadroom}
 
 
 A PAUSE message sent from a receiver to an upstream sender needs some time to arrive and take effect. To avoid packet drops, the receiver (i.e., the sender of the PAUSE message) must reserve enough buffer to accommodate any packets it may receive during this time. In this part, we calculate the amout of buffer needed as the PFC headroom.
 
-\textbf{ Per port per priority PFC headroom:} At first, we calculate the time for a PFC message to arrive and take effect at its destination port. It mainly consists of six parts.
+\textbf{Per port per priority PFC headroom:} At first, we calculate the time for a PFC message to arrive and take effect at its destination port. It mainly consists of six parts.
 
 \begin{enumerate}
 	

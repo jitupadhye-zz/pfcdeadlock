@@ -1,2 +1,48 @@
-\section{Solution for Generic Topology}\label{sec:generic}
+\section{Tag-based Solution}\label{sec:generic}
+
+\subsection{Overview}
+
+
+\subsection{TTL-based Tagging System}\label{subsec:ttlscheme}
+
+\textbf{Buffer division}: we divide the buffer of network nodes into $k$ partitions, and let the $j$-$th$ partition associated with priority class $j$. If a packet is classified into priority class $j$, it will  be buffered in the $j$-$th$ buffer partition. Packets queued in queues $q_{in}^{i,j}$ and $q_{out}^{i,j}$ ($1\leq i \leq n$) are the packets currently buffered in the $j$-$th$ buffer partition.
+
+Let $d$ be the number of hops of the longest legal routing path in the network, $n$ be the number of switch ports, and $m_{p}$ be the maximum packet size. Our buffer division will always ensure $k \geq d$, and the size of any buffer partition is no smaller than $n*m_{p}$. 
+
+\textbf{TTL-based packet buffering}: 
+\begin{enumerate}
+	\item  Initially, we set the TTL values of all packets to $ttl_0=d$ at all the source servers. TTL value of every packet will be decreased by 1 per hop. At all the source servers, packets are buffered in a buffer of priority class $0$.
+	
+	\item Let $ttl_i$ be the TTL value of a packet $p$ at its $i$-$th$ hop ($i \geq 0$). If $ttl_i = 0$, packet $p$ will be dropped by the receiving switch or server. At every hop, the priority class of any incoming packet $p$ is calculated as $\lambda_p = ttl_0 - ttl_i $. Packet $p$ will be buffered and queued according to the calculated priority class $\lambda_p$ at every hop.
+\end{enumerate}
+  
+\subsubsection{Proof of deadlock-free}
+
+\textbf{Claim:} our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
+
+\textbf{Proof:} To prove our TTL-based solution is deadlock-free, we prove by contradiction that no legal buffer state can be deadlocked buffer state under our TTL-based solution.
+
+Assuming there exists a legal buffer state  $BS_N(t)$ which is also a deadlocked buffer state under our TTL-based solution. If no new packets are injected into the network since $t$, according to Equation~(\ref{eqn:deadlockstatedef}), $BS_N(t)$ will converge into a fixed non-empty buffer state $BS_N(t_0)$ at some finite time $t_0>t$. 
+
+
+\textbf{Case 1:} All the VEQs in $BS_N(t_0)$ is empty. As $BS_N(t_0) \neq BS^0_N$, $BS_N(t_0)$ has at least one non-empty VIQ. As $BS_N(t)$ is a legal buffer state, accroding to Equation~(\ref{eqn:legalstatecon}), there are finite number of packets queued in non-empty VIQs of $BS_N(t_0)$. Then according to Equations~(\ref{eqn:schecon1}), (\ref{eqn:nodupschedule}) and (\ref{eqn:fwdcon}), any unscheduled packet remaining in any VIQ will be forwarded to some VEQ within finite time at some finite time $t_2>t_0$. This means that $BS_N(t_0)$ will transition to some other buffer state, which violates the fact that $\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
+
+\textbf{Case 2:} There exist some non-empty VEQs (at least one) in $BS_N(t_0)$. Let $q_{out}^{i,m}$ be the queue of highest priority class among all the non-empty VEQ queues ($m\leq k$). Under our TTL-based solution, packets in $q_{out}^{i,m}$ will not be paused by PFC PAUSE messages as packets can only be paused by packets of higher priority class. According to Equations~(\ref{eqn:schecon2}) and (\ref{eqn:transcon}), packets in $q_{out}^{i,m}$ will be transmitted to next hop within finite time. This means that $BS_N(t_0)$ will transition to some other buffer state  at some finite time $t_2>t_0$, which violates the fact that $\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
+
+Based on the above discussion, the assumption we made will cause contradiction in both cases. Hence $BS_N(t)$ is not a deadlocked buffer state under our TTL-based solution. So our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
+    
+
+\if 0
+\subsubsection{Proof of Deadlock-free Property}\label{subsec:proof}
+In this part, we are going to prove that our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
+
+In our proof, we use $p_{size}$, $p_{ttl}$ and $p_{dst}$ to denote the size, the TTL value and the destination of a packet $p$, respectively. Any ingress queue $q_{in}^{i,j}$ and any egress queue $q_{out}^{i,j}$ are viewed as packet sets. According to the switch model, we have $q_{in}^{i}=\cup_{j=1}^{k}q_{in}^{i,j}$, and $q_{out}^{i}=\cup_{j=1}^{k}q_{out}^{i,j}$.
+
+We use $|q_{in}^{i,j}|$ and $|q_{out}^{i,j}|$ to denote the queue lengths of $q_{in}^{i,j}$ and $q_{out}^{i,j}$, where $|q_{in}^{i,j}|=\sum_{p\in q_{in}^{i,j}}p_{size}$, and $|q_{out}^{i,j}|=\sum_{p\in q_{out}^{i,j}}p_{size}$.
+\fi
+
+
+
+
+\subsection{Greedy Algorithm for Minimizing the Number of Lossless Priorities}
 

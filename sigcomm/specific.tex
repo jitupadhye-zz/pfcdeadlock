@@ -1,83 +1,11 @@
 %\vspace{-0.1in}
-\section{Solution for Structured Topology}\label{sec:sol}
+\section{Further Improvement for Structured Topology}\label{sec:sol}
 
 \fixme{This is the old solution. Will re-write this part.}
 
-\subsection{Switch Model}\label{subsec:model}
-
-\begin{figure}
-	%\vspace{-0.1in}
-	\centering
-		\includegraphics[width=0.5\textwidth] {figs/switch_model}
-	\caption{Switch model.}\label{fig:switchmodel}
-
-\end{figure}
-
-In this part, we introduce the switch model under which we develop our TTL-based buffer management scheme. As shown in Fig.~\ref{fig:switchmodel},
-our switch model consists of five elements: switch port, forwarding engine, PFC engine, crossbar and switch buffer. The function of these elements are list as follows.
-
-%Fig.~\ref{fig:switchmodel}(a) shows the architecture of the switch model, which consists of a switching fabric and N line cards. Line cards are mainly used to receive/send packets and make routing/forwarding decisions. Switching fabric is a module to transfer packet cells from the input line card to the output line card. 
-
-\begin{itemize}
-	\item \textbf{Switch port}: The element to receive and send packets. Each switch port consists of an input port and an output port, and is connected with a link.
-	
-	\item \textbf{Forwarding engine}: The element to make the routing and/or switching decisions. In the forwarding engine, there is a module to decide the priority class of a packet based on the TTL value. 
-	
-	\item \textbf{PFC engine}: The element to perform PFC function.
-	
-	\item \textbf{Crossbar}: The element to switch packet cells from the ingress buffer to the egress buffer. 
-	
-	\item \textbf{Switch buffer}: The element to buffer incoming packets. We assume shared buffer in our model. In the ingress buffer, we use  virtual ingress queue (VIQ) to track the incoming packets. In the egress buffer, we use virtual egress queue (VEQ) to track the outgoing packets. Each VIQ is uniquely corresponding to an input port, while each VEQ is uniquely corresponding to an output port. As shown in Fig.~\ref{fig:switchmodel}, both VIQ and VEQ consist of k queues, with each queue corresponding to a priority class. A packet of priority class $j$ will enter the $j$-$th$ queue of its destined VIQ and VEQ.
-	
-%    Note that in our switch model, when a packet in some VIQ is forwarded to some VEQ, this VIQ will not perform dequeue operation. Dequeue operation will be performed only after this packet leaves the switch buffer. This is because the purpose of using VIQ is to track the bytes of currently buffered packets received by an input port, such that PFC can work properly.
-	
-	\textbf{Discussion}: It is not always the case for switch to have both ingress buffer and egress buffer at the same time. It depends on the buffering strategy. If we adopt output-queued strategy, there will be no ingress buffer, and VIQs are simply some counters to record the bytes of buffered packets received by different input ports. If we adopt input-queued strategy~\cite{islip}, there will be no egress buffer, and VEQs can be simulated using virtual output	queuing technique~\cite{tinytera} at the ingress buffer. If we adopt the combined-input-and-output-queued strategy~\cite{chuang1999matching}, the switch will have both ingress buffer and egress buffer. The switching function of crossbar can also be virtual, not necessary to involve packet copying.
-
-\end{itemize}
-
-\textbf{Enqueue and dequeue operations of VIQ and EIQ}: We use $q_{in}^{i}$ to denote VIQ $i$, and $q_{out}^{i}$ to denote VEQ $i$.
-Let $q_{in}^{i,j}$ be the $j$-$th$ queue of VIQ $i$, and $q_{out}^{i,j}$ be the $j$-$th$ queue of VEQ $i$ ($1\leq i \leq n$, $1 \leq j \leq k$). The dequeue and enqueue operatons of VIQ and VEQ are performed as follows:
-	
-	\begin{enumerate}
-		\item  Packet $p$ of priority class $j$ enters the switch buffer via input port $i_1$: VIQ $i_1$ performs enqueue operation and puts packet $p$ to the tail of $q_{in}^{i_1,j}$.
-		
-		\item  Packet $p$ in the head of $q_{in}^{i_1,j}$ is forwarded to VEQ $i_2$:  VEQ $i_2$ performs enqueue operation and puts packet $p$ to the tail of $q_{out}^{i_2,j}$. At the same time, head point of $q_{in}^{i_1,j}$ is moved to the next packet currently queued in $q_{in}^{i_1,j}$. Note that dequeue operation of packet $p$ will not be performed at $q_{in}^{i_1,j}$ at this point in time. 
-		
-		\item  Packet $p$ in the head of $q_{out}^{i_2,j}$ is forwarded to output port $i_2$: VEQ $i_2$ performs dequeue operation and removes packet $p$ from $q_{out}^{i_2,j}$.  VIQ $i_1$ performs dequeue operation and removes packet $p$ from $q_{in}^{i_1,j}$ (say packet $p$ was previously forwarded from $q_{in}^{i_1,j}$ to $q_{out}^{i_2,j}$). 
-	\end{enumerate}
-		
-	Note that in our switch model, dequeue operation is performed at corresponding VIQ only after packet $p$ leaves the switch buffer. This is because the purpose of using VIQ is to track the bytes of currently buffered packets received by an input port, such that PFC can work properly.
-
-\subsection{Modified PFC Mechanism}\label{subsec:PFC}
-
-As shown in Fig.~\ref{fig:switchmodel}(b), the function of our modified PFC mechanism consists of four parts. 
-
-The PFC engine will track the instant queue lengths of all the VIQs (function (1)). If the queue length of some queue  $q_{in}^{i,j}$ exceeds the configured PFC threshold, PFC engine will generate a PAUSE message to pause the packet transmission of the immediate upstream node on priority class $j$-$1$ over the link connected with port $i$. If the queue length of $q_{in}^{i,j}$ becomes less than the threshold later, PFC engine will generate a RESUME message to resume the packet transmission over the previously paused link on priority class $j$-$1$ (function (2)).
-
-If some output port, say output port $i$, receives a PAUSE or RESUME message on priority class $j$ from its immediate downstream node, the PFC engine will then pause or resume the corresponding egress queue $q_{out}^{i,j}$, accordingly (function (3) and function (4)).
-
-The main difference between our modified PFC mechanism and the typical PFC mechanism is that, if the queue length of some queue $q_{in}^{i,j}$ at some network node exceeds the PFC threshold, PFC engine will pause the packet transmission of the immediate upstream node on priority class $j$-$1$ over the incoming link instead of on priority class $j$. This feature is important for realizing our TTL-based buffer management scheme, as we will introduce in the next.
 
 
-\subsection{TTL-based Buffer Management Scheme}\label{subsec:ttlscheme}
-
-\textbf{Buffer division}: we divide the buffer of network nodes into $k$ partitions, and let the $j$-$th$ partition associated with priority class $j$. If a packet is classified into priority class $j$, it will  be buffered in the $j$-$th$ buffer partition. Packets queued in queues $q_{in}^{i,j}$ and $q_{out}^{i,j}$ ($1\leq i \leq n$) are the packets currently buffered in the $j$-$th$ buffer partition.
-
-Let $d$ be the number of hops of the longest legal routing path in the network, $n$ be the number of switch ports, and $m_{p}$ be the maximum packet size. Our buffer division will always ensure $k \geq d$, and the size of any buffer partition is no smaller than $n*m_{p}$. 
-
-\textbf{TTL-based packet buffering}: 
-\begin{enumerate}
-	\item  Initially, we set the TTL values of all packets to $ttl_0=d$ at all the source servers. TTL value of every packet will be decreased by 1 per hop. At all the source servers, packets are buffered in a buffer of priority class $0$.
-	
-	\item Let $ttl_i$ be the TTL value of a packet $p$ at its $i$-$th$ hop ($i \geq 0$). If $ttl_i = 0$, packet $p$ will be dropped by the receiving switch or server. At every hop, the priority class of any incoming packet $p$ is calculated as $\lambda_p = ttl_0 - ttl_i $. Packet $p$ will be buffered and queued according to the calculated priority class $\lambda_p$ at every hop.
-\end{enumerate}
-
-\subsection{Proof of Deadlock-free Property}\label{subsec:proof}
-In this part, we are going to prove that our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
-
-In our proof, we use $p_{size}$, $p_{ttl}$ and $p_{dst}$ to denote the size, the TTL value and the destination of a packet $p$, respectively. Any ingress queue $q_{in}^{i,j}$ and any egress queue $q_{out}^{i,j}$ are viewed as packet sets. According to the switch model, we have $q_{in}^{i}=\cup_{j=1}^{k}q_{in}^{i,j}$, and $q_{out}^{i}=\cup_{j=1}^{k}q_{out}^{i,j}$.
-
-We use $|q_{in}^{i,j}|$ and $|q_{out}^{i,j}|$ to denote the queue lengths of $q_{in}^{i,j}$ and $q_{out}^{i,j}$, where $|q_{in}^{i,j}|=\sum_{p\in q_{in}^{i,j}}p_{size}$, and $|q_{out}^{i,j}|=\sum_{p\in q_{out}^{i,j}}p_{size}$.
+\if 0
 \subsubsection{Definition of switch functions}
  
 \begin{enumerate}
@@ -192,26 +120,9 @@ Let $t_{cost}(f)$ be the time cost of performing switch function $f$. In the fol
   \exists \text{ finite } t_0 > t, \quad \forall t_1>t_0, \nonumber\\
   BS_N(t_1)\equiv BS_N(t_0) \quad \text{and} \quad BS_N(t_0) \neq BS^0_N.
   \end{align}
-  
-    \subsubsection{Proof of deadlock-free}
     
+\fi 0
 
-    
-    \textbf{Claim:} our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
-  
-    \textbf{Proof:} To prove our TTL-based solution is deadlock-free, we prove by contradiction that no legal buffer state can be deadlocked buffer state under our TTL-based solution.
-    
-    Assuming there exists a legal buffer state  $BS_N(t)$ which is also a deadlocked buffer state under our TTL-based solution. If no new packets are injected into the network since $t$, according to Equation~(\ref{eqn:deadlockstatedef}), $BS_N(t)$ will converge into a fixed non-empty buffer state $BS_N(t_0)$ at some finite time $t_0>t$. 
-    
-    
-   \textbf{Case 1:} All the VEQs in $BS_N(t_0)$ is empty. As $BS_N(t_0) \neq BS^0_N$, $BS_N(t_0)$ has at least one non-empty VIQ. As $BS_N(t)$ is a legal buffer state, accroding to Equation~(\ref{eqn:legalstatecon}), there are finite number of packets queued in non-empty VIQs of $BS_N(t_0)$. Then according to Equations~(\ref{eqn:schecon1}), (\ref{eqn:nodupschedule}) and (\ref{eqn:fwdcon}), any unscheduled packet remaining in any VIQ will be forwarded to some VEQ within finite time at some finite time $t_2>t_0$. This means that $BS_N(t_0)$ will transition to some other buffer state, which violates the fact that $\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
-   
-   \textbf{Case 2:} There exist some non-empty VEQs (at least one) in $BS_N(t_0)$. Let $q_{out}^{i,m}$ be the queue of highest priority class among all the non-empty VEQ queues ($m\leq k$). Under our TTL-based solution, packets in $q_{out}^{i,m}$ will not be paused by PFC PAUSE messages as packets can only be paused by packets of higher priority class. According to Equations~(\ref{eqn:schecon2}) and (\ref{eqn:transcon}), packets in $q_{out}^{i,m}$ will be transmitted to next hop within finite time. This means that $BS_N(t_0)$ will transition to some other buffer state  at some finite time $t_2>t_0$, which violates the fact that $\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
-   
-   Based on the above discussion, the assumption we made will cause contradiction in both cases. Hence $BS_N(t)$ is not a deadlocked buffer state under our TTL-based solution. So our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
-    
-    
-    
     %     \textbf{Lemma 1}: for arbitrary non-deadlocked buffer state $BS_N(t)$, when no new packets are injected into the network since $t$, there exists a finite $t_0>t$, $BS_N(t_0)=BS^0_N$.
     %     
     %      \textbf{Proof}: Assuming that there does not exist a finite $t_0>t$, $BS_N(t_0)=BS^0_N$. As $BS_N(t)$ is a non-deadlocked buffer state, according to Equation~\ref{eqn:deadlockstatedef}, $BS_N(t)$ will not converge into any fixed non-empty buffer state. 

@@ -11,28 +11,33 @@ There are two main issues, 1) most of the solutions require significant changes 
 the path of each packet. This is conflicted with the nature of Ethernet and IP networks and hard to achieve in practice.
 We have evidences from production datacenters that a certain portion of packets are routed unexpectedly, though not dropped.
 2) The number of lossless priority available is very limited. There are only several traffic classes in total,
-and each lossless class requires siginifant reserved buffer to make PFC work. 
+and each lossless class requires siginifant reserved buffer to make PFC work. This is the biggest obstacle of 
+deadlock free designs in practice.
 
 \para{(Our solution)} In this paper, we work on a practical solution that can immediately implemented by 
 commodity switches. We do not enforce the path of each packet or make any changes on the routing algorithm. 
-This is important for network operators. We also minimize the hardware resources usage, like number of priority
-classes, reserved buffer and number of ACL rules.
+This is important for network operators. We must also minimize the hardware resources usage, like number of priority
+classes, reserved buffer and number of ACL rules. 
 
-\para{(Limit the scope)} We do not discuss centralized SDN solutions. BTW, the centralized solution is not trivial, refer
-to our hotnets paper. We assume our networks rely on PFC. These solutions would require significant changes 
-in the network, and may affect performance.
+\para{(Limit the scope)} We do not discuss centralized SDN solutions that decide the path and timing of each flow. In 
+addition, the centralized solution is not trivial (refer
+to our hotnets paper). We assume our networks rely on PFC. Using centralized controller or getting rid of PFC would require 
+significant changes in the network design, and may not have as good performance as RoCE.
 
 \para{Specifically,} we seek to design an algorithm that takes the topology and routes that must be lossless as the 
-input, and outputs the buffer configuration and ACL rules that guarantee no deadlock. To begin with, we focus on 
-common structured datacenter topology, including Fat-tree and BCube. The key idea is to tag the packets along 
-the path, and assign each packet to different lossless queues. Properly configured, we can eliminate any
-possibilities of deadlock with a small number of lossless queues.
+input, and outputs the buffer configuration and ACL rules that guarantee no deadlock. Our key idea is to tag the packets along 
+the path, and assign each packet to different lossless queues. Without any special assumptions about the topology, 
+TTL is a type of tag that carries implicit information of what path the packet has took.
+Properly configured, we can avoid cyclic buffer dependency using this information.
+We design a greedy algorithm that combines multiple tags into one lossless priority and effectively reduce the number of 
+required priorities.
 
-\para{We further extend our algorithms in two directions.} First, we consider generic, unstructured topology. 
-We abstract the ideas in designing algorithms for strucutred topology, and develop an algorithm that works for
-any graph, using TTL as a generic tag. We show that it works well for random topology like Jellyfish.
-Second, in cases where the limit number of lossless queues cannot guarantee deadlock-free, we provide suggestions for 
+\para{However, we found that this heurisitc does not always yield the optimal solution in terms of the number of lossless priorities. 
+Therefore, we further investigate structured datacenter topology.} We show that, on Fat-tree and BCube, we can develop 
+smarter tagging system than TTL and further reduce the number of lossless priorities.
+In cases where the limit number of lossless queues cannot guarantee deadlock-free, we provide suggestions for 
 network operator that which part of routing paths may be turned into lossy so that the whole network can be deadlock-free.
+
 
 \para{We implement our algorithm and verify it using testbed and NS-3 simulations.} \\
 
