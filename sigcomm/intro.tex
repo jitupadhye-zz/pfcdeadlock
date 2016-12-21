@@ -14,10 +14,10 @@ We have evidences from production datacenters that a certain portion of packets 
 and each lossless class requires siginifant reserved buffer to make PFC work. This is the biggest obstacle of 
 deadlock free designs in practice.
 
-\para{(Our solution)} In this paper, we work on a practical solution that can immediately implemented by 
+\para{(Our solution)} In this paper, we work on a practical solution that can be immediately implemented by 
 commodity switches. We do not enforce the path of each packet or make any changes on the routing algorithm. 
-This is important for network operators. We must also minimize the hardware resources usage, like number of priority
-classes, reserved buffer and number of ACL rules. 
+This is important for network operators. We must also minimize the hardware resources usage, like number of lossless
+queues, reserved buffer and number of ACL rules. 
 
 \para{(Limit the scope)} We do not discuss centralized SDN solutions that decide the path and timing of each flow. In 
 addition, the centralized solution is not trivial (refer
@@ -30,20 +30,24 @@ the path, and assign each packet to different lossless queues. Without any speci
 TTL is a type of tag that carries implicit information of what path the packet has took.
 Properly configured, we can avoid cyclic buffer dependency using this information.
 We design a greedy algorithm that combines multiple tags into one lossless priority and effectively reduce the number of 
-required priorities.
+required queues.
 
-\para{However, we found that this heurisitc does not always yield the optimal solution in terms of the number of lossless priorities. 
-Therefore, we further investigate structured datacenter topology.} We show that, on Fat-tree and BCube, we can develop 
-smarter tagging system than TTL and further reduce the number of lossless priorities.
-In cases where the limit number of lossless queues cannot guarantee deadlock-free, we provide suggestions for 
-network operator that which part of routing paths may be turned into lossy so that the whole network can be deadlock-free.
+\para{However, we found that this heurisitc does not always yield the optimal solution in terms of the number of lossless queues.}
+We further investigate popular structured datacenter topology. We show that, on Fat-tree and BCube, we can develop 
+smarter tagging system than TTL and achieve the optimal number of lossless queues.
+When there are multiple application traffic classes that need lossless property, we can further reduce the number of
+lossless queues on each switch by resuing the lossless queues. It is feasible because of the knowledge of structured topology and routing. 
 
 
-\para{We implement our algorithm and verify it using testbed and NS-3 simulations.} \\
+\para{Our contributions.} 1) we analyze and show evidences of practical challenges in making RoCE deadlock-free, including 
+the challenges in enforcing/predicting routing and the limit of lossless queues. 2) We develop an algorithm for generic graphs 
+and prove that formally proves that it is deadlock-free. The algorithm does not have any assumptions on the topology and routing,
+and requres acceptable number of lossless queues. 3) We further show that, given some knowledge of the popular structured topology
+(like Fat-Tree and BCbue), we can improve the system to achieve optimal results and efficiently support multiple application classes.  
+We also share our insights on how we may achieve optimal results on other structured topology.  
 
-\para{Our contributions.} 1) we analyze the practical challenges in making RoCE deadlock-free, including 
-the challenges in enforcing/predicting routing and the limit of lossless queues. 2) we develop practical solutions
-that eliminate deadlock for Fat-Tree and BCbue. 3) we extend our algorithm for generic graphs and scenarios
-where the number of lossless queues is insufficient.
 
+\para{We implement our algorithm and verify it using testbed and NS-3 simulations.} In evaluation, we also study the required number of
+lossless queues in different topology or routing. We hope that network operators can take this into account when they are choosing a
+topology or routing scheme when building RoCE networks.
 

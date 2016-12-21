@@ -1,22 +1,45 @@
-\section{Tag-based Solution}\label{sec:generic}
+\section{Solution: Tag-based System}\label{sec:generic}
 
-\subsection{Overview}
+We explore the practical solution for preventing PFC deadlock without any specific assumptions on the topology and routing that operator chooses.
 
+\subsection{Key Ideas}
 
-\subsection{TTL-based Tagging System}\label{subsec:ttlscheme}
+\begin{enumerate}
+	\item Our first insight is to change the priority of a packet right before it may cause cyclic buffer dependency if it does not change priority.
+	
+	\item Each switch must make the decision for each packet locally and distributedly, based on the packet's past path. This operation should be purely done in the
+	data plane.
+
+	\item The way the switch gets a packet's past path is by the tag the packet carries. We encode the information of past path into the tag, and let switches change 
+	the tag along the path. 
+
+\end{enumerate}
+
+The price we pay is that we will need {\em multiple} switch lossless queues to support one lossless application class. As the first step, we focus on supporting
+{\em just one} lossless application class. In Section~\ref{sec:specific}, we will revisit this issue and show how we may support multiple application classes efficiently.
+
+\fixme{Here is how we use multiple switch lossless queues for one application class.}
 
 \textbf{Buffer division}: we divide the buffer of network nodes into $k$ partitions, and let the $j$-$th$ partition associated with priority class $j$. If a packet is classified into priority class $j$, it will  be buffered in the $j$-$th$ buffer partition. Packets queued in queues $q_{in}^{i,j}$ and $q_{out}^{i,j}$ ($1\leq i \leq n$) are the packets currently buffered in the $j$-$th$ buffer partition.
 
 Let $d$ be the number of hops of the longest legal routing path in the network, $n$ be the number of switch ports, and $m_{p}$ be the maximum packet size. Our buffer division will always ensure $k \geq d$, and the size of any buffer partition is no smaller than $n*m_{p}$. 
 
-\textbf{TTL-based packet buffering}: 
+\subsection{Tagging System}
+
+Two requirements of our tagging system.
+
 \begin{enumerate}
-	\item  Initially, we set the TTL values of all packets to $ttl_0=d$ at all the source servers. TTL value of every packet will be decreased by 1 per hop. At all the source servers, packets are buffered in a buffer of priority class $0$.
-	
-	\item Let $ttl_i$ be the TTL value of a packet $p$ at its $i$-$th$ hop ($i \geq 0$). If $ttl_i = 0$, packet $p$ will be dropped by the receiving switch or server. At every hop, the priority class of any incoming packet $p$ is calculated as $\lambda_p = ttl_0 - ttl_i $. Packet $p$ will be buffered and queued according to the calculated priority class $\lambda_p$ at every hop.
+
+	\item A packet's tag is unchanged or changed at each hop of its path. When the tag is changed, it must be changed monotonically along any packet’s path (e.g., always increasing).
+
+	\item All packets that have the same tag cannot have cyclic buffer dependency.
+
 \end{enumerate}
-  
-\subsubsection{Proof of deadlock-free}
+
+On each switch, packets are classified into different priority classes purely based on the tags. Then we can prove that our network is deadlock-free.
+
+
+\para{Proof of deadlock-free} \fixme{Need to rewrite the following.}
 
 \textbf{Claim:} our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
 
@@ -30,7 +53,19 @@ Assuming there exists a legal buffer state  $BS_N(t)$ which is also a deadlocked
 \textbf{Case 2:} There exist some non-empty VEQs (at least one) in $BS_N(t_0)$. Let $q_{out}^{i,m}$ be the queue of highest priority class among all the non-empty VEQ queues ($m\leq k$). Under our TTL-based solution, packets in $q_{out}^{i,m}$ will not be paused by PFC PAUSE messages as packets can only be paused by packets of higher priority class. According to Equations~(\ref{eqn:schecon2}) and (\ref{eqn:transcon}), packets in $q_{out}^{i,m}$ will be transmitted to next hop within finite time. This means that $BS_N(t_0)$ will transition to some other buffer state  at some finite time $t_2>t_0$, which violates the fact that $\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
 
 Based on the above discussion, the assumption we made will cause contradiction in both cases. Hence $BS_N(t)$ is not a deadlocked buffer state under our TTL-based solution. So our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
-    
+
+
+\para{TTL-based tagging system.} In a generic topology and routing, TTL is a natural tagging system that satisfies our requirements.
+
+
+\textbf{TTL-based packet buffering}: 
+\begin{enumerate}
+	\item  Initially, we set the TTL values of all packets to $ttl_0=d$ at all the source servers. TTL value of every packet will be decreased by 1 per hop. At all the source servers, packets are buffered in a buffer of priority class $0$.
+	
+	\item Let $ttl_i$ be the TTL value of a packet $p$ at its $i$-$th$ hop ($i \geq 0$). If $ttl_i = 0$, packet $p$ will be dropped by the receiving switch or server. At every hop, the priority class of any incoming packet $p$ is calculated as $\lambda_p = ttl_0 - ttl_i $. Packet $p$ will be buffered and queued according to the calculated priority class $\lambda_p$ at every hop.
+\end{enumerate}
+  
+The drawback of TTL-based tagging is that it requires a lot of lossless queues. 
 
 \if 0
 \subsubsection{Proof of Deadlock-free Property}\label{subsec:proof}
@@ -42,7 +77,6 @@ We use $|q_{in}^{i,j}|$ and $|q_{out}^{i,j}|$ to denote the queue lengths of $q_
 \fi
 
 
+\subsection{Greedy Algorithm for Minimizing the Number of Lossless Queues}
 
-
-\subsection{Greedy Algorithm for Minimizing the Number of Lossless Priorities}
-
+\fixme{Here is the generic algorithm in ppt.}

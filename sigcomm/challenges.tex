@@ -3,11 +3,19 @@
 
 \subsection{Adapting to Existing Ethernet/IP Routing}
 
-We do not force the network operator to change any routing configuration. Existing routing configuration has been designed in a way that 
-best fit the needs. But common routing may lead to deadlock. (Show our bouncing data from production here.)
+We do not want to force the network operator to change any routing configuration. 
+Existing routing configuration has been designed in a way that 
+best fit the needs. But common routing may lead to deadlock. 
+
+\fixme{Show our bouncing data from production here.}
 
 \subsection{Limited number of lossless queues}\label{subsec:pfcheadroom}
 
+The number of lossless queues that can implemented on each switch is limited by two factors. First, the popular ASICs usually support up to eight different classes,
+and a few of which must be reserved for lossy traffic. Second, each lossless queue requires certain amount of buffer to operate. This further limits the number of
+lossless queues. 
+
+\fixme{Below is the analysis of how many lossless queues we can have based on PFC headroom and buffer space.}
 
 A PAUSE message sent from a receiver to an upstream sender needs some time to arrive and take effect. To avoid packet drops, the receiver (i.e., the sender of the PAUSE message) must reserve enough buffer to accommodate any packets it may receive during this time. In this part, we calculate the amout of buffer needed as the PFC headroom.
 
