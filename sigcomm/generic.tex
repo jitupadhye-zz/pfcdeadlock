@@ -5,7 +5,7 @@ We explore the practical solution for preventing PFC deadlock without any specif
 \subsection{Key Ideas}
 
 \begin{enumerate}
-	\item Our first insight is to change the priority of a packet right before it may cause cyclic buffer dependency if it does not change priority.
+	\item Our first insight is to change the lossless queue of a packet right before it may cause cyclic buffer dependency if it does not change priority.
 	
 	\item Each switch must make the decision for each packet locally and distributedly, based on the packet's past path. This operation should be purely done in the
 	data plane.
@@ -15,18 +15,21 @@ We explore the practical solution for preventing PFC deadlock without any specif
 
 \end{enumerate}
 
-The price we pay is that we will need {\em multiple} switch lossless queues to support one lossless application class. As the first step, we focus on supporting
-{\em just one} lossless application class. In Section~\ref{sec:specific}, we will revisit this issue and show how we may support multiple application classes efficiently.
+The overhead of this design is that we will need {\em multiple} switch lossless queues to support one lossless application class.
+This overhead is inevitable given that routing is not changed. 
+As the first step, we focus on supporting {\em just one} lossless application class. In Section~\ref{sec:specific}, we will revisit 
+this issue and show how we may support multiple application classes efficiently.
 
-\fixme{Here is how we use multiple switch lossless queues for one application class.}
 
-\textbf{Buffer division}: we divide the buffer of network nodes into $k$ partitions, and let the $j$-$th$ partition associated with priority class $j$. If a packet is classified into priority class $j$, it will  be buffered in the $j$-$th$ buffer partition. Packets queued in queues $q_{in}^{i,j}$ and $q_{out}^{i,j}$ ($1\leq i \leq n$) are the packets currently buffered in the $j$-$th$ buffer partition.
+\para{To use multiple switch lossless queues for one application class}, we divide the buffer of network nodes into $k$ partitions, and let the $j$-$th$ partition associated with priority class $j$. If a packet is classified into priority class $j$, it will  be buffered in the $j$-$th$ buffer partition. Packets queued in queues $q_{in}^{i,j}$ and $q_{out}^{i,j}$ ($1\leq i \leq n$) are the packets currently buffered in the $j$-$th$ buffer partition.
 
-Let $d$ be the number of hops of the longest legal routing path in the network, $n$ be the number of switch ports, and $m_{p}$ be the maximum packet size. Our buffer division will always ensure $k \geq d$, and the size of any buffer partition is no smaller than $n*m_{p}$. 
+% Let $d$ be the number of hops of the longest legal routing path in the network, $n$ be the number of switch ports, and $m_{p}$ be the maximum packet size. Our buffer division will always ensure $k \geq d$, and the size of any buffer partition is no smaller than $n*m_{p}$. 
 
 \subsection{Tagging System}
 
-Two requirements of our tagging system.
+The tag of the packet must carry the information of each packet's past path. Thus, we divide the path of each packet into multiple stages,
+and use the tag to represent the stage each packet is on. We can later prove that the network is deadlock-free if the tagging system satisfies
+the two requirements below:
 
 \begin{enumerate}
 
@@ -67,14 +70,13 @@ Based on the above discussion, the assumption we made will cause contradiction i
   
 The drawback of TTL-based tagging is that it requires a lot of lossless queues. 
 
-\if 0
-\subsubsection{Proof of Deadlock-free Property}\label{subsec:proof}
-In this part, we are going to prove that our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
 
-In our proof, we use $p_{size}$, $p_{ttl}$ and $p_{dst}$ to denote the size, the TTL value and the destination of a packet $p$, respectively. Any ingress queue $q_{in}^{i,j}$ and any egress queue $q_{out}^{i,j}$ are viewed as packet sets. According to the switch model, we have $q_{in}^{i}=\cup_{j=1}^{k}q_{in}^{i,j}$, and $q_{out}^{i}=\cup_{j=1}^{k}q_{out}^{i,j}$.
+%\subsubsection{Proof of Deadlock-free Property}\label{subsec:proof}
+%In this part, we are going to prove that our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
 
-We use $|q_{in}^{i,j}|$ and $|q_{out}^{i,j}|$ to denote the queue lengths of $q_{in}^{i,j}$ and $q_{out}^{i,j}$, where $|q_{in}^{i,j}|=\sum_{p\in q_{in}^{i,j}}p_{size}$, and $|q_{out}^{i,j}|=\sum_{p\in q_{out}^{i,j}}p_{size}$.
-\fi
+%In our proof, we use $p_{size}$, $p_{ttl}$ and $p_{dst}$ to denote the size, the TTL value and the destination of a packet $p$, respectively. Any ingress queue $q_{in}^{i,j}$ and any egress queue $q_{out}^{i,j}$ are viewed as packet sets. According to the switch model, we have $q_{in}^{i}=\cup_{j=1}^{k}q_{in}^{i,j}$, and $q_{out}^{i}=\cup_{j=1}^{k}q_{out}^{i,j}$.
+
+%We use $|q_{in}^{i,j}|$ and $|q_{out}^{i,j}|$ to denote the queue lengths of $q_{in}^{i,j}$ and $q_{out}^{i,j}$, where $|q_{in}^{i,j}|=\sum_{p\in q_{in}^{i,j}}p_{size}$, and $|q_{out}^{i,j}|=\sum_{p\in q_{out}^{i,j}}p_{size}$.
 
 
 \subsection{Greedy Algorithm for Minimizing the Number of Lossless Queues}

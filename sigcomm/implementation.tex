@@ -1,6 +1,8 @@
-\section{Implementation Details}\label{sec:implementation}
+\section{Implementation}\label{sec:implementation}
 
-\fixme{Need to rewrite this to explain what ACLs and buffer management we use for implementation.}
+The output of our algorithm can already be implemented in the commodity switches. In this section, we
+describe the details of our implementation, starting by explaining how the commodity shared-buffer switch
+maintains the queues and handles PFC.   
 
 \subsection{Switch Model}\label{subsec:model}
 
@@ -12,8 +14,10 @@
 
 \end{figure}
 
-In this part, we introduce the switch model on which we implement our algorithm output. As shown in Fig.~\ref{fig:switchmodel},
-our switch model consists of five elements: switch port, forwarding engine, PFC engine, crossbar and switch buffer. The function of these elements are list as follows.
+In this part, we abstract the switch model on which we implement our algorithm output. 
+Most commodity shared-buffer switches comply with this model. 
+As shown in Fig.~\ref{fig:switchmodel},
+the switch consists of five elements: switch port, forwarding engine, PFC engine, crossbar and switch buffer. The function of these elements are list as follows.
 
 %Fig.~\ref{fig:switchmodel}(a) shows the architecture of the switch model, which consists of a switching fabric and N line cards. Line cards are mainly used to receive/send packets and make routing/forwarding decisions. Switching fabric is a module to transfer packet cells from the input line card to the output line card. 
 
@@ -45,15 +49,19 @@ Let $q_{in}^{i,j}$ be the $j$-$th$ queue of VIQ $i$, and $q_{out}^{i,j}$ be the 
 		\item  Packet $p$ in the head of $q_{out}^{i_2,j}$ is forwarded to output port $i_2$: VEQ $i_2$ performs dequeue operation and removes packet $p$ from $q_{out}^{i_2,j}$.  VIQ $i_1$ performs dequeue operation and removes packet $p$ from $q_{in}^{i_1,j}$ (say packet $p$ was previously forwarded from $q_{in}^{i_1,j}$ to $q_{out}^{i_2,j}$). 
 	\end{enumerate}
 		
-	Note that in our switch model, dequeue operation is performed at corresponding VIQ only after packet $p$ leaves the switch buffer. This is because the purpose of using VIQ is to track the bytes of currently buffered packets received by an input port, such that PFC can work properly.
+	Note that, dequeue operation is performed at corresponding VIQ only after packet $p$ leaves the switch buffer. This is because the purpose of using VIQ is to track the bytes of currently buffered packets received by an input port, such that PFC can work properly.
 
-\subsection{Modified PFC Mechanism}\label{subsec:PFC}
+\subsection{ACL Rules for Tag Handling}\label{subsec:acl}
 
-As shown in Fig.~\ref{fig:switchmodel}(b), the function of our modified PFC mechanism consists of four parts. 
 
-The PFC engine will track the instant queue lengths of all the VIQs (function (1)). If the queue length of some queue  $q_{in}^{i,j}$ exceeds the configured PFC threshold, PFC engine will generate a PAUSE message to pause the packet transmission of the immediate upstream node on priority class $j$-$1$ over the link connected with port $i$. If the queue length of $q_{in}^{i,j}$ becomes less than the threshold later, PFC engine will generate a RESUME message to resume the packet transmission over the previously paused link on priority class $j$-$1$ (function (2)).
+\subsection{Transition of Lossless Queue}\label{subsec:change_priority}
 
-If some output port, say output port $i$, receives a PAUSE or RESUME message on priority class $j$ from its immediate downstream node, the PFC engine will then pause or resume the corresponding egress queue $q_{out}^{i,j}$, accordingly (function (3) and function (4)).
 
-The main difference between our modified PFC mechanism and the typical PFC mechanism is that, if the queue length of some queue $q_{in}^{i,j}$ at some network node exceeds the PFC threshold, PFC engine will pause the packet transmission of the immediate upstream node on priority class $j$-$1$ over the incoming link instead of on priority class $j$. This feature is important for realizing our TTL-based buffer management scheme, as we will introduce in the next.
+%As shown in Fig.~\ref{fig:switchmodel}(b), the function of our modified PFC mechanism consists of four parts. 
+
+%The PFC engine will track the instant queue lengths of all the VIQs (function (1)). If the queue length of some queue  $q_{in}^{i,j}$ exceeds the configured PFC threshold, PFC engine will generate a PAUSE message to pause the packet transmission of the immediate upstream node on priority class $j$-$1$ over the link connected with port $i$. If the queue length of $q_{in}^{i,j}$ becomes less than the threshold later, PFC engine will generate a RESUME message to resume the packet transmission over the previously paused link on priority class $j$-$1$ (function (2)).
+
+%If some output port, say output port $i$, receives a PAUSE or RESUME message on priority class $j$ from its immediate downstream node, the PFC engine will then pause or resume the corresponding egress queue $q_{out}^{i,j}$, accordingly (function (3) and function (4)).
+
+%The main difference between our modified PFC mechanism and the typical PFC mechanism is that, if the queue length of some queue $q_{in}^{i,j}$ at some network node exceeds the PFC threshold, PFC engine will pause the packet transmission of the immediate upstream node on priority class $j$-$1$ over the incoming link instead of on priority class $j$. This feature is important for realizing our TTL-based buffer management scheme, as we will introduce in the next.
 
