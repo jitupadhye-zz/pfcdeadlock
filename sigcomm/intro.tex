@@ -1,53 +1,88 @@
 %\vspace{-0.1in}
-\section{Introduction}\label{sec:intro}
+\section{Introduction}
+\label{sec:intro}
 
-\para{Datacenter appliations demand high performance from the network. RDMA provides such performance.
-We deploy RDMA over Converged Ethernet (RoCE).} \\ 
+In this paper, we present a simple and practical mechanism called \sysname{} to prevent deadlocks
+in large deployments of Remote Direct Memory Access (RDMA) over Ethernet (RoCE).
 
-\para{RoCE relies on PFC. PFC can cause deadlocks.} \\
+Large cloud providers like Microsoft~\cite{dcqcn} and Google~\cite{timely} are
+deploying RoCE in their data centers to provide low latency, high throughput
+network transfers with minimal CPU overhead~\cite{dcqcn}.  RoCE uses priority
+flow control (PFC) to eliminate packet losses due to buffer overflow at the
+switches. PFC allows a switch to temporarily pause its immediately upstream
+neighbor to prevent buffer overflow. While PFC is effective, it can cause
+numerous problems~\cite{dcqcn}, including deadlocks. 
 
-\para{Prior work} proposes theoritical solutions. But none of them is practical for current datacenter deployment.
-There are two main issues, 1) most of the solutions require significant changes on routing, enforcing or accurately predicting
-the path of each packet. This is conflicted with the nature of Ethernet and IP networks and hard to achieve in practice.
-We have evidences from production datacenters that a certain portion of packets are routed unexpectedly, though not dropped.
-2) The number of lossless priority available is very limited. There are only several traffic classes in total,
-and each lossless class requires siginifant reserved buffer to make PFC work. This is the biggest obstacle of 
-deadlock free designs in practice.
+The deadlock problem is well known~\cite{xxx}, especially in the HPC community. The
+problem is not merely theoretical -- our conversations with engineers at large
+cloud providers confirm that they have seen the problem in practice and at least
+one provider has reported it publicly~\cite{cxpaper}. Deadlcoks are a serious
+problem because they are not transient -- once a deadlock forms, it does not go
+away even after the conditions (e.g. a temporary routing loop due to link
+failure) that caused its formation have abated.
 
-\para{(Our solution)} In this paper, we work on a practical solution that can be immediately implemented by 
-commodity switches. We do not enforce the path of each packet or make any changes on the routing algorithm. 
-This is important for network operators. We must also minimize the hardware resources usage, like number of lossless
-queues, reserved buffer and number of ACL rules. 
+Deadlock in PFC-enabled network can occur in numerous ways~\cite{hotnetspaper},
+although in all cases, there is a circular buffer dependency (CBD) among the
+group of deadlocked switches. We will describe CBD more formally later in the
+paper. For now, the simple example shown in Figure~\ref{xxx} is sufficient --
+deadlock is formed, since switch A is blocked by switch B, which is blocked by
+C, which is paused by A.
 
-\para{(Limit the scope)} We do not discuss centralized SDN solutions that decide the path and timing of each flow. In 
-addition, the centralized solution is not trivial (refer
-to our hotnets paper). We assume our networks rely on PFC. Using centralized controller or getting rid of PFC would require 
-significant changes in the network design, and may not have as good performance as RoCE.
+A number of solutions to the deadlock problem are known, and they fall in two
+broad categories. The first category consists of solutions that detect the
+formation of the deadlock and then use various techniques to break
+it~\cite{mellnoaxhotnetspaper}. The problem with these solutions is that they do
+not address the root cause of the problem -- and hence cannot guarantee that the
+deadlock would not immediately reappear. We do not consider these solutions any
+further in this paper. 
 
-\para{Specifically,} we seek to design an algorithm that takes the topology and routes that must be lossless as the 
-input, and outputs the buffer configuration and ACL rules that guarantee no deadlock. Our key idea is to tag the packets along 
-the path, and assign each packet to different lossless queues. Without any special assumptions about the topology, 
-TTL is a type of tag that carries implicit information of what path the packet has took.
-Properly configured, we can avoid cyclic buffer dependency using this information.
-We design a greedy algorithm that combines multiple tags into one lossless priority and effectively reduce the number of 
-required queues.
+The second category of solutions are designed to prevent the key necessary
+condition for deadlock formation -- namely, the CBD. There are three ways to
+prevent CBD.  Some solutions require centralized, SDN-style routing.  These
+solutions are difficult to deploy in existing data centers, without wholesale
+infrastructure changes.  The second category of solutions require major changes
+to the routing protocols~\cite{xxx}, and thus cannot be implemented using
+commodity switches. Many of these solutions also require carefully controlling
+path of each packet -- something that is simply not possible with decentralized
+routing in presence of link failures~\cite{mingpaper}.  Finally, there are
+protocols that require creation of numerous priorities and buffer management
+according to those priorities. For example, if each of the flows in
+Figure~\ref{xxx} had its own priority and was buffered separately at each
+switch, there would be no deadlock. However, as shown in~\cite{cxpaper}, each
+priority class requires reservation of a certain amount of ``headroom'' buffer
+space, which limits the total number of priorities one can support. This
+headroom depends, among other factors, on the cable length -- since the buffer
+must be large enough to absorb all packets in flight.  Given the long cable
+lengths used in modern data centers, and the shallow buffers available on
+commodify switches, modern data center can typically support only two or three
+lossess priorities~\cite{cx}.
 
-\para{However, we found that this heurisitc does not always yield the optimal solution in terms of the number of lossless queues.}
-We further investigate popular structured datacenter topology. We show that, on Fat-tree and BCube, we can develop 
-smarter tagging system than TTL and achieve the optimal number of lossless queues.
-When there are multiple application traffic classes that need lossless property, we can further reduce the number of
-lossless queues on each switch by resuing the lossless queues. It is feasible because of the knowledge of structured topology and routing. 
+Given these shortcomings, to the best of our knowledge, no deadlock free routing
+solution has been deployed in production networks.
 
+In this paper, we present \syname{}, which can be implemented on existing
+commodity switches. It does not require any changes to the existing routing
+protocol deployed in the data center. 
 
-\para{Our contributions.} 1) we analyze and show evidences of practical challenges in making RoCE deadlock-free, including 
-the challenges in enforcing/predicting routing and the limit of lossless queues. 2) We develop an algorithm for generic graphs 
-and prove that formally proves that it is deadlock-free. The algorithm does not have any assumptions on the topology and routing,
-and requres acceptable number of lossless queues. 3) We further show that, given some knowledge of the popular structured topology
-(like Fat-Tree and BCbue), we can improve the system to achieve optimal results and efficiently support multiple application classes.  
-We also share our insights on how we may achieve optimal results on other structured topology.  
+\sysname{} takes the topology and routes that must be lossless as the input, and
+outputs the buffer configuration and ACL rules that guarantee no deadlock. Our
+key idea is to tag the packets along the path, and assign each packet to
+different lossless queues. Without any special assumptions about the topology,
+TTL is a type of tag that carries implicit information of what path the packet
+has taken.  Properly configured, we can avoid cyclic buffer dependency using
+this information.  We design a greedy algorithm that combines multiple tags into
+one lossless priority and effectively reduce the number of required queues.
+While the greedy heuristic is not optimal, for popular data center topologies
+such as as FatTree, we show that we can reduce the number of priorities even
+further by exploiting special structure of the topology.
 
+We have implemented and tested \sysname{} on commodity Arista 7050 Switches that
+use the popular Broadcom Trident-2 chipset.
 
-\para{We implement our algorithm and verify it using testbed and NS-3 simulations.} In evaluation, we also study the required number of
-lossless queues in different topology or routing. We hope that network operators can take this into account when they are choosing a
-topology or routing scheme when building RoCE networks.
-
+Our key contributions are as follows: first, using traces from a large cloud
+provider's data center, we demonstrate the practical challenges in making RoCE
+deadlock-free. We also analyze \sysname{} using simulations and a testbed
+implementation. Second, we develop \sysname{} for general topologies and
+formally prove that it prevents deadlocks. Third, we optimize \sysname{} for
+popular data center topologies such as FatTree to achieve optimal results and
+efficiently support multiple application classes.  
