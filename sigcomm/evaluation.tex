@@ -1,65 +1,86 @@
 \section{Evaluation}\label{sec:eval}
 
-\subsection{Experiment 1: scalability evaluation}\label{subsec:exp_scalability}
+We evaluate \sysname{} using a combination of testbed experiments and numerical experiments. Our evaluation centers around four key questions:
 
-\textbf{Point to demonstrate:} our solution is scalable .
+\begin{itemize}
+	\item \textbf{Can \sysname{} prevent deadlock when deadlock-prone misconfiguration or network failure happens?}
+	
+	\item \textbf{Is \sysname{} scalable for large scale datacenters?}
+	
+	\item \textbf{Can \sysname{} work at full line rate with little performance overhead?}
+	
+	\item \textbf{Does the mechanism of priority reusing cause any inefficiency or unfairness problem?} 
+	
+\end{itemize}
 
-\textbf{Setup:} for Fattree, BCube and Jellyfish, we run simulation to calculate 1) the $\#$ of lossless priorities, 2) the $\#$ of total ACL rules and 3) the $\#$ of ACL rules at the bottleneck switch under different network scale.
+\subsection{Validation}\label{subsec:exp_validation}
 
- \textbf{compared solution:} buffer management scheme.
- 
- \subsection{Experiment 2: CBD probability}\label{subsec:exp_CBDprobability}
- 
- \textbf{Point to demonstrate:} it is easy for a network to have CBD.
- 
- \textbf{Setup:} for Fattree, we randomly generate k failures or misconfiguration, and evaluate whether CBD is created.
- 
-  for BCube and Jellyfish, we calculate the default lossless routing by randomly choosing m shortest paths between each node pair. And then we check whether the output routing includes CBD.
- 
-\subsection{Experiment 3: Deadlock prevention}\label{subsec:exp_deadlockprevention}
+\textbf{Purpose:} demonstrate our solution can prevent deadlock.
 
-\textbf{Point to demonstrate:} Our solution can prevent deadlock and localize the damage of network errors/failures.
+\textbf{Scenario-1:} In a Clos network, we generate 2 flows across different ToRs. Flow 1 enters a routing loop due to misconfiguration, and forms a deadlock. Without \sysname{}, flow 2 will also get paused due to propagation of PFC PAUSE. With \sysname{}, there is no deadlock and flow 2 is not affected by the routing loop.
 
-\textbf{Setup:} In a Clos network, we generate 4 flows across different ToRs. Flow 1 is from ToR-1 to ToR-3, while flow 2, 3 and 4 are from ToR-2 to ToR-4. Due to a misconfiguration, flow 1 runs into a routing loop. Without our solution, deadlock occurs and all the 4 flows are paused. With our solution, the impact of routing loop is localized: none of flow 2, 3, 4 will be permanently paused.
+\textbf{Scenario-2:} We inject 2 flows into two paths that contain a CBD. Without \sysname{}, deadlock occurs and both flows are paused. With \sysname{}, there is no deadlock and both flows achieve good throughput.
 
-\textbf{Results:} Two figures to compare the throughput of 4 flows over time with and without our solution, respectively.
+\subsection{Overhead}\label{subsec:exp_overhead}
 
-\subsection{Experiment 4: Hierarchical lossless space improves application performance}\label{subsec:exp_appperformance}
+\subsubsection{Resource Consumption}\label{subsec:exp_resourceconsump}
 
-\textbf{Point to demonstrate:} For Clos network, applications can achieve better performance when both shortest paths and 1 bounce paths are lossless.
+\textbf{Purpose:} demonstrate our solution only consumes a small number of priorities and ACL entries.
 
-\textbf{Setup:} In a Clos network, we run both throughput-intensive and latency-sensitive applications. We randomly generate k failures in the network to let some of the flows enter 1 bounce paths.
+\textbf{Scenario:} for Fattree, BCube and Jellyfish, we calculate the following metrics under different network scales to show \sysname{} is scalable in terms of resource consumption.
+\begin{enumerate}
+	\item $\#$ of lossless priorities;
+	\item $\#$ of total ACL rules;
+ 	\item $\#$ of ACL rules at the bottleneck switch.
+\end{enumerate}
 
- \textbf{compared schemes:} 1) both shortest paths are  1 bounce paths are lossless; 2) shortest paths are lossless while 1 bounce paths are lossy; 3) Only shortest paths are used.
+\subsubsection{Performance overhead}\label{subsec:exp_performanceoverhead}
 
-\textbf{Results:} Two figures: one figure to show the FCT of throughput-intensive applications, and the other to show the FCT of latency-sensitive applications. We can get more results by varying the $\#$ of failures.
+ \textbf{Purpose:} demonstrate performance overhead of \sysname{} is small.
 
-\subsection{Experiment 5: Priority sharing among  traffic classes.}\label{subsec:exp_prioritysharing}
+\textbf{Scenario-1:} We let a flow traverse $m$ hops in the network, and perform tagging and priority manipulation at every hop. We can evaluate the performance overhead of \sysname{} by measuring the throughput and latency when using different values of $m$.
 
-\textbf{Point to demonstrate:} Our solution to share priority among traffic classes intruduces little performance interference.
+\textbf{Scenario-2:} we increase the $\#$ of ACL rules installed in a switch, and observe the performance overhead of the flows passing over this switch.
 
-\textbf{Setup:} In a Clos network, two users belonging to different traffic classes generate some traffic simultaneously. We randomly create a few link failures to let some flows enter the second lossless space. By measuring the throughput and latency, we can evaluate the performance interference when sharing priority among traffic classes.
+\subsection{Impact of priority reusing}\label{subsec:exp_priorityreusing}
 
- \textbf{compared schemes:} 1) no priority sharing among traffic classes (4 priorities are used); 2) there is priority sharing among traffic classes (3 priorities are used).
- 
- \textbf{Results:} Two figures. One to compare the average throughput. The other to 
-  compare the average RTT.
+\textbf{Purpose:} demonstrate the mechanism of priority reusing will not downgrade link utilization and throughput of flows (but may introduce unfairness problem).
+
+\textbf{Scenario:} A Clos network serves two users belonging to different application classes. For user 1, priority 1 is used for traffic following shortest paths, and priority 2 is used for traffic following 1-bounce paths. For user 2, priority 2 is used for traffic following shortest paths, and priority 3 is used for traffic following 1-bounce paths.
+
+Assuming WRR policy among different egress queues. Assuming traffic of these two users shares a bottleneck link. We create a link failure to let some flows of user 1 enter the second lossless space, and then compete link bandwidth with flows of user 2 on the bottleneck link. 
+
+By measuring the link utilization and throughput of all flows, we can demonstrate that link utilization of the bottleneck link and overall throughput of all flows is not downgraded, but priority reusing does cause some unfairness problem among different suers.
+
+\textbf{compared scheme:} no priority reusing among users (4 priorities are used)
   
-  \subsection{Experiment 6: Performance overhead of tagging and priority manipulation.}\label{subsec:exp_acloverhead}
+\subsection{Hierarchical lossless space improves application performance}\label{subsec:exp_appperformance}
+
+\textcolor{red}{This experiment will be moved to Section 3 as an motivation experiment.}
+
+\textbf{Purpose:} demonstrate that for Clos network, applications can achieve better performance when both shortest paths and 1 bounce paths are lossless.
+
+\textbf{Scenario:} In a Clos network, we run both throughput-intensive and latency-sensitive applications. We randomly generate k failures in the network to have some of the flows follow 1-bounce paths.
+
+ \textbf{compared schemes:}
+ \begin{enumerate}
+ 	\item both shortest paths and  1 bounce paths are lossless.
+ 	\item shortest paths are lossless. 1 bounce paths are lossy.
+ 	\item Only shortest paths are allowed.
+ \end{enumerate}
   
-  \textbf{Point to demonstrate:} performance overhead of tagging and priority manipulation is small.
-  
-  \textbf{Setup-1:} We let a flow traverse $m$ hops in the network, and perform tagging and priority manipulation at each hop. We evaluate performance overhead of tagging and priority manipulation by measuring the throughput and latency of this flow when using different values of $m$.
-  
-  \textbf{Setup-2:} we increase the $\#$ of ACL rules installed in a switch, and observe the performance overhead caused by ACL look-up.
-  
-  \textbf{compared schemes:} 1) no tagging and priority manipulation; 2) only tagging; 3) only priority manipulation; 4) tagging and priority manipulation.
-  
- \textbf{Results:} Throughput and latency of the observed flow under different schemes and settings.
- 
-   \subsection{Experiment 7: dealcok-free reconfiguration of ACL rules.}\label{subsec:exp_acloverhead}
-   
-   \textbf{Point to demonstrate:} when operator changes the topology or desired routing, we can do an online dealcok-free reconfiguration of ACL rules.
-   
-    \textcolor{red}{need a solution to do dealcok-free reconfiguration of ACL rules at first.}
+%   \subsection{Experiment 7: dealcok-free reconfiguration of ACL rules.}\label{subsec:exp_acloverhead}
+%   
+%   \textbf{Point to demonstrate:} when operator changes the topology or desired routing, we can do an online dealcok-free reconfiguration of ACL rules.
+%   
+%    \textcolor{red}{need a solution to do dealcok-free reconfiguration of ACL rules at first.}
+    
+    
+    % \subsection{Experiment 2: CBD probability}\label{subsec:exp_CBDprobability}
+    % 
+    % \textbf{Point to demonstrate:} it is easy for a network to have CBD.
+    % 
+    % \textbf{Setup:} for Fattree, we randomly generate k failures or misconfiguration, and evaluate whether CBD is created.
+    % 
+    %  for BCube and Jellyfish, we calculate the default lossless routing by randomly choosing m shortest paths between each node pair. And then we check whether the output routing includes CBD.
   
