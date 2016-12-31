@@ -19,7 +19,7 @@ We evaluate \sysname{} using a combination of testbed experiments and numerical 
 
 \textbf{Scenario-1:} In a Clos network, we generate 2 flows across different ToRs. Flow 1 enters a routing loop due to misconfiguration, and forms a deadlock. Without \sysname{}, flow 2 will also get paused due to propagation of PFC PAUSE. With \sysname{}, there is no deadlock and flow 2 is not affected by the routing loop.
 
-\textbf{Scenario-2:} We inject 2 flows into two paths that contain a CBD. Without \sysname{}, deadlock occurs and both flows are paused. With \sysname{}, there is no deadlock and both flows achieve good throughput.
+\textbf{Scenario-2:} We inject 3 flows into three paths that contain a CBD. Without \sysname{}, deadlock occurs and three flows are all paused. With \sysname{}, there is no deadlock and three flows achieve good throughput.
 
 \subsection{Overhead}\label{subsec:exp_overhead}
 
