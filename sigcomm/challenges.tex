@@ -1,11 +1,53 @@
 %\vspace{-0.1in}
 \section{Challenges}\label{sec:challenges}
 
+\subsection{Packet reroutes do happen}
+In a Clos based network \cite{fat-tree,vl2}, if packets always follow the UP-DOWN routing, then deadlock cannot happen as CBD is not possible. In up-down routing, a packet first goes UP from the source server to one of the common ancestor switches of the source and destination servers, then it goes DOWN from the common ancestor to the destination server.
+In UP-DOWN routing, the following property holds: when the packet is on its way UP, it should not go DOWN; when it is on its way DOWN, it should not go UP.
+
+Packet reroutes may happen due to several reasons including link flapping and routing protocol flapping \cite{f10}. 
+As have shown in \cite{shpiner2016unlocking}, when the UP-DOWN property is broken and packets may reroute multiple times between two layers of switches, and deadlocks may form as a result.
+
+In this paper, we show our measurement results from a large cloud computing provider that UP-DOWN routing property does break in reality and packets can be rerouted with a non negligible probability. 
+
+Our measurement works as follows. We instrument the servers to send out IP-in-IP packets to the high-layer switches. The outer source and destination IP addresses are set to the sending server and one of the high layer switches, and the inner source and destination IP addresses are set to the switch and the sending server, respectively. The high-layer switches are configured to decapsulate those IP-in-IP packets that are targeting themselves in hardware. 
+
+After decapsulation, the outer IP header is discarded, and the packet is then routed using its inner header. We set a TTL value, 64 in this paper, in the inner IP header. As the packet is forwarded back to the server, the TTL is decremented per hop. For a three-layer Clos network, there are three hops from the highest layer switches to the server. Hence normally the TTL value of the received packets should be 61. 
+
+If, however, the TTL value of a received packet is smaller than 61, say 59, we know the received packet was not taking the shortest path, and the packet must have taken a reroute path. 
+
+In this paper, for every measurement, a server sends out $n=100$ IP-in-IP probing packets, if the received TTL values are not equal, we know packet reroute happened for this measurement. We then calculate the reroute probability of the measurements as $\frac{M}{N}$, where $M$ is the number of measurements that experienced packet reroute, and $N$ is the total number of measurements. We carried out the measurements for one week in more than 20 data centers. The measurement results are shown in Table~\ref{fig:reroute}.
+
+\begin{table}[t]
+\begin{small}
+\begin{center}
+\begin{tabular}{|r|r|r|c|}
+\hline    Date    & Total No.  & Rerouted No.   & Reroute probability \\
+\hline 11/01/2016 & 11381533570 & 148416 &  1.3e-5 \\
+\hline 11/02/2016 & 11056408780 & 130815 &  1.2e-5 \\
+\hline 11/03/2016 & 10316034165 & 104472 &  1.0e-5 \\
+\hline 11/04/2016 & 10273000622 & 92555  &  0.9e-5 \\
+\hline 11/05/2016 & 10230003382 & 102872 &  1.0e-5 \\
+\hline 11/06/2016 & 10491233987 & 106266 &  1.0e-5 \\
+\hline 11/07/2016 & 9608289622  & 100916 &  1.1e-5 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Packet reroute measurements in the data centers of a large cloud computing service provider.}\label{fig:reroute}
+\end{small}
+\end{table}
+
+The most important conclusion we can draw from Table~\ref{fig:reroute} is that packet reroute does happen in data center networks. The reroute probability is around $10^{-5}$. Though $10^{-5}$ is not a big number, given the large traffic volume and the large scale data center networks, the deadlocks due to packet reroute as discussed in \cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} do not just exist in paper designs. They are real!
+
+Therefore how to address potential deadlocks due to packet reroute becomes a pressing challenge.  
+
+%adding discussions on why packet reroute happen.
+
 \subsection{Adapting to Existing Routing}
 
-We do not want to force the network operator to change any routing configuration. 
-Existing routing configuration has been designed in a way that 
-best fit the needs. But common routing may lead to deadlock. 
+We do not want to force the network operator to change any routing configuration.
+Existing routing configuration has been designed in a way that
+best fit the needs. But common routing may lead to deadlock.
 
 \fixme{Show our bouncing data from production here.}
 
@@ -13,7 +55,7 @@ best fit the needs. But common routing may lead to deadlock.
 
 The number of lossless queues that can implemented on each switch is limited by two factors. First, the popular ASICs usually support up to eight different classes,
 and a few of which must be reserved for lossy traffic. Second, each lossless queue requires certain amount of buffer to operate. This further limits the number of
-lossless queues. 
+lossless queues.
 
 \fixme{Below is the analysis of how many lossless queues we can have based on PFC headroom and buffer space.}
 
@@ -44,13 +86,13 @@ b_{hr} &=& r_{l}*(t_{snd}+t_{wire}+t_{rev}+t_{pro}+t_{stop}+t_{wire})     \nonum
 &=& 2(s_{MTU}+s_{PFC}+r_l*t_{wire})+r_l*t_{pro}
 \end{eqnarray}
 
-For typical TCP/IP based RDMA DCNs, we have $s_{MTU}=1500$bytes, $s_{PFC}=64$bytes. The length of links used in a single DCN is usually no larger than 300 meters~\cite{rdmaatscale}. As every 100 meters of link delays the reception of a packet by about 500ns for copper cables~\cite{pfcheadroom}, we have $t_{wire} \leq 1.5us$.  
+For typical TCP/IP based RDMA DCNs, we have $s_{MTU}=1500$bytes, $s_{PFC}=64$bytes. The length of links used in a single DCN is usually no larger than 300 meters~\cite{rdmaatscale}. As every 100 meters of link delays the reception of a packet by about 500ns for copper cables~\cite{pfcheadroom}, we have $t_{wire} \leq 1.5us$.
 
 The value of  $t_{pro}$ is implementation related. Let a quanta be the time needed to transmit 512 bits at the current network speed. The PFC definition caps this time to 60 quanta for any implementation~\cite{pfcheadroom}. Hence we have $r_l*t_{pro}=512 * 60 = 30,720 $ bits.
 
 According to the above parameters, when  $r_l=40Gbps$, the per port per priority PFC headroom $b_{hr} \leq 21968$ bytes $\approx 22$ KB.
 
-\textbf{PFC headroom of a switch:} For a $n$ port switch which supports $k$ priority classes, PFC PAUSE is possible to be triggered at all ports and priority classes simultaneously. So we should at least reserve $n*k*b_{hr}$ buffers as PFC headroom at every switch. 
+\textbf{PFC headroom of a switch:} For a $n$ port switch which supports $k$ priority classes, PFC PAUSE is possible to be triggered at all ports and priority classes simultaneously. So we should at least reserve $n*k*b_{hr}$ buffers as PFC headroom at every switch.
 
 For commodity switches like Arista 7050QX32 which has 32 full duplex 40Gbps ports, when supporting 8 priority classes, it requires about $32*8*22=5632$KB buffer as the PFC headroom.
 
@@ -60,7 +102,7 @@ For commodity switches like Arista 7050QX32 which has 32 full duplex 40Gbps port
 
 %\subsection{Necessary Buffer for Achieving Work-Conservation}\label{subsec:bufferthroughput}
 %
-%According to the rule-of-thumb~\cite{crtt,sizingrouterbuffer}, we at least need a buffer of size $b = C*RTT$ per port for achieving work-conservation, where RTT is the average round-trip time, and C is the link capacity. As our TTL-based solution allocates dedicated buffer to different priority classes, for a switch of n ports, when supporting $k$ priority classes, it demands a buffer of size $n*k*C*RTT$. 
+%According to the rule-of-thumb~\cite{crtt,sizingrouterbuffer}, we at least need a buffer of size $b = C*RTT$ per port for achieving work-conservation, where RTT is the average round-trip time, and C is the link capacity. As our TTL-based solution allocates dedicated buffer to different priority classes, for a switch of n ports, when supporting $k$ priority classes, it demands a buffer of size $n*k*C*RTT$.
 %
 %Assuming that the average RTT in the DCN is $50$us. For Arista 7050QX32 switch, when supporting 8 priority classes, we need to reserve a buffer of size $32*8*40Gbps*50us=64MB$. This apparently exceeds the total buffer size of most commodity switches. The key to solving this problem is to let packets of different priority classes share some buffer.
 %
@@ -78,7 +120,7 @@ For commodity switches like Arista 7050QX32 which has 32 full duplex 40Gbps port
 %
 %The intuition behind Equation~\ref{eqn:pfcthreshold} is to share the buffer of partition $k+1$ among different priority classes with respect to the weight $\frac{b_i}{\sum_{j=1}^k b_j}$. As for the buffer of dedicated partitions, we follow the idea of original dynamic PFC thresholding scheme to dynamically share it among different ports within the same priority class.
 %
-%Under the new buffer allocation scheme and the new dynamic PFC thresholding scheme, the buffer needed for achieving work-conservation is reduced to 
+%Under the new buffer allocation scheme and the new dynamic PFC thresholding scheme, the buffer needed for achieving work-conservation is reduced to
 %$n*C*RTT$, which is within the buffer capacity of most commodity switches.
 %\textbf{ Case of multiple priority classes:} When $k$ priority classes are enabled simultaneously at a single port, we cannot simply calculate the PFC headroom of a switch as $k*b_{hr}$. The reason is that in this case packets of any priority class cannot be transmitted at full line rate as the bandwidth is now shared by $k$ priority classes. Let $r_i$ be the packet transmission rate of priority class $i$, $1\leq i \leq k$. The per port PFC headroom of priority class $i$ can be expressed using the following equation
 %
@@ -87,7 +129,7 @@ For commodity switches like Arista 7050QX32 which has 32 full duplex 40Gbps port
 %&=& 2(s_{MTU}+s_{PFC}+r_i*t_{wire})+r_i*t_{pro}
 %\end{eqnarray}
 %
-%Then the total per port PFC headroom of all the $k$ priority classes can be calculated as 
+%Then the total per port PFC headroom of all the $k$ priority classes can be calculated as
 %
 %\begin{eqnarray} \label{eqn:sumpriority}
 %b_{hr}&=&\sum\limits_{i=1}^k b^i_{hr}       \nonumber \\
