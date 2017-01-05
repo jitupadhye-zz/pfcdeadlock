@@ -143,8 +143,8 @@ def yen_ksp(G, source, target, K=1):
     else:
         return None
 
-#print "K= ", K
-#print "A before ", A
+    #print "K= ", K
+    #print "A before ", A
     for k in range(1, K):
         # The previous k-shortest path
         last_path = A[-1][0]
@@ -196,5 +196,5 @@ def yen_ksp(G, source, target, K=1):
         else:
             break
 
-#print "A after ", A
+    #print "A after ", A
     return A
