@@ -56,7 +56,6 @@
 \usepackage{tabularx}
 %\usepackage{algorithm2e}
 \usepackage[ruled,vlined]{algorithm2e}
-\usepackage{algpseudocode}
 \usepackage{amsmath}
 \usepackage{mathtools}
 \newtheorem{mydef}{Definition}
@@ -130,6 +129,8 @@
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
 %\newtheorem{problem}[theorem]{Problem}
+
+\def\BState{\State\hskip-\ALG@thistlm}
 
 \newenvironment{definition}[1][Definition]{\begin{trivlist}
 \item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}

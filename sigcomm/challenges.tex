@@ -1,7 +1,27 @@
 %\vspace{-0.1in}
 \section{Challenges}\label{sec:challenges}
 
-\subsection{Packet reroutes do happen}
+\subsection{Incremental Deployment}\label{sec:incremental}
+
+Incremental deployment means a few practical constraints.
+
+First, we do not want to force the network operator to change the topology or routing configuration.
+Existing routing configuration has been designed in a way that best fit the needs. 
+Changing it may cause loss of performance, {\em e.g.,} limit the number of multipaths, or increase
+complexity and reduce reliability.
+
+Unfortunately, the common network topology and routing, even a Clos network with BGP routing, has 
+the risk of having cyclic buffer dependency (Section~\ref{sec:reroute}).
+
+Second, the deadlock prevention solution must be decentralized. A centralized controller for deadlock
+prevention requires significant changes in the network.
+
+Finally, we do not change the packet header formats.
+
+\subsection{Common IP Routing is Dynamic}\label{sec:reroute}
+
+This is due to the fact that IP routing protocols 
+
 In a Clos based network \cite{fat-tree,vl2}, if packets always follow the UP-DOWN routing, then deadlock cannot happen as CBD is not possible. In up-down routing, a packet first goes UP from the source server to one of the common ancestor switches of the source and destination servers, then it goes DOWN from the common ancestor to the destination server.
 In UP-DOWN routing, the following property holds: when the packet is on its way UP, it should not go DOWN; when it is on its way DOWN, it should not go UP.
 
@@ -42,14 +62,6 @@ The most important conclusion we can draw from Table~\ref{fig:reroute} is that p
 Therefore how to address potential deadlocks due to packet reroute becomes a pressing challenge.  
 
 %adding discussions on why packet reroute happen.
-
-\subsection{Adapting to Existing Routing}
-
-We do not want to force the network operator to change any routing configuration.
-Existing routing configuration has been designed in a way that
-best fit the needs. But common routing may lead to deadlock.
-
-\fixme{Show our bouncing data from production here.}
 
 \subsection{Limited Number of Lossless Queues}\label{subsec:pfcheadroom}
 

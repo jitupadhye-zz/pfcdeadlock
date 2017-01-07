@@ -1,75 +1,158 @@
-\section{Solution: Tag-based System}\label{sec:generic}
+\section{Tagger: Deadlock Prevention on Generic Topology}\label{sec:generic}
 
-We explore the practical solution for preventing PFC deadlock without any specific assumptions on the topology and routing that operator chooses.
+Keeping the challenges in mind, we design our system, Tagger, for preventing PFC deadlock.
+Because of incremental deployment (Section~\ref{sec:incremental}), our design does not change the 
+topology and routing that operator chooses. However, our key insight is that knowing the topology 
+and the routes that must be lossless (we call them {\em lossless routes}) significantly helps our design. 
+Therefore, we take them as input. 
 
-\subsection{Key Ideas}
+Given the input, Tagger outputs the detailed configurations for each switch. Tagger has three main ideas. 
+First, the switch configurations eliminate deadlock by reacting to the past path of each packet and move the packet
+into a safe priority just before CBD may appear. Second, the transition of priority is designed carefully so that 
+a single tag in the packet header is sufficent for each switch to make such decisions.
+Finally, we make sure that Tagger requires only a small number of lossless queues.
+
+\subsection{Idea 1: Priority Transition Based on Micropaths} 
+
+Though Tagger works on generic topology, it is inspired from analyzing the most popular data center topology -- Clos.
+Figure~\ref{fig:clos} shows a simple Clos topology. In addition to shortest path routing, the operators also
+require the ``1-bounce'' paths to be lossless to mitigate the impact of failed links/switches. 
+Unfortunately, multiple ``1-bounce'' paths together may form CBD and cause deadlock (Figure~\ref{fig:clos})~\cite{mellanox}.
+
+However, if we divide the paths into two segments, {\em before-bounce} and {\em after-bounce}, and assign them to
+different priority queues, there is no more CBD (Figure~\ref{fig:clos}). 
+The insight we get from this example is that if the switch can detect that a packet may cause CBD in next hops,
+it can change the packet's priority to avoid CBD, thus avoiding deadlock. 
+
+This is different from the prior solutions, which either assign a fixed priority based on pre-compute paths (cannot 
+react to dynamic routing), or change the priority every hop (requires too many priority queues). Instead, we chop 
+the paths into a few segments, which we call {\em micropaths},
+and change packet's priority only at a few transition point. It has the advantages from both types of prior work,
+{\em i.e.,} it requires a small number of priroties, and allows the switch to react to each packet's path.
+
+The key enabler of our approach is the topology and the set {\em lossless routes} specified by the operators
+as the input. By properly dividing lossless routes into multiple subspaces of micropaths, we can
+ensure that CBD is eliminated {\em within} each subspace. Section~\ref{sec:greedy} shows a way to achieve this.
+
+Inevitably, we will need {\em multiple} switch lossless queues to support one lossless application class.
+Specifically, we divide the buffer of network nodes into $k$ partitions, and let the $j$-$th$ partition associated 
+with priority queue $j$. If a packet is classified into priority queue $j$, it will be buffered in the $j$-$th$ buffer 
+partition and can generate PFC of priority $j$. 
+
+In this section, we focus on supporting {\em just one} lossless application class. In Section~\ref{sec:specific}, we will revisit 
+this issue and show how we may support multiple application classes more efficiently.
+
+\subsection{Idea 2: Tag for Ordered Micropath Subspaces}
+
+Even though proper micropath partition ensures no CBD {\em within} each priority, packets can still cause CBD
+{\em across} priorities. Switch must know the past path of each packet in order to decide the priority that avoids CBD.
+
+We enforce the order of transitioning among micropath subspaces and tag only based on current subspace.
+With this, the packets do not need to record the whole history of past micropaths in headers. A fixed length 
+header field (most commonly, DSCP) is sufficient to carry the tag. The tag values are one-one mapped to the micropath subspaces,
+which one-one maps to priority queues on each switch. 
+
+With this idea, we design the tag system in Tagger. In this system, each switch enqueues each packet into priority queue based
+on its tag, and changes the tag if the switch decides to change the packet's priority at the next hop.
+We can prove that the network is deadlock-free if the tag system, which defines micropath subspaces and transition, 
+satisfies the two requirements below:
 
 \begin{enumerate}
-	\item Our first insight is to change the lossless queue of a packet right before it may cause cyclic buffer dependency if it does not change priority.
-	
-	\item Each switch must make the decision for each packet locally and distributedly, based on the packet's past path. This operation should be purely done in the
-	data plane.
 
-	\item The way the switch gets a packet's past path is by the tag the packet carries. We encode the information of past path into the tag, and let switches change 
-	the tag along the path. 
+	\item A packet's tag is unchanged or changed at each hop of its path. When the tag is changed, it must be changed monotonically 
+	along any packet's path (e.g., always increasing).
+
+	\item For any given tag, all micropaths within the corresponding micropath subspace do not form cyclic buffer dependency.
 
 \end{enumerate}
 
-The overhead of this design is that we will need {\em multiple} switch lossless queues to support one lossless application class.
-This overhead is inevitable given that routing is not changed. 
-As the first step, we focus on supporting {\em just one} lossless application class. In Section~\ref{sec:specific}, we will revisit 
-this issue and show how we may support multiple application classes efficiently.
+\para{Proof of deadlock-free}
 
 
-\para{To use multiple switch lossless queues for one application class}, we divide the buffer of network nodes into $k$ partitions, and let the $j$-$th$ partition associated with priority class $j$. If a packet is classified into priority class $j$, it will  be buffered in the $j$-$th$ buffer partition. Packets queued in queues $q_{in}^{i,j}$ and $q_{out}^{i,j}$ ($1\leq i \leq n$) are the packets currently buffered in the $j$-$th$ buffer partition.
+\textbf{Claim:} Any tag system that satisfies the above two requirements is deadlock-free regardless of the 
+packet scheduling algorithms on any swithes.
 
-% Let $d$ be the number of hops of the longest legal routing path in the network, $n$ be the number of switch ports, and $m_{p}$ be the maximum packet size. Our buffer division will always ensure $k \geq d$, and the size of any buffer partition is no smaller than $n*m_{p}$. 
+\textbf{Proof:} We prove by contradiction that no legal buffer state can be in deadlocked buffer state.
 
-\subsection{Tagging System}
+\fixme{Need to rewrite the below symbols.}
 
-The tag of the packet must carry the information of each packet's past path. Thus, we divide the path of each packet into multiple stages,
-and use the tag to represent the stage each packet is on. We can later prove that the network is deadlock-free if the tagging system satisfies
-the two requirements below:
+Assuming there exists a legal buffer state $BS_N(t)$ which is also a deadlocked buffer state. If no new packets are injected into 
+the network since time $t$, according to Equation~(\ref{eqn:deadlockstatedef}), $BS_N(t)$ will converge into a fixed non-empty 
+buffer state $BS_N(t_0)$ at some finite time $t_0>t$. 
 
+
+\textbf{Case 1:} All the VEQs in $BS_N(t_0)$ is empty. As $BS_N(t_0) \neq BS^0_N$, $BS_N(t_0)$ has at least one non-empty VIQ. 
+As $BS_N(t)$ is a legal buffer state, accroding to Equation~(\ref{eqn:legalstatecon}), there are finite number of packets queued 
+in non-empty VIQs of $BS_N(t_0)$. Then according to Equations~(\ref{eqn:schecon1}), (\ref{eqn:nodupschedule}) and (\ref{eqn:fwdcon}), 
+any unscheduled packet remaining in any VIQ will be forwarded to some VEQ within finite time at some finite time $t_2>t_0$. 
+This means that $BS_N(t_0)$ will transition to some other buffer state, which violates the fact that 
+$\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
+
+\textbf{Case 2:} There exist some non-empty VEQs (at least one) in $BS_N(t_0)$. Let $q_{out}^{i,m}$ be the queue of highest priority 
+class among all the non-empty VEQ queues ($m\leq k$). Packets in $q_{out}^{i,m}$ will not be paused 
+by PFC PAUSE messages as packets can only be paused by packets of higher priority class. According to Equations~(\ref{eqn:schecon2}) 
+and (\ref{eqn:transcon}), packets in $q_{out}^{i,m}$ will be transmitted to next hop within finite time. This means that $BS_N(t_0)$ 
+will transition to some other buffer state at some finite time $t_2>t_0$, which violates the fact that 
+$\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
+
+Based on the above discussion, the assumption we made will cause contradiction in both cases. Hence $BS_N(t)$ is not a deadlocked 
+buffer state. So any tag-based solution that satisfies the above two requirements is deadlock-free regardless of the packet 
+scheduling algorithms.
+
+In short, this idea guarantees that the deadlock is eliminated while avoiding modifying packet headers.
+
+
+\subsection{Idea 3: Minimizing the Number of Micropath Subspaces} 
+The number of micropath subspaces (or tags) is essentially the number of lossless queues required on each switch.
+We must reduce it to below the switch hardware limit. 
+We first formalize this optimization problem as follows.
+
+Let $A_i$ represent a unique ingress port in the network, {\em i.e.,} switch $A$'s $i^th$ ingress port.
+$(A_i, x)$ is a port-tag pair: the case where $A_i$ gets a packet with tag $x$.
+$V$ is the set of all port-tag pairs that appear in input {\em lossless routes}. 
+Between these port-tag pairs, there exists an edge $(A_i, x)\rightarrow(B_j, y)$ $iff.$ switch $A$ and $B$ are 
+connected, AND switch $A$ may change a packet's tag from $x$ to $y$ before sending to $B$.
+It is essentially a buffer dependency.
+$E$ is the set of all such edges. $G(V, E)$ is the lossless graph.
+
+
+\textbf{Input:} the lossless graph $G(V, E)$, defined by Table~\ref{tab:symbols}
+
+\textbf{Goal:} minimize $|\{G_i\}|$, where $\{G_i\}$ is a partition of lossless graph $G(V, E)$, {\em s.t.,}
 \begin{enumerate}
-
-	\item A packet's tag is unchanged or changed at each hop of its path. When the tag is changed, it must be changed monotonically along any packet’s path (e.g., always increasing).
-
-	\item All packets that have the same tag cannot have cyclic buffer dependency.
-
+\item The {\em port-dependency graph} of any $G_i$ does NOT have a cycle, because a cycle means the possiblity of CBD.
+\item There is no lossless route going from $G_i$ to $G_j$ if $i \l j$ (monotonically non-increasing transision).
 \end{enumerate}
 
-On each switch, packets are classified into different priority classes purely based on the tags. Then we can prove that our network is deadlock-free.
+\fixme{The definition of port-dependency graph.}
 
+\begin{table}
+\small
+\centering
+\caption{Notations in the formalized problem description.}
+\label{tab:symbols}
+\begin{tabular}{|c|c|}
+\hline
+Symbol & Description \\ \hline
+$A_i$ & Switch $A$'s $i^{th}$ ingress port  \\ \hline
+$(A_i, x)$ & A port-tag pair \\ \hline
+$(A_i, x)\rightarrow(B_j, y)$ & A hop \\ \hline
+$V$ & All port-tag pairs in lossless paths  \\ \hline
+$E$ & All lossless hops \\ \hline
+$G(V, E)$ & Lossless graph \\ \hline
+\end{tabular}
+\end{table}
 
-\para{Proof of deadlock-free} \fixme{Need to rewrite the following.}
-
-\textbf{Claim:} our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
-
-\textbf{Proof:} To prove our TTL-based solution is deadlock-free, we prove by contradiction that no legal buffer state can be deadlocked buffer state under our TTL-based solution.
-
-Assuming there exists a legal buffer state  $BS_N(t)$ which is also a deadlocked buffer state under our TTL-based solution. If no new packets are injected into the network since $t$, according to Equation~(\ref{eqn:deadlockstatedef}), $BS_N(t)$ will converge into a fixed non-empty buffer state $BS_N(t_0)$ at some finite time $t_0>t$. 
-
-
-\textbf{Case 1:} All the VEQs in $BS_N(t_0)$ is empty. As $BS_N(t_0) \neq BS^0_N$, $BS_N(t_0)$ has at least one non-empty VIQ. As $BS_N(t)$ is a legal buffer state, accroding to Equation~(\ref{eqn:legalstatecon}), there are finite number of packets queued in non-empty VIQs of $BS_N(t_0)$. Then according to Equations~(\ref{eqn:schecon1}), (\ref{eqn:nodupschedule}) and (\ref{eqn:fwdcon}), any unscheduled packet remaining in any VIQ will be forwarded to some VEQ within finite time at some finite time $t_2>t_0$. This means that $BS_N(t_0)$ will transition to some other buffer state, which violates the fact that $\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
-
-\textbf{Case 2:} There exist some non-empty VEQs (at least one) in $BS_N(t_0)$. Let $q_{out}^{i,m}$ be the queue of highest priority class among all the non-empty VEQ queues ($m\leq k$). Under our TTL-based solution, packets in $q_{out}^{i,m}$ will not be paused by PFC PAUSE messages as packets can only be paused by packets of higher priority class. According to Equations~(\ref{eqn:schecon2}) and (\ref{eqn:transcon}), packets in $q_{out}^{i,m}$ will be transmitted to next hop within finite time. This means that $BS_N(t_0)$ will transition to some other buffer state  at some finite time $t_2>t_0$, which violates the fact that $\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
-
-Based on the above discussion, the assumption we made will cause contradiction in both cases. Hence $BS_N(t)$ is not a deadlocked buffer state under our TTL-based solution. So our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
-
-
-\para{TTL-based tagging system.} In a generic topology and routing, TTL is a natural tagging system that satisfies our requirements.
-
-
-\textbf{TTL-based packet buffering}: 
-\begin{enumerate}
-	\item  Initially, we set the TTL values of all packets to $ttl_0=d$ at all the source servers. TTL value of every packet will be decreased by 1 per hop. At all the source servers, packets are buffered in a buffer of priority class $0$.
-	
-	\item Let $ttl_i$ be the TTL value of a packet $p$ at its $i$-$th$ hop ($i \geq 0$). If $ttl_i = 0$, packet $p$ will be dropped by the receiving switch or server. At every hop, the priority class of any incoming packet $p$ is calculated as $\lambda_p = ttl_0 - ttl_i $. Packet $p$ will be buffered and queued according to the calculated priority class $\lambda_p$ at every hop.
-\end{enumerate}
-  
-The drawback of TTL-based tagging is that it requires a lot of lossless queues. 
-
+\if 0
+\para{Start point: brute-force tag system.} A strawman solution is to monotonically change the tag (thus, the priority) every hop.
+This is a degenerate version of our micropath-based solution.
+Initially, the tag of all packets is set to $tag_0$. The tag value decreases by one every hop. 
+Let $tag_i$ be the tag value of a packet at its $i$-$th$ hop ($i \geq 0$). At every hop, 
+set the tag (priority) of any incoming packet $p$ to be $tag_0 - tag_i$. 
+It is easy to verify that this satisfies the two requirements above: the tag changes monotonically, and there is no CBD
+within each micropath subspace.
+However, the drawback of such tagging is that it requires too many lossless queues. 
+\fi
 
 %\subsubsection{Proof of Deadlock-free Property}\label{subsec:proof}
 %In this part, we are going to prove that our TTL-based solution is deadlock-free regardless of the packet scheduling algorithms.
@@ -79,6 +162,49 @@ The drawback of TTL-based tagging is that it requires a lot of lossless queues.
 %We use $|q_{in}^{i,j}|$ and $|q_{out}^{i,j}|$ to denote the queue lengths of $q_{in}^{i,j}$ and $q_{out}^{i,j}$, where $|q_{in}^{i,j}|=\sum_{p\in q_{in}^{i,j}}p_{size}$, and $|q_{out}^{i,j}|=\sum_{p\in q_{out}^{i,j}}p_{size}$.
 
 
-\subsection{Greedy Algorithm for Minimizing the Number of Lossless Queues}
+\para{Greedy algorithm for minimizing the number of tags.} For generic topology and routing, we design a greedy algorithm.
+It works by combining as many buffer dependency as possible into each micropath subspaces under CBD-free constraint.
+To ensure the monotonic property, we leverage TTL as the starting point. The idea is that if we treat TTL as a tag,
+it naturely guarantees the monotonic property. We start from combing the port-tags with largest TTL to smallest TTL,
+hte monotonic property will still hold after combination. 
 
-\fixme{Here is the generic algorithm in ppt.}
+
+\begin{algorithm}
+    \KwIn{Topology and lossless routes}
+	\KwOut{A partition of $G$}
+	$output \gets Set()$\; 
+	$S \gets Set()$\; 
+	$output.add(S)$\;
+	$t \gets initialTTL$\;
+	\While{ $ t \le 0$} {
+    	$leftOver \gets False$\; 
+		\For{each $v$ in $V$ whose tag is $t$} {
+			$S' \gets S U {v}$ \;
+			$G' \gets portDependencyGraph(S')$ \;
+			\uIf{$G'$ is acyclic} {
+				$S \gets S'$ \; 
+				$V \gets V \\ {v}$ \;
+			}
+			\Else{
+				$leftOver \gets True$\;
+			}
+		}
+		\uIf{$leftOver$} {
+			$S \gets Set()$\; 
+			$output.add(S)$\;
+		}
+		\Else {
+			$t \gets t-1$\;
+		}
+	}
+	\Return{$output$}\;
+    \caption{Greedily minimizing the number of micropath subspaces by merging brute-force tags.}
+\end{algorithm}
+
+In the end, we assign a new tag (different from TTL) for each micropath subspace, and generate switch configurations
+based on this. We can prove that, the worst case scenario is as bad as using TTL directly as the tag, which requires
+as many priority queues as the longest route in lossless routes. However,
+in Section~\ref{sec:eval}, we show that this algorithm works reasonably well for generic topology, like Jellyfish. 
+
+This greedy algorithm may always return the optimal solution. For example, the result it gives for Clos network is not 
+optimal! In the next section, we will show that for structured topology, we can design smarter 
