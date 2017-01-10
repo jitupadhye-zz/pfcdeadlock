@@ -15,12 +15,31 @@ Finally, we make sure that Tagger requires only a small number of lossless queue
 \subsection{Idea 1: Priority Transition Based on Micropaths} 
 
 Though Tagger works on generic topology, it is inspired from analyzing the most popular data center topology -- Clos.
-Figure~\ref{fig:clos} shows a simple Clos topology. In addition to shortest path routing, the operators also
+
+\begin{figure}[t]
+	%\vspace{-0.1in}
+	\centering
+	
+	\subfloat[short for lof][1-bounce paths creates CBD.] {
+		\includegraphics[width=0.5\textwidth] {figs/cbd_a}
+	}
+	
+%	\vspace{-0.15in}
+	\subfloat[short for lof][CBD is eliminated with path segmenting and prioritizing.]{
+		\includegraphics[width=0.5\textwidth] {figs/cbd_b}
+	}
+	
+	\caption{Micropath based priority transition can eliminate CBD.}\label{fig:priority_transition}
+\end{figure}
+
+
+
+Figure~\ref{fig:priority_transition}(a) shows a simple Clos topology. In addition to shortest path routing, the operators also
 require the ``1-bounce'' paths to be lossless to mitigate the impact of failed links/switches. 
-Unfortunately, multiple ``1-bounce'' paths together may form CBD and cause deadlock (Figure~\ref{fig:clos})~\cite{mellanox}.
+Unfortunately, multiple ``1-bounce'' paths together may form CBD and cause deadlock (Figure~\ref{fig:priority_transition}(a))~\cite{mellanox}.
 
 However, if we divide the paths into two segments, {\em before-bounce} and {\em after-bounce}, and assign them to
-different priority queues, there is no more CBD (Figure~\ref{fig:clos}). 
+different priority queues, there is no more CBD (Figure~\ref{fig:priority_transition}(b)). 
 The insight we get from this example is that if the switch can detect that a packet may cause CBD in next hops,
 it can change the packet's priority to avoid CBD, thus avoiding deadlock. 
 
@@ -44,10 +63,25 @@ this issue and show how we may support multiple application classes more efficie
 
 \subsection{Idea 2: Tag for Ordered Micropath Subspaces}\label{sec:tag_order}
 
-Even though proper micropath partition ensures no CBD {\em within} each priority, packets can still cause CBD
-{\em across} priorities. Switch must know the past path of each packet in order to decide the priority that avoids CBD.
+\begin{figure}[t]
+	%\vspace{-0.1in}
+	\centering
+	
+	\subfloat[short for lof][CBD among subspaces.] {
+		\includegraphics[width=0.24\textwidth] {figs/subspace_a}
+	}
+	\subfloat[short for lof][Ordered subspaces.]{
+		\includegraphics[width=0.26\textwidth] {figs/subspace_b}
+	}
+	
+	\caption{Ordered subspaces ensure deadlock-free priority transition.}\label{fig:subspace}
+\end{figure}
 
-We enforce the order of transitioning among micropath subspaces and tag only based on current subspace.
+
+Even though proper micropath partition ensures no CBD {\em within} each priority, packets can still cause CBD
+{\em across} priorities, as shown in Figure~\ref{fig:subspace}(a). Switch must know the past path of each packet in order to decide the priority that avoids CBD.
+
+As shown in Figure~\ref{fig:subspace}(b), We enforce the order of transitioning among micropath subspaces and tag only based on current subspace.
 With this, the packets do not need to record the whole history of past micropaths in headers. A fixed length 
 header field (most commonly, DSCP) is sufficient to carry the tag. The tag values are one-one mapped to the micropath subspaces,
 which one-one maps to priority queues on each switch. 
@@ -208,3 +242,21 @@ in Section~\ref{sec:eval}, we show that this algorithm works reasonably well for
 
 This greedy algorithm may not always return the optimal solution. For example, the result it gives for Clos network is not 
 optimal! In Section~\ref{sec:specific}, we show that for structured topology, smarter tagging system can achieve optimal results.
+
+%\begin{figure}[t]
+%	%\vspace{-0.1in}
+%	\centering
+%	
+%	\subfloat[short for lof][Topology and routes.] {
+%		\includegraphics[width=0.45\textwidth] {figs/alo_walkthrough_a}
+%	}
+%
+%	\subfloat[short for lof][Tagged graph.]{
+%		\includegraphics[width=0.45\textwidth] {figs/alo_walkthrough_b}
+%	}
+%	
+%		\subfloat[short for lof][Partitions of tagged graph.]{
+%		\includegraphics[width=0.45\textwidth] {figs/alo_walkthrough_c}
+%	}
+%	\caption{Walk-through example for the  algorithm.}\label{fig:subspace}
+%\end{figure}
