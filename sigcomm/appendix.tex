@@ -9,13 +9,13 @@ Once a pause frame is generated, it may be blocked by a packet ahead of it which
 
 %The transmission of the PAUSE frame  can pass ahead of any other packet queued in the receiver, but cannot preempt another frame currently being transmitted in the same direction. In the worst case, the receiver generates a PAUSE frame right when the first bit of a maximum-size packet has started engaging the transmission logic. So we have  $t_{snd}=(s_{MTU}+s_{PFC})/r_{l}$, where $s_{MTU}$ is the size of a maximum-size packet, $s_{PFC}$ is the size of PFC PAUSE frame and $r_{l}$ is the line rate of network link.
 
-\noindent\textbf{The PAUSE frame propagation time $t2$}. This value is decided by the cable length between the sender and receiver.
+\noindent\textbf{The PAUSE frame propagation time $t_2$}. This value is decided by the cable length between the sender and receiver.
 
 \noindent\textbf{The PAUSE frame receiving time at the sender $t3$}. $t_3=\frac{L_{pfc}}{B}$.
 
 \noindent\textbf{The PFC response time $t_4$}. This is the amount of time needed for the sender to respond after the pause frame is received.
 
-\noindent\textbf{The time for the sender to stop transmitting $t_5$)}. Again, because Ethernet is non-preemptive, when the sender decides to stop transmitting, it needs to finish the packet already gets started. In the worst-case, the packet size can be $L^{p}_{mtu}$, which is the maximum packet size for that lossless class $p$. Hence $t_5 = \frac{L^{p}_{mtu}}{B}$.
+\noindent\textbf{The time for the sender to stop transmitting $t_5$}. Again, because Ethernet is non-preemptive, when the sender decides to stop transmitting, it needs to finish the packet already gets started. In the worst-case, the packet size can be $L^{p}_{mtu}$, which is the maximum packet size for that lossless class $p$. Hence $t_5 = \frac{L^{p}_{mtu}}{B}$.
 
 \noindent\textbf{The time for the pipe to be drained $t_6$}. We know $t_6 = t_2$.
 
