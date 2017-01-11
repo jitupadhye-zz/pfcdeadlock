@@ -103,37 +103,19 @@ satisfies the two requirements below:
 \para{Proof of deadlock-free}
 
 
-\textbf{Claim:} Any tag system that satisfies the above two requirements is deadlock-free regardless of the 
-packet scheduling algorithms on any swithes.
+\textbf{Claim:} Any tag system that satisfies the above two requirements is deadlock-free.
 
-\textbf{Proof:} We prove by contradiction that no legal buffer state can be in deadlocked buffer state.
+\textbf{Proof:} We prove by contradiction. Assuming we can find a topology and a set of lossless routes, for which there exists a subspace partition and priority transition that satisfies the above two requirements, but is not deadlock-free.
 
-\fixme{Need to rewrite the below symbols.}
+Since the tag system is not deadlock-free, we can find a set of micropaths that form a CBD. 
 
-Assuming there exists a legal buffer state $BS_N(t)$ which is also a deadlocked buffer state. If no new packets are injected into 
-the network since time $t$, according to Equation~(\ref{eqn:deadlockstatedef}), $BS_N(t)$ will converge into a fixed non-empty 
-buffer state $BS_N(t_0)$ at some finite time $t_0>t$. 
+\textbf{Case 1:} All these micropaths are in the same subspace. According to requirement 2, micropaths within the same subspace do not form CBD. contradicted.
 
-
-\textbf{Case 1:} All the VEQs in $BS_N(t_0)$ is empty. As $BS_N(t_0) \neq BS^0_N$, $BS_N(t_0)$ has at least one non-empty VIQ. 
-As $BS_N(t)$ is a legal buffer state, accroding to Equation~(\ref{eqn:legalstatecon}), there are finite number of packets queued 
-in non-empty VIQs of $BS_N(t_0)$. Then according to Equations~(\ref{eqn:schecon1}), (\ref{eqn:nodupschedule}) and (\ref{eqn:fwdcon}), 
-any unscheduled packet remaining in any VIQ will be forwarded to some VEQ within finite time at some finite time $t_2>t_0$. 
-This means that $BS_N(t_0)$ will transition to some other buffer state, which violates the fact that 
-$\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
-
-\textbf{Case 2:} There exist some non-empty VEQs (at least one) in $BS_N(t_0)$. Let $q_{out}^{i,m}$ be the queue of highest priority 
-class among all the non-empty VEQ queues ($m\leq k$). Packets in $q_{out}^{i,m}$ will not be paused 
-by PFC PAUSE messages as packets can only be paused by packets of higher priority class. According to Equations~(\ref{eqn:schecon2}) 
-and (\ref{eqn:transcon}), packets in $q_{out}^{i,m}$ will be transmitted to next hop within finite time. This means that $BS_N(t_0)$ 
-will transition to some other buffer state at some finite time $t_2>t_0$, which violates the fact that 
-$\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
-
-Based on the above discussion, the assumption we made will cause contradiction in both cases. Hence $BS_N(t)$ is not a deadlocked 
-buffer state. So any tag-based solution that satisfies the above two requirements is deadlock-free regardless of the packet 
-scheduling algorithms.
-
-In short, this idea guarantees that the deadlock is eliminated while avoiding modifying packet headers.
+\textbf{Case 2:} These micropaths are in different subspaces. We sort these micropaths according to the subspaces they belong to, and choose a micropath in the smallest subspace. Since these micropaths can form a CBD,  Starting from the source end of the chosen micropath, we can always find a circular path back to the chosen micropath when traversing along these micropaths. 
+ 
+ According to requirement 1, once we enter a larger subspace, we can never go back. So this circular path should only include micropaths in the smallest subspace. But according to requirement 2, micropaths within the same subspace do not form a CBD. Hence no circular path can be found within the smallest subspace. So this circular path does not exist. Contradicted.
+ 
+Based on the discussion of both cases, we can conclude that there do not exist a set of micropaths that form a CBD. This contradicts the supposition that the tag system is not deadlock-free. Hence, any tag system that satisfies the above two requirements is deadlock-free.
 
 
 \subsection{Idea 3: Minimizing the Number of Tags} 
@@ -293,3 +275,39 @@ in Section~\ref{sec:eval}, we show that this algorithm works reasonably well for
 %	}
 %	\caption{Walk-through example for the  algorithm.}\label{fig:subspace}
 %\end{figure}
+
+
+%\para{Proof of deadlock-free}
+%
+%
+%\textbf{Claim:} Any tag system that satisfies the above two requirements is deadlock-free regardless of the 
+%packet scheduling algorithms on any swithes.
+%
+%\textbf{Proof:} We prove by contradiction that no legal buffer state can be in deadlocked buffer state.
+%
+%\fixme{Need to rewrite the below symbols.}
+%
+%Assuming there exists a legal buffer state $BS_N(t)$ which is also a deadlocked buffer state. If no new packets are injected into 
+%the network since time $t$, according to Equation~(\ref{eqn:deadlockstatedef}), $BS_N(t)$ will converge into a fixed non-empty 
+%buffer state $BS_N(t_0)$ at some finite time $t_0>t$. 
+%
+%
+%\textbf{Case 1:} All the VEQs in $BS_N(t_0)$ is empty. As $BS_N(t_0) \neq BS^0_N$, $BS_N(t_0)$ has at least one non-empty VIQ. 
+%As $BS_N(t)$ is a legal buffer state, accroding to Equation~(\ref{eqn:legalstatecon}), there are finite number of packets queued 
+%in non-empty VIQs of $BS_N(t_0)$. Then according to Equations~(\ref{eqn:schecon1}), (\ref{eqn:nodupschedule}) and (\ref{eqn:fwdcon}), 
+%any unscheduled packet remaining in any VIQ will be forwarded to some VEQ within finite time at some finite time $t_2>t_0$. 
+%This means that $BS_N(t_0)$ will transition to some other buffer state, which violates the fact that 
+%$\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
+%
+%\textbf{Case 2:} There exist some non-empty VEQs (at least one) in $BS_N(t_0)$. Let $q_{out}^{i,m}$ be the queue of highest priority 
+%class among all the non-empty VEQ queues ($m\leq k$). Packets in $q_{out}^{i,m}$ will not be paused 
+%by PFC PAUSE messages as packets can only be paused by packets of higher priority class. According to Equations~(\ref{eqn:schecon2}) 
+%and (\ref{eqn:transcon}), packets in $q_{out}^{i,m}$ will be transmitted to next hop within finite time. This means that $BS_N(t_0)$ 
+%will transition to some other buffer state at some finite time $t_2>t_0$, which violates the fact that 
+%$\forall t_1>t_0, BS_N(t_1)\equiv BS_N(t_0)$.
+%
+%Based on the above discussion, the assumption we made will cause contradiction in both cases. Hence $BS_N(t)$ is not a deadlocked 
+%buffer state. So any tag-based solution that satisfies the above two requirements is deadlock-free regardless of the packet 
+%scheduling algorithms.
+%
+%In short, this idea guarantees that the deadlock is eliminated while avoiding modifying packet headers.
