@@ -1,0 +1,39 @@
+\begin{appendices}
+\section{PFC headroom calculation}\label{APPHEADROOM}
+
+The PFC headroom needed per port per lossless class can be calculated by considering the time interval needed for a receiver to pause its upstream sender. The time interval is composed of the following 6 periods for the lossless class $p$:
+
+\begin{enumerate}
+	
+\item\textbf{The time to send a PAUSE frame $t_1$}. 
+Once a pause frame is generated, it may be blocked by a packet ahead of it which just starts transmitting. Since Ethernet is non-preemptive, the pause fame has to wait for the completion of the previous packet. Hence in the worst-cast, $t_1 = \frac{ L_{mtu} + L_{pfc}}{B}$, where $L_{mtu}$ is the MTU size, and $L_{pfc}$ is the size of a PFC pause frame, and $B$ is the link rate. 
+
+%The transmission of the PAUSE frame  can pass ahead of any other packet queued in the receiver, but cannot preempt another frame currently being transmitted in the same direction. In the worst case, the receiver generates a PAUSE frame right when the first bit of a maximum-size packet has started engaging the transmission logic. So we have  $t_{snd}=(s_{MTU}+s_{PFC})/r_{l}$, where $s_{MTU}$ is the size of a maximum-size packet, $s_{PFC}$ is the size of PFC PAUSE frame and $r_{l}$ is the line rate of network link.
+
+\item\textbf{The PAUSE frame propagation time $t2$}. This value is decided by the cable length between the sender and receiver. 
+
+\item\textbf{The PAUSE frame receiving time at the sender $t3$}. $t_3=\frac{L_{pfc}}{B}$.
+
+\item\textbf{The PFC response time $t_4$}. This is the amount of time needed for the sender to respond after the pause frame is received. 
+
+\item\textbf{The time for the sender to stop transmitting $t_5$)}. Again, because Ethernet is non-preemptive, when the sender decides to stop transmitting, it needs to finish the packet already gets started. In the worst-case, the packet size can be $L^{p}_{mtu}$, which is the maximum packet size for that lossless class $p$. Hence $t_5 = \frac{L^{p}_{mtu}}{B}$. 
+
+\item\textbf{The time for the pipe to be drained $t_6$}. We know $t_6 = t_2$. 
+
+\end{enumerate}
+
+At a first glance, the headroom size should be $B\times\sum t_i$. 
+
+ To correctly calculate the PFC headroom, we need to further consider the fact that most modern switches divide the switch buffer into cells of fixed size. A buffer cell can only accommodate bytes of a single packet. For example, A 64-byte packet will consume one cell of 100 bytes, and 36 bytes of this cell will remain unused.
+
+ We use $s_{cell}$ to denote the size of buffer cell, and $s_{min}$ to denote the minimum size of a packet. In the worst case, the sender sends packets of minimum size in periods 1,2,3,4 and 6, and packets of maximum size in period 5. Hence
+ PFC headroom for a single priority per port is (denoted as $b_{hr}$):
+
+
+ \begin{eqnarray} \label{eqn:pfcheadroom}
+ b_{hr}  & = &  s_{cell}\lceil\frac{(s_{MTU}+2s_{PFC}+2r_{l}t_{wire}+r_{l}t_{pro})}{s_{min}}\rceil \nonumber   \\
+ & & +  s_{cell}\lceil\frac{s_{MTU}}{s_{min}}\rceil
+ \end{eqnarray}
+
+For typical TCP/IP based RDMA DCNs, we have $s_{MTU}$ = 1500bytes, $s_{min}$ = 64bytes, $s_{PFC}$ = 64bytes, $t_{wire} \leq$ 1.5us and $t_{pro}\le $ 4us. For Broadcom chipset, we have $s_{cell}$ = 208bytes. According to the above equation, for commodity switches like Arista 7050QX32 which has 32 full duplex 40Gbps ports and 12MB buffer, it requires about 3.8MB buffer to support a single lossless priority. Hence only 2 lossless priorities can be supported.
+\end{appendices}
