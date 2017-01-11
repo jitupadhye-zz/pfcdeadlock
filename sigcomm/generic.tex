@@ -1,4 +1,4 @@
-\section{Tagger: Deadlock Prevention on Generic Topology}\label{sec:generic}
+\section{Deadlock Prevention on Generic Topology}\label{sec:generic}
 
 Keeping the challenges in mind, we design our system, Tagger, for preventing PFC deadlock.
 Because of incremental deployment (Section~\ref{sec:incremental}), our design does not change the 
@@ -136,52 +136,79 @@ scheduling algorithms.
 In short, this idea guarantees that the deadlock is eliminated while avoiding modifying packet headers.
 
 
-\subsection{Idea 3: Minimizing the Number of Micropath Subspaces} 
-The number of micropath subspaces (or tags) is essentially the number of lossless queues required on each switch.
+\subsection{Idea 3: Minimizing the Number of Tags} 
+The number of tags (or, corresponding micropath subspaces) is essentially the number of lossless queues required on each switch.
 We must reduce it to below the switch hardware limit. In this section, we focus on hte number of lossless queues for 
-just ONE application class. We first formalize this optimization problem.
+just {\em one} application class. We first formalize the tagging system.
 
-\para{Notations.} Let $A_i$ represent a unique ingress port in the network, {\em i.e.,} switch $A$'s $i^th$ ingress port.
-With a tagging system, each port may receive packets with different tags.
-$(A_i, x)$ is a port-tag pair: the case where $A_i$ gets a packet with tag $x$.
-$V$ is the set of all possible port-tag pairs. 
+\para{Tagging system.} Let $A_i$ represent a unique ingress port in the network, {\em i.e.,} switch $A$'s $i^{th}$ ingress port.
+We use a {\em tagged graph} $G(V,E)$ to uniquely represent a tagging system.
+With a tagging system, the {\em tagged graph} $G(V,E)$ is generated following below rules.
 
-Between these port-tag pairs, there exists an edge $(A_i, x)\rightarrow(B_j, y)$ {\em iff.} switch $A$ and $B$ are 
-connected, AND switch $A$ may change a packet's tag from $x$ to $y$ before sending to $B$ (the case $i=j$ also counts).
-It is essentially a buffer dependency -- whether $A_i$ can dequeue packets depending on whether $B_j$ has paused upstream.
-$E$ is the set of all such edges. We call $G(V, E)$ the tagged graph.
-
-The tags define a partition of the tagged graph, $\{G_k\}$, where $G_k = \{(A_i, k) | \forall A, i\}$.
-Each $G_k$ is a {\em micropath subspace}. We assign a separate lossless priority to each $G_k$.
-
-A brute-force solution is to monotonically change the tag (thus, the priority) every hop.
-It is easy to verify that CBD is eliminated. However, it requires too many lossless queues in a large network.
-We want to minize the number of lossless queues by leveraging the routing information.
-
-%\textbf{Input:} the lossless graph $G(V, E)$, defined by Table~\ref{tab:symbols}
-\para{Algorithm goal:} find a tagging system that minimizes $|\{G_k\}|$, {\em s.t.,}
 \begin{enumerate}
-\item Any $G_i$ does NOT have a cycle, because a cycle means the possiblity of CBD.
-\item There is no lossless route going from $G_i$ to $G_j$ if $i \l j$ (monotonically non-increasing transision).
+\item $G$ contains a node, $(A_i, x)$, {\em iff.} a port $A_i$ may receive packets with tag $x$, and these packets must 
+be lossless. $V$ is the set of all such nodes.
+\item In $G$, there exists an edge $(A_i, x)\rightarrow(B_j, y)$ {\em iff.} switch $A$ and $B$ are 
+connected, {\em and} switch $A$ may change a packet's tag from $x$ to $y$ before sending to $B$ (the case $x=y$ also counts).
+$E$ is the set of all such edges.
 \end{enumerate}
 
-The two requirements correspond to the requirements stated in Section~\ref{sec:tag_order}.
+
+The tags define a partition of the tagged graph, $\{G_k\}$, 
+where $G_k = \{(A_i, k) | \forall A, i\}$. Each $G_k$ is a {\em micropath subspace} and has a unique lossless priority.
+On switches, we configure ACL rules to match on tags and assign lossless priorities.
+In addition, each edge that has different tags on two ends corresponds to an action of changing tags on switches.
+
+Two requirements directly follow Section~\ref{sec:tag_order}. First, any $G_i$ does {\em not} have a cycle. This is because
+each edge in $G_i$ is essentially a buffer dependency -- whether $A_i$ can dequeue packets depending on whether $B_j$ 
+has paused upstream. A cycle in $G_i$ means cyclic buffer dependency. Second, There is no lossless route going from 
+$G_i$ to $G_j$ if $i<j$, because we enforce the order of micropath subspaces.
+
+
+\para{Brute-force tagging system.} For general graph without structure information, a straight forward tagging system
+to monotonically change the tag (thus, the priority) every hop, as described in Algorithm~\ref{alg:ttl}. It is easy to 
+verify that the above requirements are met, so deadlock is eliminated with this tagging system. However, it requires 
+too many lossless queues in a large network since it depends on the diameter of the topology.
+
+\begin{algorithm}
+	\small
+    \KwIn{Topology and routing paths $R$ that must be lossless}
+	\KwOut{A tagged graph $G(V, E)$}
+	$V \gets Set()$\;
+	$E \gets Set()$\; 
+	$maxTag \gets$ longestPath($R$)\;
+	\For{each path $r$ in $R$} {
+		$tag \gets maxTag$\;
+		\For{each hop $h$ in $r$} {
+			$V \gets V \cup \{(h, tag)\}$\;
+			$E \gets E \cup \{lastHop\rightarrow(h, tag)\}$\;
+			$tag \gets tag-1$\;
+		}
+	}
+	\Return{$G(V, E)$}\;
+    \caption{A brute-force tagging system that decreases the tag by one every hop.}
+	\label{alg:ttl}
+\end{algorithm}
+
+%\textbf{Input:} the lossless graph $G(V, E)$, defined by Table~\ref{tab:symbols}
+%\para{Algorithm goal:} we want to find a tagging system that minimizes $|\{G_k\}|$
+%The two requirements correspond to the requirements stated in Section~\ref{sec:tag_order}.
 
 \begin{table}
 \small
 \centering
-\caption{Notations in the formalized problem description.}
-\label{tab:symbols}
 \begin{tabular}{|c|c|}
 \hline
 Symbol & Description \\ \hline
 $A_i$ & Switch $A$'s $i^{th}$ ingress port  \\ \hline
-$(A_i, x)$ & A port-tag pair \\ \hline
-$(A_i, x)\rightarrow(B_j, y)$ & A hop \\ \hline
-$V$ & All port-tag pairs in lossless paths  \\ \hline
-$E$ & All tagged hops \\ \hline
+$(A_i, x)$ & A node in tagged graph \\ \hline
+$(A_i, x)\rightarrow(B_j, y)$ & A tagged edge \\ \hline
+$V$ & All tagged nodes  \\ \hline
+$E$ & All tagged edges \\ \hline
 $G(V, E)$ & Tagged graph \\ \hline
 \end{tabular}
+\caption{Notations in the formalized description.}
+\label{tab:symbols}
 \end{table}
 
 \if 0
@@ -203,45 +230,51 @@ However, the drawback of such tagging is that it requires too many lossless queu
 %We use $|q_{in}^{i,j}|$ and $|q_{out}^{i,j}|$ to denote the queue lengths of $q_{in}^{i,j}$ and $q_{out}^{i,j}$, where $|q_{in}^{i,j}|=\sum_{p\in q_{in}^{i,j}}p_{size}$, and $|q_{out}^{i,j}|=\sum_{p\in q_{out}^{i,j}}p_{size}$.
 
 
-\para{Greedy algorithm.} We design Algorithm~\ref{alg:greedy} for the above goal.
-It works by greedily combining as many micropaths as possible into each micropath subspaces under CBD-free constraint.
-To ensure the monotonic property, we use the brute-force solution as the starting point. We start from combing the port-tags 
-with largest tag to smallest tag in the brute-force solution,
-the monotonic property will still hold after combination. 
+\para{Greedy algorithm.} Leveraging the brute-force tagging system as a start point, we design Algorithm~\ref{alg:greedy} minize the 
+number of lossless queues. It works by greedily combining as many nodes, from brute-force tagging system, 
+as possible into each micropath subspaces under CBD-free constraint. To ensure the monotonic property, we start 
+from combing the nodes with largest tag to smallest tag in the brute-force tagging system.
+Obviously, the monotonic property will still hold after combination. 
 
 
 \begin{algorithm}
+	\small
     \KwIn{The brute-force tagged graph $G(V, E)$}
-	\KwOut{A partition of $G$}
-	$G_x \gets Set()$ array $[0..maxTag]$\; 
-	$i \gets 0$\;
-	\For{$t \gets maxTag$ \textbf{downto} $minTag$} {
-		\For{each $v$ in $V$ whose tag is $t$} {
-			$G_i' \gets G_i \cup \{v\}$ \;
-			\uIf{MergeNodesByPorts$(G_i')$ is acyclic} {
-				$G_i \gets G_i'$ \; 
+	\KwOut{A new tagged graph $G'(V', E')$ that has small $|\{G'_k\}|$}
+	$V' \gets Set()$\;
+	$E' \gets Set()$\;
+	$t' \gets 0$\;
+	\For{$t \gets maxTag$ \textbf{down to} $minTag$} {
+		$V_{tmp} \gets Set()$\;
+		$E_{tmp} \gets Set()$\;
+		\For{each $(A_i, t)$ in $V$ whose tag is $t$} {
+			$V_{tmp} \gets V_{tmp} \cup \{A_i\}$\;
+			$E_{tmp} \gets E_{tmp} \cup \{$edges whose both ends are in $V_{tmp}\}$\;
+			\uIf{$G_{tmp}(V_{tmp}, E_{tmp})$ is acyclic} {
+				$V' \gets V' \cup \{(A_i, t')\}$\;
+				$E' \gets E' \cup \{$edges of $(A_i, t)$, change $t$ to $t'\}$\; 
 			}
 			\Else{
-				$G_{i+1} \gets G_{i+1} \cup \{v\}$\;
+				$V' \gets V' \cup \{(A_i, t'+1)\}$\;
+				$E' \gets E' \cup \{$edges of $(A_i, t)$, change $t$ to $t'+1\}$\;
 			}
 			$V \gets V \backslash \{v\}$ \;
 		}
-		\uIf{$G_{i+1}$ is not empty} {
-			$i \gets i+1$\;
+		\uIf{$V'$ contains nodes of tag $t'+1$} {
+			$t' \gets t'+1$\;
 		}
 	}
-	\Return{$\{G_0, G_1, ...\}$}\;
+	\Return{$G'(V', E')$}\;
     \caption{Greedily minimizing the number of micropath subspaces by merging brute-force tags.}
 	\label{alg:greedy}
 \end{algorithm}
 
-In the end, we assign a new tag (different from the brute-force tag) for each micropath subspace, and generate switch configurations
-based on the new tags. The worst case scenario is as bad as using the brute-force tags, which require
-as many priority queues as the longest route in lossless routes. However,
-in Section~\ref{sec:eval}, we show that this algorithm works reasonably well for generic topology, like Jellyfish. 
+We assign a new tag $t'$ (different from the brute-force tag) for each micropath subspace, and generate switch configurations
+based on the algorithm output. The worst case scenario is as bad as using the original input, brute-force tags, which require
+as many priority queues as the length of longest lossless route. However,
+in Section~\ref{sec:eval}, we show that this algorithm works reasonably well for generic topology. 
+\fixme{highlight: For example, Jellyfish with 1000 nodes require only X priorities for {\em one} application class.}
 
-This greedy algorithm may not always return the optimal solution. For example, the result it gives for Clos network is not 
-optimal! In Section~\ref{sec:specific}, we show that for structured topology, smarter tagging system can achieve optimal results.
 
 %\begin{figure}[t]
 %	%\vspace{-0.1in}
