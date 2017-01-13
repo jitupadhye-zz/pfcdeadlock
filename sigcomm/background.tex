@@ -1,4 +1,5 @@
 \section{Background}
+\label{sec:background}
 
 We now provide a brief primer on RDMA, RoCE, the problem of deadlocks in data
 center networks, and prior work in this area.
@@ -17,11 +18,22 @@ ingress buffer occupancy reaches a preset threshold. As long as sufficient
 ``headroom'' is reserved to buffer packets that are in flight during the time
 takes for the PAUSE to take effect, no packet will be dropped due to buffer
 overflow. See~\cite{cisco-whitepaper,dcqcn} and \S\ref{subsec:pfcheadroom} for
-details.
+details. 
 
-PFC, while useful, can cause a number of problems, including unfairness and
-head-of-the-line-blocking~\cite{dcqcn}. Perhaps the worst problem with PFC is
-that it can lead to deadlock.
+The PFC standard defines 8 classes\footnote{Although, only one or two can be
+used in practice -- see \S\ref{subsec:pfcheadroom}.}, called priorities~\footnote{The word priority is a
+misnomer. There is no implicit ordering among priorities -- they are really just
+separate classes.}. Packets in each priority are buffered separately, and PAUSE
+messages carry this priority.  When a packet arrives at port $i$ of switch $S$
+with priority $j$, it is enqueued in queue $j$ of port $i$. If the queue length
+now exceeds the PFC threshold, a pause message (XOFF) is sent to the upstream
+switch connected to port $i$. The message carries priority $j$. The upstream
+switch then stops sending packets with priority $j$ to switch $S$ on port $i$ until a resume
+message (XOFF) with priority $j$ is received.
+
+In short, PFC does flow control on a per-port, per-priority basis. This can
+cause a number of problems, such as unfairness and
+head-of-the-line-blocking~\cite{dcqcn}. Worse yet, it can lead to deadlocks.
 
 %% Since PAUsing is carried out
 %% on a per-ingress port, and not on a per-flow basis, problems such as unfairness
