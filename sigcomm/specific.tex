@@ -1,7 +1,88 @@
 %\vspace{-0.1in}
 \section{Optimal Solution for Structured Topology}\label{sec:specific}
 
-\subsection{Caveats of the Generic Greedy Solution}
+\subsection{Caveats of the Generic Greedy Algorithm}\label{sec:caveats}
+
+Although the generic Algorithm~\ref{alg:greedy} has significantly reduced the number of lossless queues,
+it has two main caveats.
+
+First, it may not always return the optimal solution. For example, we again consider the simple three-layer
+Clos network in Figure~\ref{xxx}. Assuming non-bounce packets and one-bounce packets must be lossless,  
+we know the optimal tagging system only requires {\em two} lossless priorities. However, the 
+greedy algorithm will output {\em three} micropath subspaces. The reason is that greedy algorithm does
+not combine bounces that happen at different hops. As a result, it has to assign a separate prirotiy
+for each case, as shown in Figure~\ref{xxx}.
+
+Second, the generic algorithm is inefficient in reusing priorities for multiple application classes.
+For example, the generic algorithm output is two priorities per application class, and the operators
+have up to two prioritie on switches. In this case, only {\em one} lossless application
+class is supported. However, if we can find a smarter tagging system that ensures basic connectivity 
+with only the first micropath, we can compress {\em two} application classes into two switch priorities, 
+as described in Section~\ref{sec:clos}.
+
+The fundamental reason of these problems is that generic algorithm does not fully utilize the inherently characteristics of structured topology. In this section, we will show the smarter tagging systems for popular topology including Clos and BCube. The smarter tagging system addresss both of the problems above.
+
+
+\subsection{Optimizing Clos Topology}\label{sec:clos}
+
+The tagging algorithm for Clos topology is straightforward. 
+We first define the baseline UP-DOWN routing as first micropath space, with tag 0. Every time the packet
+bounces, we increase the tag by one, until the packet is assigned to a lossy queue. Algorithm~\ref{alg:clos}
+shows the process. For Clos topology, we can simply replace Algorithm~\ref{alg:ttl} by 
+Algorithm~\ref{alg:clos}, and Algorith~\ref{alg:greedy} is not needed any more.
+With $k$ lossless priorities, packets with up to $k-1$ bounces are all lossless.
+It's easy to prove that, to handle $k-1$ bounces, at least $k$ lossless priorities are required.
+
+
+\begin{algorithm}
+	\small
+    \KwIn{Clos topology and routing paths $R$ that must be lossless}
+	\KwOut{A tagged graph $G(V, E)$}
+	$V \gets Set()$\;
+	$E \gets Set()$\; 
+	\For{each path $r$ in $R$} {
+		$tag \gets 0$\;
+		\For{each hop $h$ in $r$} {
+			$V \gets V \cup \{(h, tag)\}$\;
+			$E \gets E \cup \{lastHop\rightarrow(h, tag)\}$\;
+			\If{$h$ is up-facing \&\& nextHop is down-facing} {
+				$tag \gets tag+1$\;
+			}
+		}
+	}
+	\Return{$G(V, E)$}\;
+    \caption{The optimal tagging system for Clos topology.}
+	\label{alg:clos}
+\end{algorithm}
+
+\para{Priority reuse.} 
+Above tagging system allows us to run $k$ application classes with $k$ lossless priorities. 
+It works as follows.
+We start the first class with priority 0 (tag 0), and change to one higher priority (tag) every time the packet
+bounces. We can then start the second class with tag 1, and change tags just like the first class. 
+Then third class starts with tag 2, and so on. We can prove that such priority reuse will not create CBD.
+
+The trade-off is that the second class supports one less bounce, the third class supports two less, and so on.
+Under fixed constraints on the number of priorities on switches, how many application classes run in parallel?
+we leave the choice to operators. In practice, we run two application classes with two priority 
+queues on switch. The second class is still lossless for most of the time, as numbers in 
+Section~\ref{sec:reroute} show.
+
+
+On the other hand, the generic algorithm cannot support this at all. The problem is the lossless routing will 
+become disconnected if any one priority (a micropath segment) is missing. Therefore, when the 
+second application class starts with tag 1, the traffic between at least some hosts becomes 
+{\em always} lossy.
+
+%Adding the priority reuse, $k$ lossless application classes can run in parallel at the cost that $i^{th}$ class only supports $k-i+1$ times bouncing.
+
+
+\subsection{Optimizing BCube Topology}
+
+\subsection{High-level Takeaways}
+
+
+\if 0
 
 \begin{enumerate}
 	\item It does not always yield optimal results in terms of number of lossless queues, e.g., in Fat-tree.
@@ -11,14 +92,6 @@
  
 \end{enumerate}
 
-\subsection{Optimizing Fat-Tree Topology}
-
-\subsection{Optimizing BCube Topology}
-
-\subsection{High-level Takeaways}
-
-
-\if 0
 \subsubsection{Definition of switch functions}
  
 \begin{enumerate}
@@ -134,7 +207,7 @@ Let $t_{cost}(f)$ be the time cost of performing switch function $f$. In the fol
   BS_N(t_1)\equiv BS_N(t_0) \quad \text{and} \quad BS_N(t_0) \neq BS^0_N.
   \end{align}
     
-\fi 0
+\fi
 
     %     \textbf{Lemma 1}: for arbitrary non-deadlocked buffer state $BS_N(t)$, when no new packets are injected into the network since $t$, there exists a finite $t_0>t$, $BS_N(t_0)=BS^0_N$.
     %     

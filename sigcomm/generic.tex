@@ -97,7 +97,7 @@ CBD {\em within} each priority, packets can still cause CBD {\em across}
 priorities, as shown in Figure~\ref{fig:subspace}(a). Switch must know the past
 path of each packet in order to decide the priority that avoids CBD. Obviously,
 the tag size is limited, so we can't carry the entire history of the packet in
-the tag. Thus, we need we need the next idea.
+the tag. Thus, we need the next idea.
 
 %% Section~\ref{sec:greedy} shows a way to achieve this.  Inevitably, we will need
 %% {\em multiple} switch lossless queues to support one lossless application class.
@@ -204,20 +204,28 @@ $E$ is the set of all such edges.
 The tags define a partition of the tagged graph, $\{G_k\}$, where $G_k = \{(A_i,
 k) | \forall A, i\}$. Each $G_k$ is a {\em micropath subspace} and has a unique
 lossless priority.  On switches, we configure ACL rules to match on tags and
-assign lossless priorities.  In addition, each edge that has different tags on
-two ends corresponds to an action of changing tags on switches.
+assign lossless priorities according to $\{G_k\}$.  In addition, each edge corresponds 
+to a switch action of setting the tag for the next hop at the egress.
 
-Two requirements directly follow Section~\ref{sec:tag_order}. First, any $G_i$
-does {\em not} have a cycle. This is because each edge in $G_i$ is essentially a
-buffer dependency -- whether $A_i$ can dequeue packets depending on whether
+\para{Handling packets that do not follow the lossless routes.}
+If a packet does not match any
+tag-setting actions, it means the packet is not expected in the lossless routing.
+Such packets are assigned a special tag, and all switches match on this tag and 
+assign lossy priority. This rule sits at the bottom of switch egress ACL, acting 
+as a default safeguard that avoids unexpected buffer dependency.
+
+To guarantee deadlock-free, two requirements directly follow Section~\ref{sec:tag_order}. 
+First, any $G_i$ does {\em not} have a cycle. This is because each edge in $G_i$ is 
+essentially a buffer dependency -- whether $A_i$ can dequeue packets depending on whether
 $B_j$ has paused upstream. A cycle in $G_i$ means cyclic buffer dependency.
 Second, There is no lossless route going from $G_i$ to $G_j$ if $i<j$, because
 we enforce the order of micropath subspaces.
 
 
-\para{Brute-force tagging system.} For general graph without structure information, a straight forward tagging system
-to monotonically change the tag (thus, the priority) every hop, as described in Algorithm~\ref{alg:ttl}. It is easy to 
-verify that the above requirements are met, so deadlock is eliminated with this tagging system. However, it requires 
+\para{Brute-force tagging system.} For general graph without structure information, a straight forward tagging 
+system is to monotonically decrease the tag (thus, the priority) every hop, as described in 
+Algorithm~\ref{alg:ttl}. It is easy to verify that the above requirements are met, so deadlock is 
+eliminated with this tagging system. However, it requires 
 too many lossless queues in a large network since it depends on the diameter of the topology.
 
 \begin{algorithm}
@@ -226,7 +234,7 @@ too many lossless queues in a large network since it depends on the diameter of 
 	\KwOut{A tagged graph $G(V, E)$}
 	$V \gets Set()$\;
 	$E \gets Set()$\; 
-	$maxTag \gets$ longestPath($R$)\;
+	$maxTag \gets$ longestPath($R$)+1\;
 	\For{each path $r$ in $R$} {
 		$tag \gets maxTag$\;
 		\For{each hop $h$ in $r$} {
@@ -239,6 +247,7 @@ too many lossless queues in a large network since it depends on the diameter of 
     \caption{A brute-force tagging system that decreases the tag by one every hop.}
 	\label{alg:ttl}
 \end{algorithm}
+
 
 \begin{table}
 \small
@@ -269,15 +278,12 @@ property will still hold after combination.
 	\small
     \KwIn{The brute-force tagged graph $G(V, E)$}
 	\KwOut{A new tagged graph $G'(V', E')$ that has small $|\{G'_k\}|$}
-	$V' \gets Set()$\;
-	$E' \gets Set()$\;
+	Initialize $V'$, $E'$, $V_{tmp}$, $E_{tmp}$ as empty $Set()$\;
 	$t' \gets 0$\;
 	\For{$t \gets maxTag$ \textbf{down to} $minTag$} {
-		$V_{tmp} \gets Set()$\;
-		$E_{tmp} \gets Set()$\;
 		\For{each $(A_i, t)$ in $V$ whose tag is $t$} {
-			$V_{tmp} \gets V_{tmp} \cup \{A_i\}$\;
-			$E_{tmp} \gets E_{tmp} \cup \{$edges whose both ends are in $V_{tmp}\}$\;
+			$V_{tmp} \gets V_{tmp} \cup \{(A_i, t')\}$\;
+			$E_{tmp} \gets E_{tmp} \cup \{$edges of $(A_i, t)$, change $t$ to $t'\}$\;
 			\uIf{$G_{tmp}(V_{tmp}, E_{tmp})$ is acyclic} {
 				$V' \gets V' \cup \{(A_i, t')\}$\;
 				$E' \gets E' \cup \{$edges of $(A_i, t)$, change $t$ to $t'\}$\; 
@@ -285,11 +291,14 @@ property will still hold after combination.
 			\Else{
 				$V' \gets V' \cup \{(A_i, t'+1)\}$\;
 				$E' \gets E' \cup \{$edges of $(A_i, t)$, change $t$ to $t'+1\}$\;
+				$V_{tmp} \gets V_{tmp} \backslash \{(A_i, t')\}$\;
+				$E_{tmp} \gets E_{tmp} \backslash \{$edges of $(A_i, t')\}$\;
 			}
-			$V \gets V \backslash \{v\}$ \;
 		}
 		\uIf{$V'$ contains nodes of tag $t'+1$} {
 			$t' \gets t'+1$\;
+			$V_{tmp} \gets \{$nodes in $V'$ with tag $t'+1\}$\;
+			$E_{tmp} \gets \{$edges in $V'$, both ends have tag $t'+1\}$\;
 		}
 	}
 	\Return{$G'(V', E')$}\;
