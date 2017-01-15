@@ -59,18 +59,19 @@ should not go UP.
 \end{figure}
 
 However, packets may deviate from the UP-DOWN paths due to several reasons
-including link flapping and routing protocol flapping~\cite{f10}. As have shown
-in~\cite{shpiner2016unlocking}, when the UP-DOWN property is broken and packets
-may reroute multiple times between two layers of switches, and deadlocks may
-form as a result, as shown in Figure~\ref{fig:up-down-deadlock}.
+including software errors on routers, link flapping, routing protocol
+flapping~\cite{f10}. As have shown in~\cite{shpiner2016unlocking}, when the
+UP-DOWN property is broken and packets may reroute multiple times between two
+layers of switches, and deadlocks may form as a result, as shown in
+Figure~\ref{fig:up-down-deadlock}.
 
-By carefully tracking TTL values, we estimated that on average, $0.001\%$ of the
-packets in our data center are forced to take a path that violates UP-DOWN
-routing.  While this fraction appears small, given that trillions of packets
-traverse our network every day, the absolute number of packets that take such
-paths is quite high -- which makes the threat of deadlocks, as discussed
+We regularly observe deviations from up-down routing in our data centers.  We
+see hundreds of such routes per day, and they can persist for minutes or even
+longer. Overall, we estimate that $0.001\%$ of the traffic is routed over such
+paths. This may sound tiny, but given that our network carries petabytes of
+traffic per day, the absolute amount of traffic affected by such routing is
+quite high. This makes the threat of deadlocks, as discussed
 in\cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} quite real.
-
 
 %% In this paper, we show our measurement results from a large cloud computing
 %% provider that UP-DOWN routing property does break in reality and packets can be
