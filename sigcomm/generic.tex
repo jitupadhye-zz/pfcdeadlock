@@ -1,153 +1,102 @@
-\section{\sysname{} design}
+\section{Generic \sysname{} design}
 \label{sec:generic}
 
-The design of \sysname{} is driven by the need to address the three challenges
-described in the previous section. Before delving into the details of the key
-algorithms in \sysname{}, it is useful briefly describe the physical
-implementation of \sysname{}. The implementation is described in detail in
-\S\ref{sec:implementation}.
+In addition to Clos networks, prior literatures have proposed different data center
+network topology. In this section, we show that \sysname{} can be extended to
+support generic topology and routing. In addition, unlike the prior section focusing 
+on high-level ideas, we will formalize the expression of \sysname{}. This is necessary
+for explaining the algorithm without specific topology properties.
+
+After removing the Clos-specific mechanisms, here is a brief description of 
+generic \sysname{}.
+
+%We briefly describe the generic implementation of \sysname{}. The implementation 
+%is described in detail in \S\ref{sec:implementation}.
 
 \sysname{} works by tagging packets.  A packet arrives at the ingress port $i$
-of a switch $S$ with a tag $j$. The arriving packet packet is enqueued in queue
-$j$.  At departure, based on the values of $i$ and $j$, the packet is possibly
-given a new tag, say $k$. The rest of the forwarding pipeline, as well as PFC
+of a switch $S$ with a tag $j$. The arriving packet packet is enqueued in ingress 
+queue $j$.  At departure, based on the values of $i$, $j$ and egress port, 
+the packet is possibly given a new tag, say $k$. In this case, the packet is put 
+into egress queue $k$. The rest of the forwarding pipeline, as well as PFC 
 PAUSE/Resume behavior (\S\ref{sec:background}) operates without change. 
 
-The smartness of the system lies in generating the two mappings: from ingress
-port and incoming tag to the queue, and from ingress port and incoming tag to
-the new tag. These mappings are calculated offline, and installed in the switch.
-Thus, there is no additional overhead at run time -- \sysname{} operates at line
-speed.
+The smartness of the system lies in generating the tag changing rules: based on 
+ingress port, incoming tag and egress port, the switch must decide whether to change
+the tag, and what the new tag value is. In Clos version \sysname{}, we leverage
+our knowledge of Clos and find that tagging on bounce is a good solution. 
+Similar to the Clos version \sysname{}, we use the topology and {\em lossless routes} 
+as input to generate these rules for generic topology.
+The rules generation is based on similar ideas as for Clos network.  
 
-\sysname{} does not require any changes to the topology of the network or the
-routing. However, our  key insight is that we can take the topology and the
-routes that must be lossless (we call them {\em lossless routes}) as input, and
-use them to generate the mappings described earlier. 
+%\sysname{} does not require any changes to the topology of the network or the
+%routing. However, our  key insight is that we can take the topology and the
+%routes that must be lossless (we call them {\em lossless routes}) as input, and
+%use them to generate the mappings described earlier. 
 
-The mappings generation is based on three main ideas.  First, the switch
-configurations eliminate deadlock by reacting to the past path of each packet
-and move the packet into a safe priority just before CBD may appear.  Second,
-the transition of priority is designed carefully so that  a single tag in the
-packet header is sufficient for each switch to make such decisions. Finally, we
-make sure that \sysname{} requires only a small number of lossless queues. We
-now describe these ideas in detail.
 
-\subsection{Idea 1: Priority Transition Based on Micropaths} 
+%First, the switch configurations eliminate deadlock by reacting to the past path of each packet
+%and move the packet into a safe priority just before CBD may appear.  Second,
+%the transition of priority is designed carefully so that  a single tag in the
+%packet header is sufficient for each switch to make such decisions. Finally, we
+%make sure that \sysname{} requires only a small number of lossless queues. We
+%now describe these ideas in detail.
 
-While \sysname{} works for any topology, we use most popular data center
-topology -- Clos -- as an example in this section.
+\subsection{Definition of A Tagging Scheme}
 
-\begin{figure}[t]
-	%\vspace{-0.1in}
-	\centering
-	
-	\subfloat[short for lof][1-bounce paths creates CBD.] {
-		\includegraphics[width=0.5\textwidth] {figs/cbd_a}
-	}
-	
-%	\vspace{-0.15in}
-	\subfloat[short for lof][CBD is eliminated with path segmenting and prioritizing.]{
-		\includegraphics[width=0.5\textwidth] {figs/cbd_b}
-	}
-	
-	\caption{Micropath based priority transition can eliminate CBD.}\label{fig:priority_transition}
-\end{figure}
-
-Figure~\ref{fig:priority_transition}(a) shows a simple Clos topology. Let's
-assume that the operator wants all normal paths to be lossless. In addition,
-let's assume that the operator is worried about rerouting due to link failures. 
-
-Typically, the "normal" paths will be the shortest paths -- which for a CLOS
-network are the ``up-down'' paths described in the last section.  In addition,
-due to link failures, we may have paths that are not up-down.  Such paths can
-form CBD, and lead to deadlock, as shown in
-Figure~\ref{fig:priority_transition}(a))~\cite{shpiner2016unlocking}. 
-
-However, if we divide the paths into two segments, {\em before-bounce} and {\em
-after-bounce}, and assign them to different priority queues, there is no more
-CBD (Figure~\ref{fig:priority_transition}(b)).  The insight we get from this
-example is that if the switch can detect that a packet may cause CBD in next
-hops, it can change the packet's priority to avoid CBD, thus avoiding deadlock. 
-
-Note that this is different from the prior solutions, which either assign a
-fixed priority based on pre-computed paths (and thus cannot react to dynamic
-routing), or change the priority every hop (and thus requires too many priority
-queues). 
-
-Instead, we divide the paths into a few segments, which we call {\em micropaths},
-and change packet's priority only at a few transition point. It has the
-advantages from both types of prior work, {\em i.e.,} it requires a small number
-of priorities, and allows the switch to react to each packet's path.
-
-The key enabler of our approach is the topology and the set {\em lossless
-routes} specified by the operators as the input. Specifying lossless routes is
-not a significant burden: in our example, the operator may specify that all
-normal up-down paths paths with a single ``bounce'' are ``lossless''. Given the
-topology and the routing protocol it is easy to automatically enumerate all such
-paths~\footnote{What happens if there are so many link failures that some
-packets end up taking a two-bounce path? In such case, our tagging scheme moves
-the packets to a lossy queue, which follows the standard drop-tail discipline.
-Such queues, obviously, do not deadlock}. 
-
-By properly dividing lossless routes into multiple subspaces of micropaths, we
-can ensure that CBD is eliminated {\em within} each subspace. We will discuss
-the details of the algorithm are described later in this section. But first, we
-must consider another issue: Even though proper micropath partition ensures no
-CBD {\em within} each priority, packets can still cause CBD {\em across}
-priorities, as shown in Figure~\ref{fig:subspace}(a). Switch must know the past
-path of each packet in order to decide the priority that avoids CBD. Obviously,
-the tag size is limited, so we can't carry the entire history of the packet in
-the tag. Thus, we need the next idea.
-
-%% Section~\ref{sec:greedy} shows a way to achieve this.  Inevitably, we will need
-%% {\em multiple} switch lossless queues to support one lossless application class.
-%% Specifically, we divide the buffer of network nodes into $k$ partitions, and let
-%% the $j$-$th$ partition associated with priority queue $j$. If a packet is
-%% classified into priority queue $j$, it will be buffered in the $j$-$th$ buffer
-%% partition and can generate PFC of priority $j$.  In this section, we focus on
-%% supporting {\em just one} lossless application class. In
-%% Section~\ref{sec:specific}, we will revisit this issue and show how we may
-%% support multiple application classes more efficiently.
-
-\subsection{Idea 2: Tag for Ordered Micropath Subspaces}\label{sec:tag_order}
-
-\begin{figure}[t]
-	%\vspace{-0.1in}
-	\centering
-	
-	\subfloat[short for lof][CBD among subspaces.] {
-		\includegraphics[width=0.24\textwidth] {figs/subspace_a}
-	}
-	\subfloat[short for lof][Ordered subspaces.]{
-		\includegraphics[width=0.26\textwidth] {figs/subspace_b}
-	}
-	
-	\caption{Ordered subspaces ensure deadlock-free priority transition.}\label{fig:subspace}
-\end{figure}
-
-As shown in Figure~\ref{fig:subspace}(b), we enforce the order of transitioning
-among micropath subspaces and tag only based on current subspace.  With this,
-the packets do not need to record the whole history of past micropaths in
-headers. A fixed length header field (most commonly, DSCP) is sufficient to
-carry the tag. The tag values are one-one mapped to the micropath subspaces,
-which one-one maps to priority queues on each switch. 
-
-Thus, with \sysname{}, the switch enqueues each packet into priority queue based
-on its tag, and changes the tag if the switch decides to change the packet's
-priority at the next hop.  We can prove that the network is deadlock-free if the
-tag system, which defines micropath subspaces and transition, satisfies the two
-requirements below:
+Before we get to the detailed designs, we first formalize the tagging scheme.
+Let $A_i$ represent a unique ingress port in the network, {\em i.e.,} switch $A$'s $i^{th}$ ingress port.
+We use a {\em tagged graph} $G(V,E)$ to uniquely represent a tagging scheme.
+Given a tagging scheme, the {\em tagged graph} $G(V,E)$ is generated following below rules.
 
 \begin{enumerate}
-
-	\item A packet's tag is unchanged or changed at each hop of its path. When the tag is changed, it must be changed monotonically 
-	along any packet's path (e.g., always increasing).
-
-	\item For any given tag, all micropaths within the corresponding micropath subspace do not form cyclic buffer dependency.
-
+\item $G$ contains a node, $(A_i, x)$, {\em iff.} a port $A_i$ may receive packets with tag $x$, and these packets must 
+be lossless. $V$ is the set of all such nodes.
+\item In $G$, there exists an edge $(A_i, x)\rightarrow(B_j, y)$ {\em iff.} switch $A$ and $B$ are 
+connected, {\em and} switch $A$ may change a packet's tag from $x$ to $y$ before sending to $B$ (the case $x=y$ also counts).
+$E$ is the set of all such edges.
 \end{enumerate}
 
-\para{Proof of deadlock freedom:}
+The tags define a partition of the tagged graph, $\{G_k\}$, where $G_k = \{(A_i,
+k) | \forall A, i\}$. Each $G_k$ is mapped to a unique
+lossless priority.  Each node is an ACL rule to match on a tag on an ingress port, and
+assign corresponding lossless queue.  In addition, each edge corresponds 
+to a switch action of setting the tag for the next hop at the egress.
+
+\begin{table}
+\small
+\centering
+\begin{tabular}{|c|c|}
+\hline
+Symbol & Description \\ \hline
+$A_i$ & Switch $A$'s $i^{th}$ ingress port  \\ \hline
+$(A_i, x)$ & A node in tagged graph \\ \hline
+$(A_i, x)\rightarrow(B_j, y)$ & A tagged edge \\ \hline
+$V$ & All tagged nodes  \\ \hline
+$E$ & All tagged edges \\ \hline
+$G(V, E)$ & Tagged graph \\ \hline
+\end{tabular}
+\caption{Notations in the formalized description.}
+\label{tab:symbols}
+\end{table}
+
+\para{Handling packets that do not follow the lossless routes.}
+If a packet does not match any edges in $G(V,E)$, it means the packet is not 
+expected in the lossless routing.
+Such packets are assigned a special tag, and all switches match on this tag and 
+assign lossy priority. This rule sits at the bottom of switch egress ACL, acting 
+as a default safeguard that avoids unexpected buffer dependency.
+
+To guarantee deadlock-free, two requirements directly follow the properties described 
+in \S~\ref{subsec:combine}. First, any $G_i$ does {\em not} have a cycle. This is 
+because each edge in $G_i$ is 
+essentially a buffer dependency -- whether $A_i$ can dequeue packets depending on whether
+$B_j$ has paused upstream. A cycle in $G_i$ means cyclic buffer dependency.
+Second, There is no lossless route going from $G_i$ to $G_j$ if $i<j$, because
+we enforce the order of micropath subspaces.
+
+\subsubsection{Proof of deadlock freedom}
+
+\fixme{Need to reword the following.}
 
 \textbf{Claim:} Any tag system that satisfies the above two requirements is deadlock-free.
 
@@ -178,59 +127,29 @@ This contradicts the supposition that the tag system is not deadlock-free.
 Hence, any tag system that satisfies the above two requirements is
 deadlock-free.
 
-Putting these two ideas together we can generate a system of tags and tag
-conversion tables for each switch. However, we must pay heed to the fact that 
-a switch cannot support more than one or two lossless priorities in practice. 
-Thus, we must minimize the number of tags we use.
 
-\subsection{Idea 3: Minimizing the Number of Tags} The number of tags (or,
-corresponding micropath subspaces) is essentially the number of lossless queues
-required on each switch.  We must reduce it to below the switch hardware limit.
-In this section, we focus on the number of lossless queues for just {\em one}
-application class. We first formalize the tagging system.
+\subsection{Step 1: Deadlock-free Tags} 
 
-\para{Tagging system.} Let $A_i$ represent a unique ingress port in the network, {\em i.e.,} switch $A$'s $i^{th}$ ingress port.
-We use a {\em tagged graph} $G(V,E)$ to uniquely represent a tagging system.
-With a tagging system, the {\em tagged graph} $G(V,E)$ is generated following below rules.
+\begin{figure*}[t]
+	\centering
+	\subfloat[short for lof][Input topology and lossless routes.] {
+		\includegraphics[width=0.6\textwidth] {figs/alo_walkthrough_a}
+	}
+	\subfloat[short for lof][Output tagged graph.]{
+		\includegraphics[width=0.4\textwidth] {figs/alo_walkthrough_b}
+	}
+	\caption{The input and output of Algorithm~\ref{alg:ttl}.}\label{fig:three_node}
+\end{figure*}
 
-\begin{enumerate}
-\item $G$ contains a node, $(A_i, x)$, {\em iff.} a port $A_i$ may receive packets with tag $x$, and these packets must 
-be lossless. $V$ is the set of all such nodes.
-\item In $G$, there exists an edge $(A_i, x)\rightarrow(B_j, y)$ {\em iff.} switch $A$ and $B$ are 
-connected, {\em and} switch $A$ may change a packet's tag from $x$ to $y$ before sending to $B$ (the case $x=y$ also counts).
-$E$ is the set of all such edges.
-\end{enumerate}
-
-The tags define a partition of the tagged graph, $\{G_k\}$, where $G_k = \{(A_i,
-k) | \forall A, i\}$. Each $G_k$ is a {\em micropath subspace} and has a unique
-lossless priority.  On switches, we configure ACL rules to match on tags and
-assign lossless priorities according to $\{G_k\}$.  In addition, each edge corresponds 
-to a switch action of setting the tag for the next hop at the egress.
-
-\para{Handling packets that do not follow the lossless routes.}
-If a packet does not match any
-tag-setting actions, it means the packet is not expected in the lossless routing.
-Such packets are assigned a special tag, and all switches match on this tag and 
-assign lossy priority. This rule sits at the bottom of switch egress ACL, acting 
-as a default safeguard that avoids unexpected buffer dependency.
-
-To guarantee deadlock-free, two requirements directly follow Section~\ref{sec:tag_order}. 
-First, any $G_i$ does {\em not} have a cycle. This is because each edge in $G_i$ is 
-essentially a buffer dependency -- whether $A_i$ can dequeue packets depending on whether
-$B_j$ has paused upstream. A cycle in $G_i$ means cyclic buffer dependency.
-Second, There is no lossless route going from $G_i$ to $G_j$ if $i<j$, because
-we enforce the order of micropath subspaces.
-
-
-\para{Brute-force tagging system.} For general graph without structure information, a straight forward tagging 
+Like the Clos version \sysname{}, we will first design a tagging scheme that avoids
+deadlock, then combine tags to reduce the required lossless queues. 
+For general graph without structure information, a straight forward tagging 
 system is to monotonically decrease the tag (thus, the priority) every hop, as described in 
-Algorithm~\ref{alg:ttl}. It is easy to verify that the above requirements are met, so deadlock is 
-eliminated with this tagging system. However, it requires 
-too many lossless queues in a large network since it depends on the diameter of the topology.
+Algorithm~\ref{alg:ttl}. 
 
 \begin{algorithm}
 	\small
-    \KwIn{Topology and routing paths $R$ that must be lossless}
+    \KwIn{Topology and lossless routes $R$}
 	\KwOut{A tagged graph $G(V, E)$}
 	$V \gets Set()$\;
 	$E \gets Set()$\; 
@@ -248,26 +167,101 @@ too many lossless queues in a large network since it depends on the diameter of 
 	\label{alg:ttl}
 \end{algorithm}
 
+It is easy to verify that the above requirements are met\fixme{may need to elaborate}, so 
+deadlock is eliminated with this tagging system. However, it requires 
+too many tags (lossless queues) in a large network since it depends on the diameter of the topology.
 
-\begin{table}
-\small
-\centering
-\begin{tabular}{|c|c|}
-\hline
-Symbol & Description \\ \hline
-$A_i$ & Switch $A$'s $i^{th}$ ingress port  \\ \hline
-$(A_i, x)$ & A node in tagged graph \\ \hline
-$(A_i, x)\rightarrow(B_j, y)$ & A tagged edge \\ \hline
-$V$ & All tagged nodes  \\ \hline
-$E$ & All tagged edges \\ \hline
-$G(V, E)$ & Tagged graph \\ \hline
-\end{tabular}
-\caption{Notations in the formalized description.}
-\label{tab:symbols}
-\end{table}
+We use a three node topology as an example to demonstrate the input and output of the 
+algorithm, as shown in Figure~\ref{fig:three_node}. It will require {\em four} 
+tags, since the longest path length is four.
 
-\para{Greedy algorithm.} Leveraging the brute-force tagging system as a start
-point, we design Algorithm~\ref{alg:greedy} minize the number of lossless
+\fixme{This idea appeared in prior work. However, it is a special case in our tagging system,
+and has the drawback that it requires too many lossless queues. Here we give it a formal 
+expression in our framwork, and will further optimize it in the next section.}
+
+
+%% Section~\ref{sec:greedy} shows a way to achieve this.  Inevitably, we will need
+%% {\em multiple} switch lossless queues to support one lossless application class.
+%% Specifically, we divide the buffer of network nodes into $k$ partitions, and let
+%% the $j$-$th$ partition associated with priority queue $j$. If a packet is
+%% classified into priority queue $j$, it will be buffered in the $j$-$th$ buffer
+%% partition and can generate PFC of priority $j$.  In this section, we focus on
+%% supporting {\em just one} lossless application class. In
+%% Section~\ref{sec:specific}, we will revisit this issue and show how we may
+%% support multiple application classes more efficiently.
+
+\para{The counter-part in the Clos version.} To ease the comparison, we show the tagging
+scheme of Clos in Algorithm~\ref{alg:clos}. The only difference is where the tag
+is updated, and is due to the fact that we have more knowledge of Clos, a structured topology.
+Algorithm~\ref{alg:clos} already includes the idea of combining tags (\S\ref{subsec:combine}). 
+
+\begin{algorithm}
+	\small
+    \KwIn{Clos topology and lossless routes $R$}
+	\KwOut{A tagged graph $G(V, E)$}
+	$V \gets Set()$\;
+	$E \gets Set()$\; 
+	\For{each path $r$ in $R$} {
+		$tag \gets 0$\;
+		\For{each hop $h$ in $r$} {
+			$V \gets V \cup \{(h, tag)\}$\;
+			$E \gets E \cup \{lastHop\rightarrow(h, tag)\}$\;
+			\If{$h$ is up-facing \&\& nextHop is down-facing} {
+				$tag \gets tag+1$\;
+			}
+		}
+	}
+	\Return{$G(V, E)$}\;
+    \caption{The optimal tagging system for Clos topology.}
+	\label{alg:clos}
+\end{algorithm}
+
+
+
+%\subsection{Idea 2: Tag for Ordered Micropath Subspaces}\label{sec:tag_order}
+
+%By properly dividing lossless routes into multiple subspaces of micropaths, we
+%can ensure that CBD is eliminated {\em within} each subspace. We will discuss
+%the details of the algorithm are described later in this section. But first, we
+%must consider another issue: Even though proper micropath partition ensures no
+%CBD {\em within} each priority, packets can still cause CBD {\em across}
+%priorities, as shown in Figure~\ref{fig:subspace}(a). Switch must know the past
+%path of each packet in order to decide the priority that avoids CBD. Obviously,
+%the tag size is limited, so we can't carry the entire history of the packet in
+%the tag. Thus, we need the next idea.
+
+%As shown in Figure~\ref{fig:subspace}(b), we enforce the order of transitioning
+%among micropath subspaces and tag only based on current subspace.  With this,
+%the packets do not need to record the whole history of past micropaths in
+%headers. A fixed length header field (most commonly, DSCP) is sufficient to
+%carry the tag. The tag values are one-one mapped to the micropath subspaces,
+%which one-one maps to priority queues on each switch. 
+
+%Thus, with \sysname{}, the switch enqueues each packet into priority queue based
+%on its tag, and changes the tag if the switch decides to change the packet's
+%priority at the next hop.  We can prove that the network is deadlock-free if the
+%tag system, which defines micropath subspaces and transition, satisfies the two
+%requirements below:
+
+%\begin{enumerate}
+%	\item A packet's tag is unchanged or changed at each hop of its path. When the tag is changed, it must be changed monotonically 
+%	along any packet's path (e.g., always increasing).
+%	\item For any given tag, all micropaths within the corresponding micropath subspace do not form cyclic buffer dependency.
+%\end{enumerate}
+
+%Putting these two ideas together we can generate a system of tags and tag
+%conversion tables for each switch. However, we must pay heed to the fact that 
+%a switch cannot support more than one or two lossless priorities in practice. 
+%Thus, we must minimize the number of tags we use.
+
+\subsection{Step 2: Greedily Combining Tags} 
+
+The tags in Algorithm~\ref{alg:ttl} have not been combined and must be combined
+to reduce the number of tags. In this section, we focus on the number of lossless 
+queues for just {\em one} application class, like \S\ref{subsec:combine}.
+
+Leveraging the brute-force tagging system as a start
+point, we design Algorithm~\ref{alg:greedy} to minize the number of lossless
 queues. It works by greedily combining as many nodes, from brute-force tagging
 system, as possible into each micropath subspaces under CBD-free constraint. To
 ensure the monotonic property, we start from combing the nodes with largest tag
@@ -306,10 +300,73 @@ property will still hold after combination.
 	\label{alg:greedy}
 \end{algorithm}
 
-We assign a new tag $t'$ (different from the brute-force tag) for each micropath
-subspace, and generate switch configurations based on the algorithm output. The
-worst case scenario is as bad as using the original input, brute-force tags,
-which require as many priority queues as the length of longest lossless route.
-However, in Section~\ref{sec:eval}, we show that this algorithm works reasonably
-well for generic topology.  \fixme{highlight: For example, Jellyfish with 1000
-nodes require only X priorities for {\em one} application class.}
+\begin{figure}[t]
+	%\vspace{-0.1in}
+	\centering
+	\includegraphics[width=0.48\textwidth] {figs/alo_walkthrough_c}
+	\caption{Algorithm~\ref{alg:greedy} output for the example in Figure~\ref{fig:three_node}.}
+	\label{fig:greedy}
+\end{figure}
+
+We use the same three-node example as the previous section, and show the output 
+$G'(V', E')$ in Figure~\ref{fig:greedy}. 
+We assign a new tag $t'$ (different from the brute-force tag) based on $G'(V', E')$, 
+and generate switch configurations based on the algorithm output. We see that
+the tags have been reduced to {\em two}.
+
+
+\subsubsection{Performance Analysis}\label{subsec:caveats}
+
+\para{Algorithm runtime}. Algorithm~\ref{alg:greedy} is efficient. Given $maxTag$ 
+(denoted as $T$ below), which equals to the longest path in {\em lossless routes} and
+total number of switches $S$, the brute-force tagged graph at most have $S \times T$ nodes.
+Each node will be examined exactly once for checking whether $G_{tmp}$ is acyclic.
+Checking whether $G_{tmp}$ is acyclic with a newly added node requires a Breath-First Search,
+with runtime complexity of $O(|V_{tmp}| + |E_{tmp}|)$. $|V_{tmp}|$ is bounded by the number
+os switches $S$, and $|E_{tmp}|$ is bounded by the number of links, $L$, in the network.
+Therefore, the total runtime complexity is $O(S \times T \times (S+L))$.
+
+\para{The output number of tags.} Algorithm~\ref{alg:greedy} significantly 
+reduces the number of tags on topology other than Clos. \fixme{For example, we 
+have tested it on BCube topology without any special design for BCube. It gives the optimal 
+result -- a $k$-level BCube needs $k$ tags for {\em one} lossless application 
+class. In addition, we test unstructure topology like Jellyfish. The result is still promising.
+Jellyfish with 1000 nodes require only X tags. Details are in \S\ref{sec:eval}.}
+
+\begin{figure}[t]
+	%\vspace{-0.1in}
+	\centering
+	\includegraphics[width=0.48\textwidth] {figs/nonoptimal_example}
+	\caption{Algorithm~\ref{alg:greedy} does not output optimal result for Clos with 1-bounce paths.}
+	\label{fig:nonoptimal}
+\end{figure}
+
+However, Algorithm~\ref{alg:greedy} may not always return the optimal solution. For example, 
+we again consider the simple three-layer Clos network in Figure~\ref{fig:nonoptimal}. 
+Assuming ``normal'' and ``1-bounce'' packets must be lossless,  
+we know the optimal tagging system only requires {\em two} lossless queues. However, the 
+greedy algorithm will output {\em three} lossless queues. The reason is that 
+Algorithm~\ref{alg:greedy} does not combine bounces that happen when the packet is going up
+and when the packet is coming down. As a result, it has to 
+assign a separate prirotiy for each case, as shown in Figure~\ref{fig:nonoptimal}.
+The fundamental reason is that generic algorithm does not fully utilize the inherently 
+characteristics of structured topology like Clos. 
+
+%Second, the generic algorithm is inefficient in reusing priorities for multiple application classes.
+%For example, the generic algorithm output is two priorities per application class, and the operators
+%have up to two prioritie on switches. In this case, only {\em one} lossless application
+%class is supported. However, if we can find a smarter tagging system that ensures basic connectivity 
+%with only the first micropath, we can compress {\em two} application classes into two switch priorities, 
+%as described in Section~\ref{sec:clos}.
+
+\para{Higher bound.} Though Algorithm~\ref{alg:greedy} does not guarantee optimal result, 
+it has a good bound of the tags in practice. Without any assumptions, the worst case 
+is the same as using the brute-force solution, which require as many tags as the length of 
+longest lossless route, $T$. However, if we know that the smallest cycle in lossless routes
+is longer than $l$, the output number of tags is bounded by $\lceil T/l \rceil$. The proof
+can be directly obtained from the greedy algorithm process, and is omitted for brevity.
+
+\subsection{Tag Reusing}
+
+\fixme{Not sure whether we need this section. Maybe a short paragraph explaining why
+the tag reusing still works on generic topology?}

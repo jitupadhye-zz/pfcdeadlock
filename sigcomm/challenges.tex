@@ -50,20 +50,20 @@ destination server.  In UP-DOWN routing, the following property holds: when the
 packet is on its way UP, it should not go DOWN; when it is on its way DOWN, it
 should not go UP.
 
-\begin{figure}
+%\begin{figure}
 	%\vspace{-0.1in}
-	\centering
-	\includegraphics[width=0.4\textwidth] {figs/up-down}
-	\caption{Violation of up-down routing can lead to deadlocks}
-	\label{fig:up-down-deadlock}
-\end{figure}
+	%\centering
+	%\includegraphics[width=0.4\textwidth] {figs/up-down}
+	%\caption{Violation of up-down routing can lead to deadlocks}
+	%\label{fig:up-down-deadlock}
+%\end{figure}
 
 However, packets may deviate from the UP-DOWN paths due to several reasons
 including software errors on routers, link flapping, routing protocol
 flapping~\cite{f10}. As have shown in~\cite{shpiner2016unlocking}, when the
 UP-DOWN property is broken and packets may reroute multiple times between two
 layers of switches, and deadlocks may form as a result, as shown in
-Figure~\ref{fig:up-down-deadlock}.
+Figure~\ref{fig:priority_transition}(a).
 
 We regularly observe deviations from up-down routing in our data centers.  We
 see hundreds of such routes per day, and they can persist for minutes or even

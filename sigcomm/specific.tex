@@ -1,276 +1,263 @@
 %\vspace{-0.1in}
-\section{Optimal Solution for Structured Topology}\label{sec:specific}
+\section{\sysname{} on Clos Topology}\label{sec:specific}
 
-\subsection{Caveats of the Generic Greedy Algorithm}\label{sec:caveats}
+While \sysname{} works for any topology, we demostrate the main ideas on the most popular data center 
+topology, Clos, with common Clos routing\footnote{Clos routing can be implemented by BGP (Microsoft, 
+Facebook) or by customized routing protocol (Google).} in this section. 
 
-Although the generic Algorithm~\ref{alg:greedy} has significantly reduced the number of lossless queues,
-it has two main caveats.
+The design of \sysname{} is driven by the need to address the three challenges described 
+in the previous section. As explained in \S~\ref{sec:incremental}, \sysname{} must  
+not require any changes to the existing topology of the 
+network or the routing. However, our key insight is that we can leverage our knowledge of 
+Clos network\footnote{We later extended \sysname{} to generic topology in \S~\ref{sec:generic}.}
+to precompute rules for every switch. Each switch locally knows how it should process 
+packets upon routing dynamics (\S~\ref{sec:reroute}) with limited lossless queues
+(\S~\ref{subsec:pfcheadroom}). All switches together eliminate deadlock.
+These rules are calculated offline. Thus, there is no additional overhead at run 
+time -- \sysname{} operates at line speed.
 
-First, it may not always return the optimal solution. For example, we again consider the simple three-layer
-Clos network in Figure~\ref{xxx}. Assuming non-bounce packets and one-bounce packets must be lossless,  
-we know the optimal tagging system only requires {\em two} lossless priorities. However, the 
-greedy algorithm will output {\em three} micropath subspaces. The reason is that greedy algorithm does
-not combine bounces that happen at different hops. As a result, it has to assign a separate prirotiy
-for each case, as shown in Figure~\ref{xxx}.
+Before delving into the details, we define the following terms.
 
-Second, the generic algorithm is inefficient in reusing priorities for multiple application classes.
-For example, the generic algorithm output is two priorities per application class, and the operators
-have up to two prioritie on switches. In this case, only {\em one} lossless application
-class is supported. However, if we can find a smarter tagging system that ensures basic connectivity 
-with only the first micropath, we can compress {\em two} application classes into two switch priorities, 
-as described in Section~\ref{sec:clos}.
+\para{Lossless routes.} The input to \sysname{}. It is a set of packet paths that network 
+operators specified to be lossless.
 
-The fundamental reason of these problems is that generic algorithm does not fully utilize the inherently characteristics of structured topology. In this section, we will show the smarter tagging systems for popular topology including Clos and BCube. The smarter tagging system addresss both of the problems above.
+\para{Lossless class.} A lossless class is a service that we provide for applications. 
+Network guarantees that packets in a lossless class will not drop on lossless routes. 
 
+\para{Tag.} Tag is a small integer assigned / associated with a packet. The tag is embedded 
+in a packet. A packet belonging to one lossless class may change its tag value, which means 
+that a lossless class may have multiple tag values. 
 
-\subsection{Optimizing Clos Topology}\label{sec:clos}
-
-The tagging algorithm for Clos topology is straightforward. 
-We first define the baseline UP-DOWN routing as first micropath space, with tag 0. Every time the packet
-bounces, we increase the tag by one, until the packet is assigned to a lossy queue. Algorithm~\ref{alg:clos}
-shows the process. For Clos topology, we can simply replace Algorithm~\ref{alg:ttl} by 
-Algorithm~\ref{alg:clos}, and Algorith~\ref{alg:greedy} is not needed any more.
-With $k$ lossless priorities, packets with up to $k-1$ bounces are all lossless.
-It's easy to prove that, to handle $k-1$ bounces, at least $k$ lossless priorities are required.
+\para{Switch conceptual model.} a switch is composed of multiple ports. 
+Per port, there are limited number of separated ingress queues and egress queues. 
+Switch classifies packets into queues based on {\em tags}. 
+Each queue can be lossless or lossy, depending on whether PFC is enabled.
+All packets are put into a lossy queue unless there are whitelist rules that classify
+specific packets into lossless queues. Lossless ingress queues can trigger PFC, 
+while lossless egress queues react to PFC from the next hop.
 
 
-\begin{algorithm}
-	\small
-    \KwIn{Clos topology and routing paths $R$ that must be lossless}
-	\KwOut{A tagged graph $G(V, E)$}
-	$V \gets Set()$\;
-	$E \gets Set()$\; 
-	\For{each path $r$ in $R$} {
-		$tag \gets 0$\;
-		\For{each hop $h$ in $r$} {
-			$V \gets V \cup \{(h, tag)\}$\;
-			$E \gets E \cup \{lastHop\rightarrow(h, tag)\}$\;
-			\If{$h$ is up-facing \&\& nextHop is down-facing} {
-				$tag \gets tag+1$\;
-			}
-		}
+%A packet is mapped 
+%to an ingress queue by using its tag only; and mapped to a new tag by using its ingress 
+%port and tag; and the packet is mapped to a egress queue by using the new tag only. 
+ 
+%Tag hierarchical space: Tags within a lossless class form a sub space; sub spaces form 
+%a DAG when packets transfer from one space to another. (I am not sure space is a right 
+%term, as space has special meaning, e.g, meet the Euclidian distance relationship. I 
+%think we will need to find a better term. Maybe just call tag hierarchical tree). 
+
+
+\subsection{Idea 1: Tagging on Bounce}\label{subsec:tag}
+
+\subsubsection{Insight from Case Study}
+
+\begin{figure}[t]
+	%\vspace{-0.1in}
+	\centering
+	
+	\subfloat[short for lof][1-bounce paths creates CBD.] {
+		\includegraphics[width=0.5\textwidth] {figs/cbd_a}
 	}
-	\Return{$G(V, E)$}\;
-    \caption{The optimal tagging system for Clos topology.}
-	\label{alg:clos}
-\end{algorithm}
+	
+%	\vspace{-0.15in}
+	\subfloat[short for lof][CBD is eliminated with path segmenting and prioritizing.]{
+		\includegraphics[width=0.5\textwidth] {figs/cbd_b}
+	}
+	
+	\caption{Micropath based priority transition can eliminate CBD.}\label{fig:priority_transition}
+\end{figure}
 
-\para{Priority reuse.} 
-Above tagging system allows us to run $k$ application classes with $k$ lossless priorities. 
-It works as follows.
-We start the first class with priority 0 (tag 0), and change to one higher priority (tag) every time the packet
-bounces. We can then start the second class with tag 1, and change tags just like the first class. 
-Then third class starts with tag 2, and so on. We can prove that such priority reuse will not create CBD.
+Figure~\ref{fig:priority_transition}(a) shows a simple Clos topology. Let's
+assume that the operator wants all normal paths to be lossless. In addition,
+let's assume that the operator is also worried about rerouting due to link 
+failures (\S\ref{sec:reroute}). In this section, we focus on just {\em one}
+lossless class for applications. We will revisit multiple lossless classes in \S\ref{subsec:reusing}.
 
-The trade-off is that the second class supports one less bounce, the third class supports two less, and so on.
-Under fixed constraints on the number of priorities on switches, how many application classes run in parallel?
-we leave the choice to operators. In practice, we run two application classes with two priority 
-queues on switch. The second class is still lossless for most of the time, as numbers in 
-Section~\ref{sec:reroute} show.
+Typically, the "normal" paths will be the shortest paths -- which for a CLOS
+network are the ``up-down'' paths described in the last section.  In addition,
+due to link failures, we may have paths that are not up-down. We call a hop that
+is ``down-up'', {\em i.e.,} a packet comes down but then goes up, {\em a bounce}.
+Such bounced paths can form CBD, and lead to deadlock, as shown in
+Figure~\ref{fig:priority_transition}(a))~\cite{shpiner2016unlocking}. 
+
+However, if we divide the paths into two segments, {\em before-bounce} and {\em
+after-bounce}, and assign them to different priority queues, there is no more
+CBD (Figure~\ref{fig:priority_transition}(b)). 
+
+\para{Key insight.} The insight we get from this
+example is that if the switch can detect that a packet may cause CBD in next
+hops, it can change the packet's priority queue to avoid CBD, thus avoiding deadlock.
+Specifically, in Clos topology, if the switch can detect packet bounce and change 
+the priority queue, CBD can be eliminated.
+
+Note that this is different from the prior solutions, which either assign a
+fixed priority queue based on pre-computed paths (and thus cannot react to dynamic
+routing), or change the priority queue every hop (and thus requires too many priority
+queues). 
+
+\subsubsection{Tag for Notifying Next Hop}
+
+How does a switch detect that the packet has bounced or not? Let us focus on the
+green dash flow in Figure~\ref{fig:priority_transition}(a). We want switch $S1$, 
+the first switch after bonuce, to detect the bounce and change priority queue. However, 
+without additional information, $S1$ cannot differentiate bounced packets from normal 
+up-going packets, {\em e.g.,} blue flow packets before bounce. 
+
+Thus, we turn to $L2$, where the green packet is first seen bouncing. In normal
+``up-down'' routing, there should not be packets going up after coming down. Our
+idea is that we pre-install switch rules on $L2$, so that once it detects bounce, it 
+assigns a special tag to the bouncing packets. Then on $S1$ and all hops after it,
+switches recognize this tag and move the packets to a separate priority queue.
+
+The key enabler of our approach is the topology and the set {\em lossless
+routes} specified by the operators as the input. Specifying lossless routes is
+not a significant burden: in this Clos example, the operator may specify that all
+normal up-down paths paths with a single bounce are lossless. Given the
+topology and the routing protocol it is easy to automatically enumerate all such
+paths. 
+
+Of course, the operator can specify packets with more bounces to be lossless, at
+the cost of more tags and priority queues. What happens if there are 
+packets ending up with more bounces than specified by the operator? In such case, 
+our tagging scheme assigns a tag that none of the switches recognizes.  
+The switches by default classify unrecognized tags into a lossy queue.
+The lossy queue follows the standard drop-tail discipline and, obviously, does not deadlock. 
 
 
-On the other hand, the generic algorithm cannot support this at all. The problem is the lossless routing will 
-become disconnected if any one priority (a micropath segment) is missing. Therefore, when the 
-second application class starts with tag 1, the traffic between at least some hosts becomes 
-{\em always} lossy.
+\subsection{Idea 2: Combining Tags}\label{subsec:combine}
+
+The idea of ``tagging on bounce'' addresses the dynamic routing challenge 
+in \S\ref{sec:reroute}. However, the challenge of limited lossless priorities 
+(\S\ref{subsec:pfcheadroom}) remains unanswered.
+
+In Clos network as shown in Figure~\ref{fig:priority_transition}(a), packets can 
+bounce at any $L$ layer, or called Leaf, switches. In addition, packets can also 
+bounce at any $T$ layer, or ToR switches. Do we need to assign a distinct tag and 
+a corresponding priority queue for each bouncing point? 
+
+Again, we leverage our knowledge of Clos topology and routing. All the path segments
+that are after first bounce and before the second bounce again form a set of ``up-down''
+routing paths. Therefore, these path segments do not have CBD even if we combine them
+into a single priority queue. We can use a single tag to represent these segments
+altogether, and map the tag to a globally unique priority queue.
+
+Now we can design a practical tagging system, Tagger, for Clos topology. We first tag all packets 
+following the normal ``up-down'' routing input with tag 1. All switches put these packets 
+into first lossless queue. Then we configure all ToR and Leaf switches such that everytime
+they see a packet coming down and then going up (therefore, bouncing) for any reasons, 
+they increase the tag by one. Assuming there are $k$ avaialbe lossless queues, all switches 
+put packets with tag $i$ to $i^{th}$ lossless queues. This means packets with up to $k-1$ 
+bounces are all lossless. If a packet bounces more than $k-1$ times, it will carry a tag
+larger than $k$. All switches will put it into a lossy queue.
+
+In this section we focus on high-level ideas and design. More details, such as formal definition
+and pseudocode, can be found in \S\ref{sec:generic}.
+
+\begin{figure}[t]
+	%\vspace{-0.1in}
+	\centering
+	
+	\subfloat[short for lof][CBD across subspaces.] {
+		\includegraphics[width=0.24\textwidth] {figs/subspace_a}
+	}
+	\subfloat[short for lof][DAG across subspaces.]{
+		\includegraphics[width=0.26\textwidth] {figs/subspace_b}
+	}
+	
+	\caption{Ordered subspaces ensure deadlock-free priority transition.}\label{fig:subspace}
+\end{figure}
+
+\para{Deadlock-free Guarantee.} We briefly explain why Tagger (for Clos) guarantees deadlock-free.
+Tagger has two important properties. First, for any given tag and its corresponding priority queue,
+there is no CBD because each tag only has a set of ``up-down'' routing paths.
+
+Second, every time the tag changes, it changes monotonically. This means that the packet is 
+going unidirectionally in a DAG of priority queues. This is important because otherwise CBD 
+may still happen across subspaces (Figure~\ref{fig:subspace}).
+
+We conclude that no CBD can form either within a tag or across different tags. The
+network is deadlock-free since CBD is a necessary condition of deadlock~\cite{our_hotnets_paper}.
+
+\para{Optimality.} We prove the optimality of our system, {\em i.e.,} to make all $k-1$ bounces 
+paths lossless and deadlock-free, at least $k$ lossless priorities are required. We use contradiction.
+Assume there exists a system with only $k-1$ lossless priorities. Consider a flow that loops between 
+$T1$ and $S1$ for $k$ times, which means bounces $k-1$ times at $T1$. With Pigeonhole principle, 
+we know that at least two times of looping fall into the the same lossless priority. This is 
+already sufficient to cause a deadlock~\cite{our_hotnets_paper}. Contradiction.
+
+
+%Every time the packet
+%bounces, we increase the tag by one, until the packet is assigned to a lossy queue. Algorithm~\ref{alg:clos}
+%shows the process. For Clos topology, we can simply replace Algorithm~\ref{alg:ttl} by 
+%Algorithm~\ref{alg:clos}, and Algorith~\ref{alg:greedy} is not needed any more.
+
+
+\subsection{Idea 3: Reusing Tags and Lossless Queues}\label{subsec:reusing}
+
+The prior ideas have been focusing on supporting single lossless application class. 
+However, multiple lossless classes impose bigger challenge on the number of priority queues.
+
+Assuming the operators want to make all paths with no more than $M$ bounces lossless, 
+and there are $N$ different lossless application classes. The most straightforward
+way is to assign totally different tags for each lossless class. Each class must have 
+$M+1$ different tags. In total, it requires $(M+1) \times N$ tags and lossless queues.
+Based on the calcualtion in \S\ref{subsec:pfcheadroom}, we can only support \fixme{one}
+lossless class assuming $M=1$.
+
+Our idea is to reuse tags and lossless queues across different lossless application classes.
+It works as follows. We start the first lossless class with tag 1, and uses tag upto $M+1$
+as described in prior section.
+The second lossless class starts with tag 2, and change tags in the same way as the first class.
+That is, whenever it has a bounce, the tag will increase by one. The second lossless class
+uses tag from 2 to $M+2$. This goes on until the $N'th$ lossless class. The total number of tags
+and lossless classes requried is $M + N$.
+
+Reusing tags and queues means the traffic from different classes may mix in some cases.
+For example, the second lossless class's ``normal'' traffic may mix with the first 
+class's ``one-bounce'' traffic.
+We can prove that there is still no deadlock after such mix, by revisiting Tagger's two
+properties described in the prior section. First, there is still no deadlock within each tag, 
+because each tag is still a set of ``up-down'' routing. Second, the update of tags is still
+monotonical. Thus, deadlock-free still holds.
+
+\para{Trade-off.} The mix of traffic also means a trade-off: we weaken the isolation between two application 
+lossless classes. This is usually acceptable for Clos topology in practice. As \S\ref{sec:reroute}
+shows, only a small fraction of packets experience one-bounce and may mix with traffic
+in the next lossless class.
+
+\para{Further reduce tags at the cost of some classes.} If the operators allow some classes
+to tolerate less bounces, the number of lossless queues can be further reduced. For example,
+Two lossless queues can support {\em two} lossless application classes, if the second class
+does not need to guarantee lossless for one-bounce traffic.
+
+%the second class supports one less bounce, the third class supports two less, and so on.
+%Under fixed constraints on the number of priorities on switches, how many application classes run in parallel?
+%we leave the choice to operators. In practice, we run two application classes with two priority 
+%queues on switch. The second class is still lossless for most of the time, as numbers in 
+%Section~\ref{sec:reroute} show.
+
+%\subsection{Idea 3: Lossless Classes Reusing Tags}
+
+%Above tagging system allows us to run $k$ application classes with $k$ lossless priorities. 
+
+%The trade-off is that the second class supports one less bounce, the third class supports two less, and so on.
+%Under fixed constraints on the number of priorities on switches, how many application classes run in parallel?
+%we leave the choice to operators. In practice, we run two application classes with two priority 
+%queues on switch. The second class is still lossless for most of the time, as numbers in 
+%Section~\ref{sec:reroute} show.
+
+
+%On the other hand, the generic algorithm cannot support this at all. The problem is the lossless routing will 
+%become disconnected if any one priority (a micropath segment) is missing. Therefore, when the 
+%second application class starts with tag 1, the traffic between at least some hosts becomes 
+%{\em always} lossy.
 
 %Adding the priority reuse, $k$ lossless application classes can run in parallel at the cost that $i^{th}$ class only supports $k-i+1$ times bouncing.
 
 
-\subsection{Optimizing BCube Topology}
-
-\subsection{High-level Takeaways}
 
 
-\if 0
-
-\begin{enumerate}
-	\item It does not always yield optimal results in terms of number of lossless queues, e.g., in Fat-tree.
-	
-	\item It requires $M*N$ lossless queues, where $M$ is the number of lossless application classes, 
-	$N$ is the number of lossless queues required by each application class. In fact, we may reduce it to $M+N-1$.
- 
-\end{enumerate}
-
-\subsubsection{Definition of switch functions}
- 
-\begin{enumerate}
-	
-	\item \textbf{Packet scheduling function of VIQs $f^{in}_{sche}$:} This is the switch function to decide which packet currently queued in some VIQ $q_{in}^{i}$ to be processed at first. Formally, this function can be expressed as follows. 
-	\begin{align} \label{eqn:inschedule}
-	 f^{in}_{sche}: q_{in}^{i} \longrightarrow p \in q_{in}^{i}
-	\end{align}
-	
-	\item \textbf{Packet scheduling function of VEQs $f^{out}_{sche}$:} This is the switch function to decide which packet currently queued in some VEQ $q_{out}^{i}$ to be processed at first. Formally, this function can be expressed as follows. 
-	\begin{align} \label{eqn:outschedule}
-	f^{out}_{sche}: q_{out}^{i} \longrightarrow p \in q_{out}^{i}
-	\end{align}
-	
-	\item \textbf{Packet forwarding function $ f_{fwd}$:} This is the switch function to forward a packet from a VIQ to a VEQ. Formally, this function can be expressed as follows. 
-	\begin{align} \label{eqn:fwd}
-	 &	f_{fwd}: (q_{in}^{i_1,j}, q_{out}^{i_2,j}, p\in q_{in}^{i_1,j})  \longrightarrow \nonumber \\
-	 	&\begin{cases}
-	 	 q_{in}^{i_1,j}=q_{in}^{i_1,j}-\{p\},  \text{current node is destination of } p,\\
-	     q_{out}^{i_2,j}=q_{out}^{i_2,j}\cup\{p\}, \text{otherwise.} 
-	 	\end{cases}
-	\end{align}
-	
-	
-	\item \textbf{Packet transmission function $ f_{trans}$:} This is the switch function to send a packet from the VEQ of current network device to the VIQ of the immediate downstream device. Formally, this function can be expressed as follows:
-	\begin{align} \label{eqn:trans}
-	f_{trans}: &(q_{in}^{i_1, j}, q_{out}^{i_2, j}, q_{in}^{i_3, j+1}, p\in q_{in}^{i_1,j}\cap q_{out}^{i_2,j})  \longrightarrow  \nonumber \\
- &	(q_{in}^{i_1,j}=q_{in}^{i_1,j}-\{p\}, q_{out}^{i_2,j}=q_{out}^{i_2,j}-\{p\}, \nonumber \\ 
- &	 q_{in}^{i_3,j+1}=q_{in}^{i_3,j+1}\cup\{p\}),  \nonumber \\
- & \text{if } p_{ttl} > 0   
- 	\end{align}
- 	\begin{align} 
- 	f_{trans}: &(q_{in}^{i_1, j}, q_{out}^{i_2, j}, p\in q_{in}^{i_1,j}\cap q_{out}^{i_2,j})  \longrightarrow  \nonumber \\
- 	&(q_{in}^{i_1,j}=q_{in}^{i_1,j}-\{p\}, q_{out}^{i_2,j}=q_{out}^{i_2,j}-\{p\}), \nonumber \\ 
- 	& \text{if } p_{ttl} =0
-	\end{align}
-	Note that here  $q_{in}^{i_1, j}$ and $q_{out}^{i_2,j}$ are two queues belonging to the same network node, while $q_{in}^{i_3, j+1}$ is a queue belonging to an immediate downstream network node.
-\end{enumerate}
 
 
-\subsubsection{Assumptions}
 
-Let $t_{cost}(f)$ be the time cost of performing switch function $f$. In the following part, we list several assumptions we make in our proof.
-
-\begin{enumerate}
-	\item \textbf{PFC threshold is no smaller than maximum transmission unit (MTU):} Formally, we have $t_{PFC}\ge s_{MTU}$.
-	
-	\item \textbf{Finite packet scheduling time:} We assume that packet scheduling functions can decide the next packet to be processed within finite time. Formally, $f^{in}_{sche}$ and $f^{out}_{sche}$ should satisfy the following constraints at any network node:
-		\begin{align} 
-    	t_{cost}(f^{in}_{sche}(q_{in}^{i})) < \infty ,1\leq i \leq n \label{eqn:schecon1}\\
-	    t_{cost}(f^{out}_{sche}(q_{out}^{i})) < \infty, 1\leq i \leq n \label{eqn:schecon2}
-		\end{align}
-		
-	\item \textbf{No selection of duplicated packet:} the packet scheduling function $f^{in}_{sche}$ will not select the same packet twice. Formally, 
-		\begin{align} \label{eqn:nodupschedule}
-		f^{in}_{sche}: \quad& q_{in}^{i_1} \longrightarrow p \in q_{in}^{i_1}, \nonumber \\
-		\mbox{Subject to}: \quad&1\leq i_2 \leq n, \forall p\prime \in q_{out}^{i_2}, p \neq p\prime .
-		\end{align}
-		
-	\item \textbf{Prefering non-paused packet:} We assume $f^{out}_{sche}$ will always prefer non-paused packets over paused packets.
-		
-	\item \textbf{Finite packet forwarding time:} We assume that any packet can be forwarded from a VIQ to a VEQ within finite time. Formally, $f_{fwd}$ should satisfy the following constraint:
-	    \begin{align} \label{eqn:fwdcon}
-		t_{cost}(f_{fwd}((q_{in}^{i_1,j}, q_{out}^{i_2,j}, p\in q_{in}^{i_1,j}))) < \infty, \nonumber \\
-		1\leq i_1, i_2 \leq n
-		\end{align}
-		
-	\item \textbf{Finite packet transmission time when no PFC pause:} We assume that any packet can be sent to the VIQ of next hop within finite time when the priority class of the packet is not paused by the immediate downstream device. Formally, $f_{trans}$ should satisfy the following constraint:
-	
-	\begin{align} \label{eqn:transcon}
-	t_{cost}(f_{trans}(q_{in}^{i_1, j}, q_{out}^{i_2, j}, q_{in}^{i_3, j+1}, p\in q_{in}^{i_1,j}\cap q_{out}^{i_2,j}))= \nonumber \\
-	\begin{cases}
-	<\infty, &\quad |q_{in}^{i_3,j+1}|< t_{PFC}\\
-	\infty, &\quad\text{otherwise.} \ 
-	\end{cases}
-	\end{align}
-	
-    \end{enumerate}
-    
-    
-   \subsubsection{Network Buffer State}
-   
-   \textbf{Buffer state:} we use a $2n$ dimensional vector  to represent the buffer state of a network node $u$ as follows: 
-   \begin{align}
-   BS_u=<q_{in}^{1}, \dots, q_{in}^{n}, q_{out}^{1}, \dots,q_{out}^{n}> \nonumber 
-   	\end{align}
-   	$BS_u(t)$ is the buffer state of node $u$ at time $t$.
-   
-   Let $N(V,E)$ be the network topology, where $V$ is the set of network nodes and $E$ is the set of network links. We represent the buffer state of netwrok $N$ (denoted as $BS_N$) as follows:
-   \begin{align}
-   BS_N=<BS_{u_1},\dots,BS_{u_i},\dots>,\forall u_i \in V \nonumber 
-   \end{align}
-   $BS_N(t)$ is the buffer state of network $N$ at time $t$.
-   
-   \textbf{Legal buffer state:} We say $BS_u$ is a legal buffer state for node $u$ when the following two conditions are satisfied:
-   \begin{align} \label{eqn:legalstatecon}
-    |q_{in}^{i}|<\infty\quad  \text{and}\quad   |q_{out}^{i}|<\infty, \quad 1\leq i \leq n
-%    |q_{in}^{i,j}|\leq t_{PFC}, \quad 1\leq i \leq n, 1\leq j \leq k \label{eqn:legalstatecon2}
-   \end{align}
-   
-   We say $BS_N$ is a legal buffer state when the buffer state of every node in $N$ is legal.
-   
-   \textbf{Empty buffer state:} We say $BS_u$ is an empty buffer state when the following condition is satisfied:
-    \begin{align} \label{eqn:emptystatecon}
-    |q_{in}^{i}|=0\quad  \text{and}\quad   |q_{out}^{i}|=0, \quad 1\leq i \leq n 
-    \end{align}
-    
-    We say $BS_N$ is a empty buffer state when the buffer state of every node in $N$ is empty. Specially, we denote the empty buffer state of network $N$ as $BS^0_N$.
-    
-  \textbf{Deadlocked buffer state:} $\forall t< \infty$, we say $BS_N(t)$ is a deadlocked buffer state if the following condition is met when no new packets are injected into the network since $t$:
-  \begin{align} \label{eqn:deadlockstatedef}
-  \exists \text{ finite } t_0 > t, \quad \forall t_1>t_0, \nonumber\\
-  BS_N(t_1)\equiv BS_N(t_0) \quad \text{and} \quad BS_N(t_0) \neq BS^0_N.
-  \end{align}
-    
-\fi
-
-    %     \textbf{Lemma 1}: for arbitrary non-deadlocked buffer state $BS_N(t)$, when no new packets are injected into the network since $t$, there exists a finite $t_0>t$, $BS_N(t_0)=BS^0_N$.
-    %     
-    %      \textbf{Proof}: Assuming that there does not exist a finite $t_0>t$, $BS_N(t_0)=BS^0_N$. As $BS_N(t)$ is a non-deadlocked buffer state, according to Equation~\ref{eqn:deadlockstatedef}, $BS_N(t)$ will not converge into any fixed non-empty buffer state. 
-    %      
-    %      Let $BS_N(t_1), \dots, BS_N(t_i), \dots$ be the buffer states $BS_N(t)$ will transition to in sequence since $t$. Let $Sum_{TTL}(BS_N(t))$ be the sum of TTL values of all packets 
-    %      
-    %      We consider any transition from $BS_N(t_i)$ to $BS_N(t_{i+1})$, $i>0$,
-    %      
-    %      \textbf{}
-    
-%\textcolor{red}{To be added.}
-
-%In this part, we will prove that our solution can ensure a \textit{lossless} network and at the same time is \textit{deadlock-free} when the following four assumptions are met.
-%
-%\textbf{Assumption 1}: There is no transmission or processing errors at all the network nodes.
-%
-%\textbf{Assumption 2}: PFC PAUSE/RESUME messages can take effect immediately at the corresponding upstream node, i.e., there is no link delay and processing delay.
-%
-%\textbf{Assumption 3}: The scheduling algorithm of any VIQ is deadlock-free: for any given time $t$, any packet $p$ queued in arbitrary $q_{in}^{i,j}$, $1\leq i \leq n$, $1 \leq j \leq k$, can be forwarded to the destined VEQ within some finite time since $t$.
-%
-%\textbf{Assumption 4}: The scheduling algorithm of any VEQ is deadlock-free: for any given time $t$, any packet $p$ queued in arbitrary $q_{out}^{i,j}$, $1\leq i \leq n$, $1 \leq j \leq k$, can be forwarded to next hop's VIQ via output port $i$ within some finite time since $t$, as long as two conditions are met: 1) $q_{out}^{i,j}$ is not paused by PFC PAUSE message since $t$; 2) VEQ $i$ does not receive any new packets since $t$.
-%
-%\textbf{Claim 1}: The TTL based buffer management scheme can work with the modified PFC mechanism to ensure a lossless network.
-%
-%\textbf{Claim 2}: The network is deadlock-free after applying the TTL based buffer management scheme and the modified PFC mechanism.
-%
-%To prove the above two claims, we first present two lemmas.
-%
-%\textbf{Lemma 1}: The priority class $\lambda_p$ of a packet $p$ buffered at a given node always satisfies $\lambda_p \leq d$.
-%
-%\textit{Proof}: As a packet with TTL value equal to 0 will be dropped by the received node, we have $ttl_i \geq 0$. Then we have $\lambda_p = ttl_0 - ttl_i \leq ttl_0 - 0 = d$.
-%
-%\textbf{Lemma 2}: If we stop injecting new packets into the network since some time $t_0$, arbitrary $q_{out}^{i,j}$, $1\leq i \leq n$, $1 \leq j \leq k$, will become empty within some finite time since $t_0$. 
-%
-%\textit{Proof}: We use induction on $\lambda_p$ to prove the lemma. First, we consider $\lambda_p=d$. 
-%
-%Under our modified PFC mechanism, pacekts in $q_{in}^{i,j}$ of some node are only possible to pause the packet transmission of the immediate upstream node on priority class $j$-$1$.  So packets in any $q_{out}^{i,j}$ of one node are only possible to be paused by the packets of higher priority class at some immediate downstream node. According to Lemma 1,  $q_{out}^{i,d}$ is the queue of highest priority class among all the non-empty queues. Hence packets in $q_{out}^{i,d}$ will not be paused by PFC PAUSE messages. 
-%
-%In the next, we prove by contradiction that any packet in $q_{out}^{i,d}$ can get drained within some finite time since $t_0$. We first assume that there exists a packet $p$ in $q_{out}^{i,d}$ which cannot get drained within some finite time since $t_0$. According to Assumption 4, if the following two conditions are met, packet $p$ will get drained within some finite time: (1) $q_{out}^{i,d}$ is not paused by PFC PAUSE messages; and (2) there exists a finite time $t_1>t_0$,  since which no new packets will be forwarded to VEQ $i$. The first condition is already met. To make our assumption valid, we can conclude that there does not exist a finite time $t_1>t_0$,  since which no new packets will be forwarded to VEQ $i$.
-%
-%As no new packets are injecting into the network since $t_0$, the number of packets remaining in the network is finite (denoted as $N_p$). Further, any packet traversing more than $d$ hops in the network will be dropped. Therefore, the number of packets to be forwarded to VEQ $i$ since $t_0$ is finite (no larger than $N_p*d$). 
-%
-%Let $t_1$ be the time at which the last packet is forwarded to VEQ $i$. $t_1$ must be finite as there are only finite number of packets to be forwarded to VEQ $i$. This contradicts with the conclusion that there does not exist a finite time $t_1>t_0$,  after which no new packets are forwarded to VEQ $i$. So our previous assumption is not valid. Then we can conclude that any packet in $q_{out}^{i,d}$ can get drained within some finite time since $t_0$.
-%
-%Since (1) any packet in $q_{out}^{i,d}$ can get drained within some finite time since $t_0$ and (2) the number of packets to be forwarded to VEQ $i$ since $t_0$ is finite, $q_{out}^{i,j}$ will become empty within some finite time since $t_0$. 
-%
-%Next, we show that the lemma holds for $\lambda_p=d-1$. After $q_{out}^{i,j}$ becomes empty at all the nodes, $q_{out}^{i,d-1}$ becomes the queue of highest priority class among all the non-empty queues. Following the same analysis, we can know that $q_{out}^{i,d-1}$ will become empty within some finite time since $t_0$. This completes proof of the lemma.
-%
-%
-%\textbf{Proof of Claim 1}: Let $b_j$ be the buffer size of the $j$-$th$ buffer partition. At every switch and every server, we set the PFC threshold of priority class $j$ as $b_j-n*m_{max}$.
-%
-%At any given time $t$, we consider packet $p$ in the head of arbitrary $q_{out}^{i,j}$, $1\leq i \leq n$, $1 \leq j \leq k$. 
-%
-%Case 1: $q_{out}^{i,j}$ is not paused by PFC PAUSE messages at time $t$. According to the PFC threshold, at the immediate downstream node, the remaining buffer size of the ($j$+$1$)-$th$ buffer partition will be no smaller than $n*m_{p}$, where $n$ is the number of switch ports and $m_{p}$ is the maximum packet size.  In the worst case, when packet $p$ is being sent to the immediate downstream node, other $n$-$1$ packets are being sent to the same node over different input ports at the same time. As the remaining buffer is large enough to accommodate all these $n$ packets, packet $p$ will not be dropped.
-%
-%case 2: $q_{out}^{i,j}$ is paused by PFC PAUSE messages at time $t$. In this case, packet $p$ will not be dropped as it is paused.
-%
-%In the above analysis, the consideration of packet $p$ and time $t$ is arbitrary, so no packet will be dropped at any node under our solution. So our solution can ensure a lossless network when properly setting the PFC threshold.
-%
-%\textbf{Proof of Claim 2}: For arbitrary given time $t$, in order to know whether the network is already in a state of deadlock, we can stop the injection of new packets into the network at time $t$, and observe whether all the packets remaining in the network can get drained within some finite time. 
-%
-%According to Lemma 2, under our TTL-based buffer management scheme, if we stop the injection of new packets into the network at time $t$, all VEQs will become empty within some finite time since $t$. According to Assumption 3, no packet will be permanently buffered in the VIQs. So packets in VIQs can also get drained within some finite time. Therefore, all the packets remaining in the network can get drained within some finite time. 
-%
-%Based on the above discussion, our TTL-based buffer management scheme is deadlock-free.
 
