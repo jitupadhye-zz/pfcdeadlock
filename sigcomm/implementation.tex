@@ -6,74 +6,117 @@ maintains the queues and handles PFC.
 
 \subsection{Switch Model}\label{subsec:model}
 
-\begin{figure*}
-	%\vspace{-0.1in}
+\begin{figure}
+	\hspace{-0.2in}
 	\centering
-		\includegraphics[width=0.9\textwidth] {figs/switch_model}
+		\includegraphics[width=0.5\textwidth] {figs/switch_model}
 	\caption{Switch model.}\label{fig:switchmodel}
 
-\end{figure*}
+\end{figure}
 
 In this part, we abstract the switch model on which we implement our algorithm output. 
 Most commodity shared-buffer switches comply with this model. 
-As shown in Fig.~\ref{fig:switchmodel}, our switch model consists of five modules: switch port, ingress pipeline, buffer management module, egress pipeline and PFC module. The function of these modules are list as follows.
+As shown in Fig.~\ref{fig:switchmodel}, our switch model consists of four modules: switch port, ingress pipeline, buffer management module and PFC module. The function of these modules are list as follows.
 
 %Fig.~\ref{fig:switchmodel}(a) shows the architecture of the switch model, which consists of a switching fabric and N line cards. Line cards are mainly used to receive/send packets and make routing/forwarding decisions. Switching fabric is a module to transfer packet cells from the input line card to the output line card. 
 
 \begin{itemize}
 	\item \textbf{Switch port}: The module to receive and send packets.
 	
-	\item \textbf{Ingress pipeline}: The module to execute packet processing tasks before a packet enters switch buffer. These tasks include packet header parsing, L2/L3 lookup, ingress ACL processing, packet tunneling, packet mirroring, etc.  This module has multiple match-action stages to fulfill its tasks. Our (tag, port)-to-priority mapping function is implemented as one match-action stage here.
+	\item \textbf{Ingress pipeline}: The module to execute packet processing tasks before a packet enters switch buffer. These tasks include packet header parsing, L2/L3 lookup, ingress ACL processing, etc.  This module has multiple match-action stages to fulfill its tasks. Our \sysname{} is implemented here.
 	
-	\item \textbf{Buffer management module}: The module to manage the switch buffer. This module has m ingress queues and m egress queues. Assuming the switch has n ports and supports k priority classes. Each port has k corresponding ingress queues and k corresponding egress queues to buffer packets of k priority classes. It is easy to know m = n*k. In the module, there is also a scheduler to forward packets to egress queues based on the packet metadata calculated at ingress pipeline.
+	\item \textbf{Buffer management module}: The module to manage switch buffer. This module has k ingress queues and k egress queues. The $i^{th}$ queue is corresponding to the $i^{th}$ priority class. Every ingress queue has n subqueues to buffer packets from different input ports. Similarly, every egress queue buffers packets destined for different output ports with n separate subqueues.
 	
-	This module maintains separate counters to track the length of each ingress queue and each egress queue (denoted as ingress counter and egress counter). The ingress counter increases when a packet enters the ingress queue, and decreases when a packet leaves the switch buffer. Egress counter works similarly. Note that when a packet is forwarded to an egress queue from some ingress queue, the corresponding ingress counter will not decrease at this stage as this packet still remains in the switch buffer.
+	Separate counters are used to track the queue length of each ingress subqueue and each egress subqueue. The ingress counter increases when a packet enters the ingress queue, and decreases when a packet leaves the switch buffer. Egress counter works similarly. 
 	
-	\item \textbf{Egress pipeline}: The module to execute packet processing tasks after a packet leaves switch buffer. This module also has multiple match-action stages to do tasks such as egress ACL processing, packet tunneling and packet mirroring. Our (tag, port)-to-newtag mapping function is implemented as one match-action stage here.
+	%Note that when a packet is forwarded to an egress queue from some ingress queue, the corresponding ingress counter will not decrease as this packet still remains in the switch buffer.
 	
-	\item \textbf{PFC engine}: The module to perform PFC function. If the switch receives a PFC PAUSE frame at some output port on some specific priority class, this module will pause the corresponding egress queue immediately. If the occupancy of some ingress queue exceeds the PFC threshold, this module will trigger the corresponding input port to send a PFC PAUSE frame to pause the upstream device on the corresponding priority. 
+	\item \textbf{PFC engine}: The module to perform PFC function. If the switch receives a PFC PAUSE frame on priority class $i$ at some output port, this module will pause $i^{th}$ subqueue of the corresponding egress queue. If the occupancy of some ingress subqueue exceeds the PFC threshold, this module will trigger the corresponding input port to send a PFC PAUSE frame to pause the upstream device on the corresponding priority. 
 
 \end{itemize}
 
 
-\subsection{ACL Rules for Tag Handling}\label{subsec:acl}
+\subsection{\sysname{} Module}\label{subsec:acl}
 
-To ensure packets enter the correct lossless space at each hop, our solution requires the switch to classify packets into different priority classes based on  (port, tag) information. This can be done by installing some ACL rules at the ingress pipeline. As shown in Fig.~\ref{fig:switchmodel}, these rules will match the port $\#$ and value of tag, and assign packets to different priority calsses accordingly.
-
-To optimize the number of priorities needed for Clos and BCube topologies, we need to support flexible manipulation of tag value.  This can be done by installing some ACL rules at the egress pipeline. As shown in Fig.~\ref{fig:switchmodel}, these rules will calculate a new tag value for any outgoing packet based on the port $\#$ and old tag value, so the vaue of tag can be updated at each hop.
-
-\subsection{Transition of Lossless Queue}\label{subsec:change_priority}
-
-\begin{figure}[t]
-	%\vspace{-0.1in}
+\begin{figure}
+	\hspace{-0.2in}
 	\centering
-	
-	\subfloat[short for lof][Ingress priority = 1, egress priority = 1 $\rightarrow$ packet drop.] {
-		\includegraphics[width=0.43\textwidth] {figs/queuetransition_1}
-	}
-
-	\vspace{-0.15in}
-	\subfloat[short for lof][Ingress priority = 2, egress priority = 2 $\rightarrow$ packet drop.]{
-		\includegraphics[width=0.43\textwidth] {figs/queuetransition_2}
-	}
-
-	\vspace{-0.15in}
-	\subfloat[short for lof][Ingress priority = 1, egress priority = 2 $\rightarrow$ no drop.]{
-		\includegraphics[width=0.43\textwidth] {figs/queuetransition_3}
-	}
-	
-	
-	\caption{Decoupling ingress priority from egress priority is necessary for ensuring a lossless network.}\label{fig:queuetransition}
+	\includegraphics[width=0.5\textwidth] {figs/tagger}
+	\caption{Tagger module.}\label{fig:tagger}
 	
 \end{figure}
 
-Current PFC mechanism cannot prevent packet loss in some cases when packets change their priority classes along the path. An example can be found in Fig.~\ref{fig:queuetransition}.  \textcolor{red}{More description about this example will be added later.}
+ To build a tagging system for guaranteeing deadlock-free, we need to perform two operations at every hop in the network, i.e.,  {\em tag-based priority queueing} and {\em tag rewriting}. As shown in Figure~\ref{fig:tagger}, these two operations are implemented using a 3-step match-action pipelines. 
+ 
+ In the first step, \sysname{} classifies packets into corresponding ingress queues based on the value of tags. In the second step, \sysname{} rewrites the value of tag based on (tag, inport, outport) information. The first two steps enforce the tagged graph $G$ our algorithm generates. 
+ 
+ 
+  \begin{figure}[t]
+ 	%\vspace{-0.1in}
+ 	\centering
+ 	
+ 	\subfloat[short for lof][Ingress priority = egress priority  $\rightarrow$ packet drop.] {
+ 		\includegraphics[width=0.43\textwidth] {figs/prioritydecoupling_1}
+ 	}
+ 	
+ 	\subfloat[short for lof][Ingress priority = 1, egress priority = 2 $\rightarrow$ no drop.]{
+ 		\includegraphics[width=0.43\textwidth] {figs/prioritydecoupling_2}
+ 	}
+ 	
+ 	
+ 	\caption{Decoupling ingress priority from egress priority at switch B is necessary for ensuring lossless priority transition.}\label{fig:prioritydecoupling}
+ 	
+ \end{figure}
+ 
+ Note that tagged graph $G$ only defines the mapping between tags and ingress queues. By default, ingress priority is configured to be the same as egress priority for any packet. However, this default configuration may lead to packet loss when priority transition is performed. An example is shown in Figure~\ref{fig:prioritydecoupling}.
+ 
+ In this example, switch B is configured to do priority transition for packets received from switch A and destined for switch C. Packets are mapped to different ingress queues based on the value of tags. 
+ 
+ In Figure~\ref{fig:prioritydecoupling}(a), we let the packets enter egress queue 1 of switch B, such that the ingress priority is equal to the egress priority at switch B. As we can see, this configuration leads to packet loss when ingress queue 2 of switch C becomes congested. This is because the PFC PAUSE from switch C to switch B cannot pause  egress queue 1 of switch B. 
+ 
+ In Figure~\ref{fig:prioritydecoupling}(b), we let the ingress priority to be different from the egress priority at switch B. As we can see, packet loss is avoided when associating the egress queue with the new tag after doing tag rewriting.
+ 
+ Based on the above observation, in the third step, \sysname{} classifies packets into corresponding egress queues based on the value of new tags. This ensures lossless priority transition.
+ 
+ \textbf{\sysname{} Implementation on commodity switches.} We use DSCP filed in the IP header as the tag, because DSCP rewriting is supported by most commodity switches. In the ingress pipeline, since ingress ACL processing is after L2/L3 lookup, we can directly install some ACL rules to do the mapping from (DSCP, inport, outport) to new DSCP (step 2 of \sysname{}).
+ 
+ Broadcom chipset based commodity switches, such as Arista 7060 switch, provides alternative internal variables for maintaining the priority class of a packet. To decouple ingress priority from  egress priority, we configure the switch to use two variables, denoted as ING$\_$PRIO and EG$\_$PRIO, to associated with ingress queue and egress queue, respectively. Then in the ingress pipeline, we install some ACL rules to calculate ING$\_$PRIO based on old DSCP value (step 1 of \sysname{}), and calculate EG$\_$PRIO based on new DSCP value (step 3 of \sysname{}).
+  
 
-As shown in Fig.~\ref{fig:queuetransition}(c), if we want a switch to pause its upstream device correctly, for packets of the same flow, the egress queue at last hop and the ingress queue at current hop must be of the same priority class. This means that we need to decouple ingress priority from egress priority in our implementation. 
+%\begin{figure}[t]
+%	%\vspace{-0.1in}
+%	\centering
+%	
+%	\subfloat[short for lof][]{
+%		\includegraphics[width=0.43\textwidth] {figs/taggerdemon}
+%	}
+%	
+%	\caption{Demonstration of \sysname{} implementation.}\label{fig:tagger_demon}
+%\end{figure}
+%
+%
+% \textbf{\sysname{} demonstration.} 
 
-Then how to do this? We notice that Broadcom chipset based commodity switches, such as Arista 7060 switch, have alternative variables that can be used to decide the priority class of a packet inside the buffer management module. In normal case, only 1 variable will be used, and ingress priority is always the same as egress priority.
 
-We configure the switch to use different variables, denoted as ING$\_$PRIO and EG$\_$PRIO, to decide ingress priority and egress priority separately.   To set correct value for both NG$\_$PRIO and EG$\_$PRIO, we install some ACL rules at the ingress pipeline to  associate ING$\_$PRIO and EG$\_$PRIO  with (port, tag) information. These rules establish separate mappings from (port, tag) to ingress priority and egress priority, respectively.
+%\subsection{Lossless Priority Transition}\label{subsec:change_priority}
+%
+%
+%Current PFC mechanism cannot prevent packet loss in some cases when packets change their priority classes along the path. An example can be found in Fig.~\ref{fig:queuetransition}.  \textcolor{red}{More description about this example will be added later.}
+%
+%As shown in Fig.~\ref{fig:queuetransition}(c), if we want a switch to pause its upstream device correctly, for packets of the same flow, the egress queue at last hop and the ingress queue at current hop must be of the same priority class. This means that we need to decouple ingress priority from egress priority in our implementation. 
+%
+%Then how to do this? We notice that Broadcom chipset based commodity switches, such as Arista 7060 switch, have alternative variables that can be used to decide the priority class of a packet inside the buffer management module. In normal case, only 1 variable will be used, and ingress priority is always the same as egress priority.
+%
+%We configure the switch to use different variables, denoted as ING$\_$PRIO and EG$\_$PRIO, to decide ingress priority and egress priority separately.   To set correct value for both NG$\_$PRIO and EG$\_$PRIO, we install some ACL rules at the ingress pipeline to  associate ING$\_$PRIO and EG$\_$PRIO  with (port, tag) information. These rules establish separate mappings from (port, tag) to ingress priority and egress priority, respectively.
+%
+
+%To ensure packets enter the correct lossless space at each hop, our solution requires the switch to classify packets into different priority classes based on  (port, tag) information. This can be done by installing some ACL rules at the ingress pipeline. As shown in Fig.~\ref{fig:switchmodel}, these rules will match the port $\#$ and value of tag, and assign packets to different priority calsses accordingly.
+%
+%To optimize the number of priorities needed for Clos and BCube topologies, we need to support flexible manipulation of tag value.  This can be done by installing some ACL rules at the egress pipeline. As shown in Fig.~\ref{fig:switchmodel}, these rules will calculate a new tag value for any outgoing packet based on the port $\#$ and old tag value, so the vaue of tag can be updated at each hop.
+
+%\item \textbf{Egress pipeline}: The module to execute packet processing tasks after a packet leaves switch buffer. This module also has multiple match-action stages to do tasks such as egress ACL processing, packet tunneling and packet mirroring. Our (tag, port)-to-newtag mapping function is implemented as one match-action stage here.
+
+%	Assuming the switch has n ports and supports k priority classes. Each port has k corresponding ingress queues and k corresponding egress queues to buffer packets of k priority classes. It is easy to know m = n*k. In the module, there is also a scheduler to forward packets to egress queues based on the packet metadata calculated at ingress pipeline.
 
 %As shown in Fig.~\ref{fig:switchmodel}(b), the function of our modified PFC mechanism consists of four parts. 
 
