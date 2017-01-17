@@ -25,13 +25,13 @@ As shown in Fig.~\ref{fig:switchmodel}, our switch model consists of four module
 	
 	\item \textbf{Ingress pipeline}: The module to execute packet processing tasks before a packet enters switch buffer. These tasks include packet header parsing, L2/L3 lookup, ingress ACL processing, etc.  This module has multiple match-action stages to fulfill its tasks. Our \sysname{} is implemented here.
 	
-	\item \textbf{Buffer management module}: The module to manage switch buffer. This module has k ingress queues and k egress queues. The $i^{th}$ queue is corresponding to the $i^{th}$ priority class. Every ingress queue has n subqueues to buffer packets from different input ports. Similarly, every egress queue buffers packets destined for different output ports with n separate subqueues.
+	\item \textbf{Buffer management module}: The module to manage switch buffer. This module has k ingress queues and k egress queues. The $i^{th}$ queue is corresponding to the $i^{th}$ priority class. Every ingress queue has n subqueues to buffer packets from n input ports. Similarly, every egress queue buffers packets destined for different output ports with n separate subqueues.
 	
-	Separate counters are used to track the queue length of each ingress subqueue and each egress subqueue. The ingress counter increases when a packet enters the ingress queue, and decreases when a packet leaves the switch buffer. Egress counter works similarly. 
+	Separate counters are used to track the queue length of each ingress subqueue and each egress subqueue. The ingress counter increases when a packet enters the ingress queue, and decreases when a queued packet leaves the switch buffer. Egress counter works similarly. 
 	
 	%Note that when a packet is forwarded to an egress queue from some ingress queue, the corresponding ingress counter will not decrease as this packet still remains in the switch buffer.
 	
-	\item \textbf{PFC engine}: The module to perform PFC function. If the switch receives a PFC PAUSE frame on priority class $i$ at some output port, this module will pause $i^{th}$ subqueue of the corresponding egress queue. If the occupancy of some ingress subqueue exceeds the PFC threshold, this module will trigger the corresponding input port to send a PFC PAUSE frame to pause the upstream device on the corresponding priority. 
+	\item \textbf{PFC engine}: The module to perform PFC function. If the switch receives a PFC PAUSE frame on priority class $i$ at some output port, this module will pause the $i^{th}$ subqueue of the corresponding egress queue. If the occupancy of some ingress subqueue exceeds the PFC threshold, this module will trigger the corresponding input port to send a PFC PAUSE frame to pause the upstream device on the corresponding priority. 
 
 \end{itemize}
 
@@ -48,7 +48,7 @@ As shown in Fig.~\ref{fig:switchmodel}, our switch model consists of four module
 
  To build a tagging system for guaranteeing deadlock-free, we need to perform two operations at every hop in the network, i.e.,  {\em tag-based priority queueing} and {\em tag rewriting}. As shown in Figure~\ref{fig:tagger}, these two operations are implemented using a 3-step match-action pipelines. 
  
- In the first step, \sysname{} classifies packets into corresponding ingress queues based on the value of tags. In the second step, \sysname{} rewrites the value of tag based on (tag, inport, outport) information. The first two steps enforce the tagged graph $G$ our algorithm generates. 
+ In the first step, \sysname{} classifies packets into corresponding ingress queues based on the value of tags. In the second step, \sysname{} rewrites the value of tag based on (tag, inport, outport) information. The first two steps together enforce the tag hierarchical tree of the target tagging system. 
  
  
   \begin{figure}[t]
@@ -68,7 +68,7 @@ As shown in Fig.~\ref{fig:switchmodel}, our switch model consists of four module
  	
  \end{figure}
  
- Note that tagged graph $G$ only defines the mapping between tags and ingress queues. By default, ingress priority is configured to be the same as egress priority for any packet. However, this default configuration may lead to packet loss when priority transition is performed. An example is shown in Figure~\ref{fig:prioritydecoupling}.
+ Note that the tagged graph $G$ only defines the mapping between tags and ingress queues. The default switch configuration ensures a packet will be forwarded to the egress queue of the same priority class as its ingress queue. However, this default configuration may lead to packet loss when priority transition is performed. An example is shown in Figure~\ref{fig:prioritydecoupling}.
  
  In this example, switch B is configured to do priority transition for packets received from switch A and destined for switch C. Packets are mapped to different ingress queues based on the value of tags. 
  
