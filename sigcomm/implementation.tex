@@ -68,11 +68,11 @@ As shown in Fig.~\ref{fig:switchmodel}, our switch model consists of four module
  	
  \end{figure}
  
- Note that the tagged graph $G$ only defines the mapping between tags and ingress queues. The default switch configuration ensures a packet will be forwarded to the egress queue of the same priority class as its ingress queue. However, this default configuration may lead to packet loss when priority transition is performed. An example is shown in Figure~\ref{fig:prioritydecoupling}.
+ Note that the tagged graph $G$ only defines the mapping between tags and ingress queues. The default switch configuration ensures a packet will be forwarded to the egress queue of the same priority class as its ingress queue. However, this default configuration may lead to packet loss when priority transition is performed. An example is shown in Figure~\ref{fig:prioritydecoupling}. 
  
- In this example, switch B is configured to do priority transition for packets received from switch A and destined for switch C. Packets are mapped to different ingress queues based on the value of tags. 
+ In this example, switch B is configured to do priority transition for packets received from switch A and destined for switch C.
  
- In Figure~\ref{fig:prioritydecoupling}(a), we let the packets enter egress queue 1 of switch B, such that the ingress priority is equal to the egress priority at switch B. As we can see, this configuration leads to packet loss when ingress queue 2 of switch C becomes congested. This is because the PFC PAUSE from switch C to switch B cannot pause  egress queue 1 of switch B. 
+ In Figure~\ref{fig:prioritydecoupling}(a), we consider the default switch configuration. Packets are forwarded to egress queue 1 at switch B. As we can see, this configuration leads to packet loss when ingress queue 2 of switch C becomes congested. This is because the PFC PAUSE from switch C to switch B cannot pause  egress queue 1 of switch B. 
  
  In Figure~\ref{fig:prioritydecoupling}(b), we let the ingress priority to be different from the egress priority at switch B. As we can see, packet loss is avoided when associating the egress queue with the new tag after doing tag rewriting.
  
