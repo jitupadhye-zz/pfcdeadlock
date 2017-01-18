@@ -56,8 +56,9 @@ connected, {\em and} switch $A$ may change a packet's tag from $x$ to $y$ before
 $E$ is the set of all such edges.
 \end{enumerate}
 
-The tags define a partition of the tagged graph, $\{G_k\}$, where $G_k = \{(A_i,
-k) | \forall A, i\}$. Each $G_k$ is mapped to a unique
+The tags define a partition of the tagged graph, $\{G_k\}$, whose nodes are $V(G_k) = \{(A_i,
+k) | \forall A, i\}$ and edges are $E(G_k) = \{v_0 \rightarrow v_1 | \forall v_0, v_1 \in V(G_k) and v_0 \rightarrow v_1 \in E(G)\}$
+Each $G_k$ is mapped to a unique
 lossless priority.  Each node is an ACL rule to match on a tag on an ingress port, and
 assign corresponding lossless queue.  In addition, each edge corresponds 
 to a switch action of setting the tag for the next hop at the egress.
@@ -86,46 +87,64 @@ Such packets are assigned a special tag, and all switches match on this tag and
 assign lossy priority. This rule sits at the bottom of switch egress ACL, acting 
 as a default safeguard that avoids unexpected buffer dependency.
 
-To guarantee deadlock-free, two requirements directly follow the properties described 
-in \S~\ref{subsec:combine}. First, any $G_i$ does {\em not} have a cycle. This is 
-because each edge in $G_i$ is 
+To guarantee deadlock-free, we directly extend the properties described 
+in \S~\ref{subsec:combine} to two requirements of $G(V,E)$. First, any 
+$G_i$ does {\em not} have a cycle. This is because each edge in $G_i$ is 
 essentially a buffer dependency -- whether $A_i$ can dequeue packets depending on whether
 $B_j$ has paused upstream. A cycle in $G_i$ means cyclic buffer dependency.
-Second, There is no lossless route going from $G_i$ to $G_j$ if $i<j$, because
-we enforce the order of micropath subspaces.
+Second, there is no link going from $G_i$ to $G_j$ if $i>j$. 
+This means we enforce the order of $G_i$.
 
 \subsubsection{Proof of deadlock freedom}
 
-\fixme{Need to reword the following.}
+\begin{theorem}
+Any tag system, defined by $G(V,E)$, that satisfies the above two requirements is deadlock-free.
+\end{theorem}
 
-\textbf{Claim:} Any tag system that satisfies the above two requirements is deadlock-free.
+\begin{proof}
+We prove by contradiction. Suppose there exists a tag system,
+whose $G(V,E)$ satisfies the above two requirements, but is not deadlock-free. This means
+$G(V,E)$ has a cycle $v_0 \rightarrow v_1 \rightarrow ... \rightarrow v_0$. With certain 
+traffic that covers all hops in the circle, the cycle turns into a CBD and can form deadlock.
 
-\textbf{Proof sketch:} We prove by contradiction. Suppose we can find a topology and a
-set of lossless routes, for which there exists a subspace partition and priority
-transition that satisfies the above two requirements, but is not deadlock-free.
-Then, as the tag system is not deadlock-free, we can find a set of micropaths
-that form a CBD. 
+\textbf{Case 1:} All the nodes in the cycle has the same tag $t$. According to
+the first requirement, $G_t$ does {\em not} have a cycle. Contradicted.
 
-\textbf{Case 1:} All these micropaths are in the same subspace. According to
-requirement 2, micropaths within the same subspace do not form CBD.
-Contradicted.
+\textbf{Case 2:} The nodes in the cycle have at least two different tags, $t_0$ and $t_1$.
+Without loss of generality, we assume $t_0 < t_1$, and $v_i$ has tag $t_0$, $v_j$
+has tag $t_1$. Because $v_i$ and $v_j$ belongs to a circle, there must exists 
+a path going from $v_j$ to $v_i$. Since $t_0 < t_1$, there must exist a hop where
+the tag decreases. However, according to the second requirement, such hop cannot
+exist. Contradicted.
 
-\textbf{Case 2:} These micropaths are in different subspaces. We sort these
-micropaths according to the subspaces they belong to, and choose a micropath in
-the smallest subspace. Since these micropaths can form a CBD,  starting from the
-source end of the chosen micropath, we can always find a circular path back to
-the chosen micropath when traversing along these micropaths. 
+Case 1 and Case 2 cover all possible scenarios. Thus, we conclude that there does not 
+exist a $G(V,E)$ that satisfies the two requirements but is not deadlock-free.
+\end{proof}
+
+%\textbf{Proof sketch:} We prove by contradiction. Suppose we can find a topology and a
+%set of lossless routes, for which there exists a subspace partition and priority
+%transition that satisfies the above two requirements, but is not deadlock-free.
+%Then, as the tag system is not deadlock-free, we can find a set of micropaths
+%that form a CBD. 
+
+
+
+%\textbf{Case 2:} These micropaths are in different subspaces. We sort these
+%micropaths according to the subspaces they belong to, and choose a micropath in
+%the smallest subspace. Since these micropaths can form a CBD,  starting from the
+%source end of the chosen micropath, we can always find a circular path back to
+%the chosen micropath when traversing along these micropaths. 
  
-According to requirement 1, once we enter a larger subspace, we can never go
-back. So this circular path should only include micropaths in the smallest
-subspace. But according to requirement 2, micropaths within the same subspace do
-not form a CBD. Hence no circular path can be found within the smallest
-subspace. So this circular path does not exist. Contradicted.
+%According to requirement 1, once we enter a larger subspace, we can never go
+%back. So this circular path should only include micropaths in the smallest
+%subspace. But according to requirement 2, micropaths within the same subspace do
+%not form a CBD. Hence no circular path can be found within the smallest
+%subspace. So this circular path does not exist. Contradicted.
  
-Thus, we conclude that there do not exist a set of micropaths that form a CBD.
-This contradicts the supposition that the tag system is not deadlock-free.
-Hence, any tag system that satisfies the above two requirements is
-deadlock-free.
+%Thus, we conclude that there do not exist a set of micropaths that form a CBD.
+%This contradicts the supposition that the tag system is not deadlock-free.
+%Hence, any tag system that satisfies the above two requirements is
+%deadlock-free.
 
 
 \subsection{Step 1: Deadlock-free Tags} 
@@ -153,13 +172,12 @@ Algorithm~\ref{alg:ttl}.
 	\KwOut{A tagged graph $G(V, E)$}
 	$V \gets Set()$\;
 	$E \gets Set()$\; 
-	$maxTag \gets$ longestPath($R$)+1\;
 	\For{each path $r$ in $R$} {
-		$tag \gets maxTag$\;
+		$tag \gets 0$\;
 		\For{each hop $h$ in $r$} {
 			$V \gets V \cup \{(h, tag)\}$\;
 			$E \gets E \cup \{lastHop\rightarrow(h, tag)\}$\;
-			$tag \gets tag-1$\;
+			$tag \gets tag+1$\;
 		}
 	}
 	\Return{$G(V, E)$}\;
@@ -192,8 +210,9 @@ expression in our framwork, and will further optimize it in the next section.}
 
 \para{The counter-part in the Clos version.} To ease the comparison, we show the tagging
 scheme of Clos in Algorithm~\ref{alg:clos}. The only difference is where the tag
-is updated, and is due to the fact that we have more knowledge of Clos, a structured topology.
-Algorithm~\ref{alg:clos} already includes the idea of combining tags (\S\ref{subsec:combine}). 
+is updated. It is due to the fact that we have more knowledge of Clos, a structured topology.
+Algorithm~\ref{alg:clos} already includes the idea of combining tags (\S\ref{subsec:combine}),
+so the algorithm in the next section will not further optimize the output.
 
 \begin{algorithm}
 	\small
@@ -274,7 +293,7 @@ property will still hold after combination.
 	\KwOut{A new tagged graph $G'(V', E')$ that has small $|\{G'_k\}|$}
 	Initialize $V'$, $E'$, $V_{tmp}$, $E_{tmp}$ as empty $Set()$\;
 	$t' \gets 0$\;
-	\For{$t \gets maxTag$ \textbf{down to} $minTag$} {
+	\For{$t \gets 0$ \textbf{to} $maxTag$} {
 		\For{each $(A_i, t)$ in $V$ whose tag is $t$} {
 			$V_{tmp} \gets V_{tmp} \cup \{(A_i, t')\}$\;
 			$E_{tmp} \gets E_{tmp} \cup \{$edges of $(A_i, t)$, change $t$ to $t'\}$\;
@@ -327,11 +346,11 @@ os switches $S$, and $|E_{tmp}|$ is bounded by the number of links, $L$, in the 
 Therefore, the total runtime complexity is $O(S \times T \times (S+L))$.
 
 \para{The output number of tags.} Algorithm~\ref{alg:greedy} significantly 
-reduces the number of tags on topology other than Clos. \fixme{For example, we 
+reduces the number of tags on topology other than Clos. For example, we 
 have tested it on BCube topology without any special design for BCube. It gives the optimal 
 result -- a $k$-level BCube needs $k$ tags for {\em one} lossless application 
 class. In addition, we test unstructure topology like Jellyfish. The result is still promising.
-Jellyfish with 1000 nodes require only X tags. Details are in \S\ref{sec:eval}.}
+\fixme{Jellyfish with 1000 nodes require only X tags. Details are in \S\ref{sec:eval}.}
 
 \begin{figure}[t]
 	%\vspace{-0.1in}
@@ -360,7 +379,7 @@ characteristics of structured topology like Clos.
 %as described in Section~\ref{sec:clos}.
 
 \para{Higher bound.} Though Algorithm~\ref{alg:greedy} does not guarantee optimal result, 
-it has a good bound of the tags in practice. Without any assumptions, the worst case 
+it has a higher bound of the tags. Without any assumptions, the worst case 
 is the same as using the brute-force solution, which require as many tags as the length of 
 longest lossless route, $T$. However, if we know that the smallest cycle in lossless routes
 is longer than $l$, the output number of tags is bounded by $\lceil T/l \rceil$. The proof
@@ -368,5 +387,16 @@ can be directly obtained from the greedy algorithm process, and is omitted for b
 
 \subsection{Tag Reusing}
 
-\fixme{Not sure whether we need this section. Maybe a short paragraph explaining why
-the tag reusing still works on generic topology?}
+The tag reusing for generic topology remains mostly the same as the Clos version.
+The first lossless class starts with tag 0. The second lossless class starts with 
+tag 1. For all tag changing rules that are for first class, {\em e.g.,} 
+$(A_i, x)\rightarrow(B_j, y)$, we install another rule handling the second class,
+{\em i.e.,} $(A_i, x+1)\rightarrow(B_j, y+1)$. This goes on to more lossless classes.
+
+For Clos version, we prove that there is no deadlock even after the traffic mix among
+different classes. However, with the output of Algorithm~\ref{alg:greedy}, the traffic
+of differenct classes does {\em not} even mix on the same link with the same tag!
+This is because, whenever the packets of class $m$ switch to tag $n$,  the packets of
+class $m+1$ will switch to $n+1$. Therefore, $G_n$ of class $m$ and $G_n$ of class $m+1$
+remain disconnected and cannot create a cycle.
+
