@@ -78,26 +78,33 @@ As shown in Fig.~\ref{fig:switchmodel}, our switch model consists of four module
  
  Based on the above observation, in the third step, \sysname{} classifies packets into corresponding egress queues based on the value of new tags. This ensures lossless priority transition.
  
- \textbf{\sysname{} Implementation on commodity switches.} We use DSCP filed in the IP header as the tag, because DSCP rewriting is supported by most commodity switches. In the ingress pipeline, since ingress ACL processing is after L2/L3 lookup, we can directly install some ACL rules to do the mapping from (DSCP, inport, outport) to new DSCP (step 2 of \sysname{}).
+ \textbf{\sysname{} Implementation on commodity switches.} We use DSCP field in IP header as the tag, as DSCP rewriting is supported by most commodity switches. In the ingress pipeline, since ingress ACL processing is after L2/L3 lookup, we can directly install some ACL rules to do the mapping from (DSCP, inport, outport) to new DSCP (step 2 of \sysname{}).
  
  Broadcom chipset based commodity switches, such as Arista 7060 switch, provides alternative internal variables for maintaining the priority class of a packet. To decouple ingress priority from  egress priority, we configure the switch to use two variables, denoted as ING$\_$PRIO and EG$\_$PRIO, to associated with ingress queue and egress queue, respectively. Then in the ingress pipeline, we install some ACL rules to calculate ING$\_$PRIO based on old DSCP value (step 1 of \sysname{}), and calculate EG$\_$PRIO based on new DSCP value (step 3 of \sysname{}).
   
 
-%\begin{figure}[t]
-%	%\vspace{-0.1in}
-%	\centering
-%	
-%	\subfloat[short for lof][]{
-%		\includegraphics[width=0.43\textwidth] {figs/taggerdemon}
-%	}
-%	
-%	\caption{Demonstration of \sysname{} implementation.}\label{fig:tagger_demon}
-%\end{figure}
-%
-%
-% \textbf{\sysname{} demonstration.} 
+\begin{figure}[t]
+	%\vspace{-0.1in}
+	\centering
+	
+	\subfloat[short for lof][Experiment scenario.]{
+		\includegraphics[width=0.25\textwidth] {figs/demon_scenario}
+	}
+	\subfloat[short for lof][Rate of flow 1 and flow 2.]{
+	\includegraphics[width=0.25\textwidth] {figs/demon_flowrate}
+}
+	
+	\caption{A simple experiment to demonstrate  \sysname{} implementation.}\label{fig:tagger_demon}
+\end{figure}
 
 
+ \textbf{\sysname{} demonstration.}  We did a simple experiment in our testbed to demonstrate the function of \sysname{}. In this experiment, as shown in Figure~\ref{fig:tagger_demon}(a), we generate two flows, flow 1 and flow 2, to send packets to C from different source servers A and B. Initially, packets of both flows are encoded with ``1'' tags. At switch S, we install some rules in the \sysname{} module to handle packets of these two flows separately. 
+ 
+ In the first step, packets carrying ``1'' tags are mapped to ingress queue 1. In the second step, tag rewriting are done based on the (tag, inport, outport) information. Packets of flow 1 are assigned a new tag ``2''. In the third step, packets are mapped to corresponding egress queues based on the new tags.
+ 
+At time = 17s, we let C to continuously send forged PFC PAUSE frames on priority 2 to switch S. The rate of both flows is plotted in Figure~\ref{fig:tagger_demon}(b) (link capacity = 40Gbps). As we can see,  after priority 2 is paused, rate of flow 1 is reduced to 0 while flow 2 gets all the available bandwidth. 
+
+We also checked the internal counters of switch S, and confirmed two things: 1) no packet gets dropped at switch S; 2) PFC PAUSE  frame propagates correctly as we observed that switch S sends PFC PAUSE frames on priority 1 to A.
 %\subsection{Lossless Priority Transition}\label{subsec:change_priority}
 %
 %
