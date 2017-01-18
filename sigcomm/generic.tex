@@ -385,9 +385,10 @@ longest lossless route, $T$. However, if we know that the smallest cycle in loss
 is longer than $l$, the output number of tags is bounded by $\lceil T/l \rceil$. The proof
 can be directly obtained from the greedy algorithm process, and is omitted for brevity.
 
-\subsection{Tag Reusing}
+\subsection{Step 3: Tag Reusing}
 
-The tag reusing for generic topology remains mostly the same as the Clos version.
+When handling multiple lossless application classes, the tag reusing for generic topology 
+remains mostly the same as the Clos-version Tagger.
 The first lossless class starts with tag 0. The second lossless class starts with 
 tag 1. For all tag changing rules that are for first class, {\em e.g.,} 
 $(A_i, x)\rightarrow(B_j, y)$, we install another rule handling the second class,
