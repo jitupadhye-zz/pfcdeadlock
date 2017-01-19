@@ -8,9 +8,10 @@ routing\footnote{Clos routing can be implemented by BGP (Microsoft, Facebook) or
 by customized routing protocol (Google).}.  Before delving into the details, we
 define the following terms.
 
-\para{Lossless routes:} The input to \sysname{}. It is a set of packet paths
+\para{Expected Lossless routes:} The input to \sysname{}. It is a set of packet paths
 that network operators require to be lossless. For example, in he Clos network,
-the operator may say that all up-down paths are lossless.
+the operator may want that all up-down paths are lossless. In the rest of the
+section, we refer to these routes simply as lossless routes.
 
 \para{Lossless class:} A lossless class is a service that we provide for
 applications.  Network guarantees that packets in a lossless class will not drop
@@ -18,16 +19,16 @@ on lossless routes.
 
 \para{Tag:} Tag is a small integer assigned / associated with a packet. The tag
 is embedded in a packet. A packet belonging to one lossless class may change its
-tag value, which means that a lossless class may have multiple tag values. Tags
-can be implemented using TTL or special DSCP values.
+tag value, which means that a lossless class may have multiple tag values.
 
-\para{Switch model:} A switch is composed of multiple ports.  Per port, there
-are limited number of separated ingress queues and egress queues.  Switch
-classifies packets into queues based on {\em tags}.  Each queue can be lossless
-or lossy, depending on whether PFC is enabled for that priority.  All packets
-are put into a lossy queue unless there are whitelist rules that classify
-specific packets into lossless queues. Lossless ingress queues can trigger PFC,
-while lossless egress queues react to PFC from the next hop.
+\para{Switch model:} We use the following simple logical model in this section.
+A switch has multiple ports. Each port has several (upto 8) lossless ingress
+queues associated with it, and one lossy queue\footnote{Typically, there is just
+one shared buffer and ``queues'' are just counters and linked lists.}.  The
+queue number corresponds to the PFC priority.  Switch classifies arriving
+packets into queues based on {\em tags}. Typically, each tag maps to a single
+priority value. If a tag does not match any priority value, it is added to a
+lossy queue. 
 
 \subsection{Tagging on Bounce}\label{subsec:tag}
 
