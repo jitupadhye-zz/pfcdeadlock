@@ -401,3 +401,74 @@ This is because, whenever the packets of class $m$ switch to tag $n$,  the packe
 class $m+1$ will switch to $n+1$. Therefore, $G_n$ of class $m$ and $G_n$ of class $m+1$
 remain disconnected and cannot create a cycle.
 
+
+
+\subsection{Idea 3: Reusing Tags and Lossless Queues}\label{subsec:reusing}
+
+The prior ideas have been focusing on supporting single lossless application class. 
+However, multiple lossless classes impose bigger challenge on the number of priority queues.
+
+Assuming the operators want to make all paths with no more than $M$ bounces lossless, 
+and there are $N$ different lossless application classes. The most straightforward
+way is to assign totally different tags for each lossless class. Each class must have 
+$M+1$ different tags. In total, it requires $(M+1) \times N$ tags and lossless queues.
+Based on the calcualtion in \S\ref{subsec:pfcheadroom}, we can only support \fixme{one}
+lossless class assuming $M=1$.
+
+Our idea is to reuse tags and lossless queues across different lossless application classes.
+It works as follows. We start the first lossless class with tag 1, and uses tag upto $M+1$
+as described in prior section.
+The second lossless class starts with tag 2, and change tags in the same way as the first class.
+That is, whenever it has a bounce, the tag will increase by one. The second lossless class
+uses tag from 2 to $M+2$. This goes on until the $N'th$ lossless class. The total number of tags
+and lossless classes requried is $M + N$.
+
+Reusing tags and queues means the traffic from different classes may mix in some cases.
+For example, the second lossless class's ``normal'' traffic may mix with the first 
+class's ``one-bounce'' traffic.
+We can prove that there is still no deadlock after such mix, by revisiting Tagger's two
+properties described in the prior section. First, there is still no deadlock within each tag, 
+because each tag is still a set of ``up-down'' routing. Second, the update of tags is still
+monotonical. Thus, deadlock-free still holds.
+
+\para{Trade-off.} The mix of traffic also means a trade-off: we weaken the isolation between two application 
+lossless classes. This is usually acceptable for Clos topology in practice. As \S\ref{sec:reroute}
+shows, only a small fraction of packets experience one-bounce and may mix with traffic
+in the next lossless class.
+
+\para{Further reduce tags at the cost of some classes.} If the operators allow some classes
+to tolerate less bounces, the number of lossless queues can be further reduced. For example,
+Two lossless queues can support {\em two} lossless application classes, if the second class
+does not need to guarantee lossless for one-bounce traffic.
+
+%the second class supports one less bounce, the third class supports two less, and so on.
+%Under fixed constraints on the number of priorities on switches, how many application classes run in parallel?
+%we leave the choice to operators. In practice, we run two application classes with two priority 
+%queues on switch. The second class is still lossless for most of the time, as numbers in 
+%Section~\ref{sec:reroute} show.
+
+%\subsection{Idea 3: Lossless Classes Reusing Tags}
+
+%Above tagging system allows us to run $k$ application classes with $k$ lossless priorities. 
+
+%The trade-off is that the second class supports one less bounce, the third class supports two less, and so on.
+%Under fixed constraints on the number of priorities on switches, how many application classes run in parallel?
+%we leave the choice to operators. In practice, we run two application classes with two priority 
+%queues on switch. The second class is still lossless for most of the time, as numbers in 
+%Section~\ref{sec:reroute} show.
+
+
+%On the other hand, the generic algorithm cannot support this at all. The problem is the lossless routing will 
+%become disconnected if any one priority (a micropath segment) is missing. Therefore, when the 
+%second application class starts with tag 1, the traffic between at least some hosts becomes 
+%{\em always} lossy.
+
+%Adding the priority reuse, $k$ lossless application classes can run in parallel at the cost that $i^{th}$ class only supports $k-i+1$ times bouncing.
+
+
+
+
+
+
+
+
