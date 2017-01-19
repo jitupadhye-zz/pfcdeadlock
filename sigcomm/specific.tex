@@ -22,7 +22,7 @@ is embedded in a packet. A packet belonging to one lossless class may change its
 tag value, which means that a lossless class may have multiple tag values.
 
 \para{Switch model:} We use the following simple logical model in this section.
-A switch has multiple ports. Each port has several (upto 8) lossless ingress
+A switch has multiple ports. Each port has several (upto 7) lossless 
 queues associated with it, and one lossy queue\footnote{Typically, there is just
 one shared buffer and ``queues'' are just counters and linked lists.}.  The
 queue number corresponds to the PFC priority.  Switch classifies arriving
@@ -64,7 +64,7 @@ the up-down routes in a lossy queue -- i.e. assign them a priority value that is
 not associated with a lossless class.  
 
 Note that being assigned to lossy priority does not mean that the packets are
-dropped -- they are dropped only if they arrive at an ingress queue that is
+dropped -- they are dropped only if they arrive at an queue that is
 full. However, these packets will not trigger PFC. Since the basic up-down paths
 are deadlock free, and the bounced packets do not trigger PFC, the network will
 stay deadlock free even if packets bounce.
